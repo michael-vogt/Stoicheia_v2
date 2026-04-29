@@ -101,15 +101,17 @@ void UpdateGuard::flush() {
     }
 
     pending.clear();
+    flushing = true;
     for (GeoObject* obj : order) {
         if (obj->isValid()) {
             obj->recompute();
         }
     }
+    flushing = false;
 }
 
 bool UpdateGuard::isActive() {
-    return depth > 0;
+    return depth > 0 || flushing;
 }
 
 bool UpdateGuard::isPending(GeoObject* obj) {

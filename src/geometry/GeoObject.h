@@ -19,7 +19,7 @@ protected:
     void notifyDirect();
     void enqueueTransitive() const;
 public:
-    virtual ~GeoObject() = default;
+    virtual ~GeoObject();
     void addDependent(GeoObject* dep);
     void removeDependent(GeoObject* dep);
     void detach();

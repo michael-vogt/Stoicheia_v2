@@ -2,6 +2,10 @@
 
 #include "UpdateGuard.h"
 
+GeoObject::~GeoObject() {
+    detach();
+}
+
 void GeoObject::addDependent(GeoObject *dep) {
     if (dep == nullptr) return;
     m_dependents.insert(dep);
@@ -17,6 +21,7 @@ void GeoObject::removeDependent(GeoObject *dep) {
 // cut connections - for Scene::remove()
 void GeoObject::detach() {
     updateGuardDequeue(this);
+
     for (GeoObject* src : m_sources) {
         src->m_dependents.erase(this);
     }
