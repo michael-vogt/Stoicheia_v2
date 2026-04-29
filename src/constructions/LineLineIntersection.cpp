@@ -13,6 +13,17 @@ void LineLineIntersection::compute() {
         setResults(0);
         return;
     }
+
+    auto [a1, b1, c1] = m_line1->parameters();
+    auto [a2, b2, c2] = m_line2->parameters();
+
+    const double det = a1 * b2 - b1 * a2;
+    if (std::abs(det) < 1e-10) {
+        setResults(0);
+        return;
+    }
+
+    setResults(1, (b1 * c2 - c1 * b2) / det, (c1 * a2 - a1 * c2) / det);
 }
 
 void LineLineIntersection::onSourceRemoved(GeoObject *src) {
