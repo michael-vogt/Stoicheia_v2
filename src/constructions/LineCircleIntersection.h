@@ -4,14 +4,14 @@
 
 
 class LineCircleIntersection : public IntersectionSet {
-    Line* m_line = nullptr;
+    LinearObject* m_line = nullptr;
     Circle* m_circle = nullptr;
 
 protected:
     void compute() override;
 
 public:
-    LineCircleIntersection(Line* line, Circle* circle);
+    LineCircleIntersection(LinearObject* line, Circle* circle);
     void onSourceRemoved(GeoObject *src) override;
 };
 

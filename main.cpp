@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "src/geometry/Line.h"
+#include "geometry/Line.h"
+#include "src/geometry/LinearObject.h"
 #include "src/geometry/Point.h"
 #include "src/geometry/Scene.h"
 

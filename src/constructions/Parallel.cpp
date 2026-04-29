@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-Parallel::Parallel(Point *origin, Line *reference)
+Parallel::Parallel(Point *origin, LinearObject *reference)
 : m_origin(origin), m_reference(reference), m_phantom(origin->x(), origin->y()), m_line(&m_phantom, origin)
 {
     if (m_origin == nullptr || m_reference == nullptr)
@@ -22,7 +22,7 @@ double Parallel::dy() const {
     return p2->y() - p1->y();
 }
 
-Line *Parallel::line() {
+LinearObject *Parallel::line() {
     return &m_line;
 }
 

@@ -1,6 +1,6 @@
 #include "LineLineIntersection.h"
 
-LineLineIntersection::LineLineIntersection(Line *line1, Line *line2) : m_line1(line1), m_line2(line2) {
+LineLineIntersection::LineLineIntersection(LinearObject *line1, LinearObject *line2) : m_line1(line1), m_line2(line2) {
     if (m_line1 == nullptr || m_line2 == nullptr)
         throw std::invalid_argument("null line");
     m_line1->addDependent(this);

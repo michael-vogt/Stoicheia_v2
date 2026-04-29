@@ -4,14 +4,14 @@
 #include "IntersectionSet.h"
 
 class LineLineIntersection : public IntersectionSet {
-    Line* m_line1;
-    Line* m_line2;
+    LinearObject* m_line1;
+    LinearObject* m_line2;
 
 protected:
     void compute() override;
 
 public:
-    LineLineIntersection(Line* line1, Line* line2);
+    LineLineIntersection(LinearObject* line1, LinearObject* line2);
     void onSourceRemoved(GeoObject *src) override;
 
 };

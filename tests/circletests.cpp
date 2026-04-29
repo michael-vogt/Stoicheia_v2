@@ -270,9 +270,9 @@ TEST(ChainedCircleTest, LineCircleIntersectionUsedAsPoint) {
 
     // Neue Linie von first() nach center
     Line L2(S.first(), &center);
-    EXPECT_NEAR(L2.getLength(), 5.0, EPS);
+    EXPECT_NEAR(L2.length(), 5.0, EPS);
 
     // Kreis wächst → L2 wird länger
     rp.moveTo(10, 0);
-    EXPECT_NEAR(L2.getLength(), 10.0, EPS);
+    EXPECT_NEAR(L2.length(), 10.0, EPS);
 }

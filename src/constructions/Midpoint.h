@@ -1,6 +1,6 @@
 #ifndef STOICHEIA_MIDPOINT_H
 #define STOICHEIA_MIDPOINT_H
-#include "geometry/Line.h"
+#include "geometry/LinearObject.h"
 #include "geometry/Point.h"
 
 
@@ -11,7 +11,7 @@ class Midpoint : public Point {
 public:
     Midpoint(Point *a, Point *b);
 
-    explicit Midpoint(const Line* line);
+    explicit Midpoint(const LinearObject* line);
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;

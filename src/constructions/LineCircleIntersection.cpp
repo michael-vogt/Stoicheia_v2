@@ -2,7 +2,7 @@
 
 #include <complex>
 
-LineCircleIntersection::LineCircleIntersection(Line *line, Circle *circle) : m_line(line), m_circle(circle) {
+LineCircleIntersection::LineCircleIntersection(LinearObject *line, Circle *circle) : m_line(line), m_circle(circle) {
     if (m_line == nullptr || m_circle == nullptr)
         throw std::invalid_argument("null argument");
     m_line->addDependent(this);

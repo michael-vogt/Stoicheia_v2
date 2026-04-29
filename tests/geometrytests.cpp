@@ -43,31 +43,31 @@ TEST(PointTest, NegativeCoordinates) {
 TEST(LineTest, LengthOnCreation) {
     Point p1(0, 0), p2(3, 4);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 5.0, EPS);
+    EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 TEST(LineTest, LengthHorizontal) {
     Point p1(0, 0), p2(10, 0);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 10.0, EPS);
+    EXPECT_NEAR(L.length(), 10.0, EPS);
 }
 
 TEST(LineTest, LengthVertical) {
     Point p1(0, 0), p2(0, 7);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 7.0, EPS);
+    EXPECT_NEAR(L.length(), 7.0, EPS);
 }
 
 TEST(LineTest, LengthZero) {
     Point p1(3, 3), p2(3, 3);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 0.0, EPS);
+    EXPECT_NEAR(L.length(), 0.0, EPS);
 }
 
 TEST(LineTest, LengthDiagonal) {
     Point p1(1, 1), p2(4, 5);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 5.0, EPS);
+    EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -79,7 +79,7 @@ TEST(PropagationTest, LineUpdatesWhenP2Moves) {
     Line L(&p1, &p2);
 
     p2.moveTo(6, 8);
-    EXPECT_NEAR(L.getLength(), 10.0, EPS);
+    EXPECT_NEAR(L.length(), 10.0, EPS);
 }
 
 TEST(PropagationTest, LineUpdatesWhenP1Moves) {
@@ -87,7 +87,7 @@ TEST(PropagationTest, LineUpdatesWhenP1Moves) {
     Line L(&p1, &p2);
 
     p1.moveTo(2, 0);
-    EXPECT_NEAR(L.getLength(), 3.0, EPS);
+    EXPECT_NEAR(L.length(), 3.0, EPS);
 }
 
 TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
@@ -96,7 +96,7 @@ TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
 
     for (int i = 1; i <= 5; ++i) {
         p2.moveTo(i * 2.0, 0);
-        EXPECT_NEAR(L.getLength(), i * 2.0, EPS);
+        EXPECT_NEAR(L.length(), i * 2.0, EPS);
     }
 }
 
@@ -119,8 +119,8 @@ TEST(PropagationTest, TwoLinesSharePoint) {
     Line L2(&p2, &p3);
 
     p2.moveTo(0, 0);
-    EXPECT_NEAR(L1.getLength(), 0.0, EPS);
-    EXPECT_NEAR(L2.getLength(), 6.0, EPS);
+    EXPECT_NEAR(L1.length(), 0.0, EPS);
+    EXPECT_NEAR(L2.length(), 6.0, EPS);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -152,7 +152,7 @@ TEST(BatchUpdateTest, ResultCorrectAfterBatch) {
         p2.moveTo(3, 4);
     }
 
-    EXPECT_NEAR(L.getLength(), 5.0, EPS);
+    EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 TEST(BatchUpdateTest, NestedGuardsFlushOnce) {
@@ -268,11 +268,11 @@ TEST(SceneTest, AfterRemove_RemainingObjectsStillUpdate) {
 
     // L2: p2=(0,0) → p3=(3,4), Länge = 5
     EXPECT_TRUE(L2->isValid());
-    EXPECT_NEAR(L2->getLength(), 5.0, EPS);
+    EXPECT_NEAR(L2->length(), 5.0, EPS);
 
     // p3 verschieben → L2 aktualisiert sich noch
     p3->moveTo(0.0, 3.0); // p2=(0,0) → p3=(0,3), Länge = 3
-    EXPECT_NEAR(L2->getLength(), 3.0, EPS);
+    EXPECT_NEAR(L2->length(), 3.0, EPS);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -305,22 +305,22 @@ TEST(DetachTest, DetachClearsSourcesAndDependents) {
 TEST(EdgeCaseTest, PointMoveToSamePosition) {
     Point p1(3,4), p2(0,0);
     Line L(&p1, &p2);
-    double before = L.getLength();
+    double before = L.length();
 
     p1.moveTo(3, 4); // keine echte Änderung
-    EXPECT_NEAR(L.getLength(), before, EPS);
+    EXPECT_NEAR(L.length(), before, EPS);
 }
 
 TEST(EdgeCaseTest, LargeCoordinates) {
     Point p1(0, 0), p2(1e9, 0);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 1e9, 1.0);
+    EXPECT_NEAR(L.length(), 1e9, 1.0);
 }
 
 TEST(EdgeCaseTest, NegativeCoordinates) {
     Point p1(-3, -4), p2(0, 0);
     Line L(&p1, &p2);
-    EXPECT_NEAR(L.getLength(), 5.0, EPS);
+    EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 TEST(EdgeCaseTest, MultiplePointsOnSameLine) {
@@ -333,9 +333,9 @@ TEST(EdgeCaseTest, MultiplePointsOnSameLine) {
 
     origin.moveTo(1, 0);
 
-    EXPECT_NEAR(L1.getLength(), 0.0, EPS);
-    EXPECT_NEAR(L2.getLength(), 1.0, EPS);
-    EXPECT_NEAR(L3.getLength(), 2.0, EPS);
+    EXPECT_NEAR(L1.length(), 0.0, EPS);
+    EXPECT_NEAR(L2.length(), 1.0, EPS);
+    EXPECT_NEAR(L3.length(), 2.0, EPS);
 }
 
 TEST(EdgeCaseTest, EmptyGuardFlushIsNoOp) {
