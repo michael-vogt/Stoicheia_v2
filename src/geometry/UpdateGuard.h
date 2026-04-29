@@ -7,11 +7,13 @@
 
 class UpdateGuard {
     static int depth;
+    static bool flushing;
     static std::unordered_set<GeoObject*> pending;
 public:
     UpdateGuard();
     ~UpdateGuard();
     static void enqueue(GeoObject* obj);
+    static void dequeue(GeoObject* obj);
     static void flush();
     static bool isActive();
     static bool isPending(GeoObject* obj);

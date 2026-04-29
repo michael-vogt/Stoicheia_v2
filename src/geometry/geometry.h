@@ -10,6 +10,7 @@
 #include "Ray.h"
 #include "Scene.h"
 #include "Segment.h"
+#include "Triangle.h"
 #include "UpdateGuard.h"
 
 #endif //STOICHEIA_GEOMETRY_H

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
-#include "geometry/geometry.h"
 #include "constructions/constructions.h"
+#include "geometry/UpdateGuard.h"
 
 static constexpr double EPS = 1e-9;
 
@@ -17,8 +17,7 @@ TEST(IntersectionTest, BasicIntersection) {
     Line yAxis(&p3, &p4);
     LineLineIntersection S(&xAxis, &yAxis);
 
-    EXPECT_TRUE(S.first()->isValid());
-    EXPECT_FALSE(S.second()->isValid());
+    EXPECT_TRUE(S.isValid());
     EXPECT_NEAR(S.first()->x(), 0.0, EPS);
     EXPECT_NEAR(S.first()->y(), 0.0, EPS);
 }
@@ -31,8 +30,7 @@ TEST(IntersectionTest, DiagonalLines) {
     Line L2(&p3, &p4);
     LineLineIntersection S(&L1, &L2);
 
-    EXPECT_TRUE(S.first()->isValid());
-    EXPECT_FALSE(S.second()->isValid());
+    EXPECT_TRUE(S.isValid());
     EXPECT_NEAR(S.first()->x(), 1.0, EPS);
     EXPECT_NEAR(S.first()->y(), 1.0, EPS);
 }
@@ -44,8 +42,7 @@ TEST(IntersectionTest, ParallelLinesAreInvalid) {
     Line L2(&p3, &p4);
     LineLineIntersection S(&L1, &L2);
 
-    EXPECT_FALSE(S.first()->isValid());
-    EXPECT_FALSE(S.second()->isValid());
+    EXPECT_FALSE(S.isValid());
 }
 
 TEST(IntersectionTest, UpdatesWhenLinesMoves) {
@@ -70,10 +67,10 @@ TEST(IntersectionTest, BecomesInvalidWhenLinesBecomesParallel) {
     Line L1(&p1, &p2);
     Line L2(&p3, &p4);
     LineLineIntersection S(&L1, &L2);
-    EXPECT_TRUE(S.first()->isValid());
+    EXPECT_TRUE(S.isValid());
 
     p4.moveTo(1, 1); // L2 jetzt auch horizontal → parallel
-    EXPECT_FALSE(S.first()->isValid());
+    EXPECT_FALSE(S.isValid());
 }
 
 // ════════════════════════════════════════════════════════════════════════════

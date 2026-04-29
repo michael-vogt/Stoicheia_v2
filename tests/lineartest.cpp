@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
-#include "geometry/geometry.h"
 #include "constructions/constructions.h"
+#include "geometry/geometry.h"
 
 static constexpr double EPS = 1e-9;
 
@@ -160,4 +160,20 @@ TEST(LinearObjectTest, LineLineIntersectionWithSegments) {
     EXPECT_TRUE(S.first()->isValid());
     EXPECT_NEAR(S.first()->x(), 2.0, EPS);
     EXPECT_NEAR(S.first()->y(), 0.0, EPS);
+}
+
+TEST(LinearObjectTest, TriangleWithSegments) {
+    Point p1(0,0), p2(3,0), p3(0,4);
+    Segment ab(&p1,&p2), bc(&p2,&p3), ca(&p3,&p1);
+    Triangle tri(&ab, &bc, &ca);
+    EXPECT_NEAR(tri.perimeter(), 12.0, EPS);
+}
+
+TEST(LinearObjectTest, TriangleUpdatesTransitively) {
+    Point p1(0,0), p2(3,0), p3(0,4);
+    Segment ab(&p1,&p2), bc(&p2,&p3), ca(&p3,&p1);
+    Triangle tri(&ab, &bc, &ca);
+    p2.moveTo(4, 0); // ab: 4, bc: 5→sqrt(32)≈5.66, ca: 4
+    EXPECT_NEAR(tri.perimeter(),
+        4.0 + std::sqrt(32.0) + 4.0, 1e-6);
 }
