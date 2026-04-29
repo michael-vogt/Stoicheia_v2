@@ -12,8 +12,9 @@ Circle::Circle(Point *center, Point* radiusPoint) : m_center(center), m_radiusPo
 }
 
 Circle::Circle(Point *center, double radius)
-    : m_fixedRadiusPoint(std::make_unique<Point>(
-        center->x() + radius, center->y())), m_center(center)
+    : m_fixedRadius(radius),
+      m_fixedRadiusPoint(std::make_unique<Point>(
+          center->x() + radius, center->y())), m_center(center)
 {
     if (m_center == nullptr)
         throw std::invalid_argument("null point");
@@ -21,11 +22,6 @@ Circle::Circle(Point *center, double radius)
     m_center->addDependent(this);
     Circle::recompute();
 }
-    /*: Circle(center, [&]() -> Point* {
-        m_fixedRadiusPoint = std::make_unique<Point>(
-            center->x() + radius, center->y());
-        return m_fixedRadiusPoint.get();
-    }()) {}*/
 
 Point* Circle::center() const {
     return m_center;
@@ -45,6 +41,10 @@ void Circle::recompute() {
     if (m_center == nullptr || m_radiusPoint == nullptr) {
         m_valid = false;
         return;
+    }
+
+    if (m_fixedRadiusPoint) {
+        m_fixedRadiusPoint->moveTo(m_center->x() + m_fixedRadius, m_center->y());
     }
 
     double dx = m_radiusPoint->x() - m_center->x();

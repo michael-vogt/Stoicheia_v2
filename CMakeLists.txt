@@ -41,25 +41,46 @@ target_link_libraries(Stoicheia PRIVATE StoicheiaLib)
 # GoogleTest
 # ---------------------------
 include(FetchContent)
+set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
-
 # ---------------------------
 # Tests
 # ---------------------------
-file(GLOB TEST_SOURCES tests/*.cpp)
-add_executable(StoicheiaTests ${TEST_SOURCES})
-
-target_link_libraries(StoicheiaTests
-        PRIVATE
-        StoicheiaLib
-        gtest_main
-)
-
 include(GoogleTest)
-gtest_discover_tests(StoicheiaTests)
+enable_testing()
+
+function (add_geo_test target source)
+    add_executable(${target} ${source})
+    target_link_libraries(${target} PRIVATE StoicheiaLib gtest_main)
+    set_target_properties(${target} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+    gtest_discover_tests(${target} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    #gtest_add_tests(TARGET ${target} SOURCES ${source})
+endfunction()
+
+add_geo_test(CircleTest tests/circletests.cpp)
+add_geo_test(ConstructionTest tests/constructiontests.cpp)
+add_geo_test(ExtendedTest tests/extendedtests.cpp)
+add_geo_test(GeometryTest tests/geometrytests.cpp)
+
+file(GLOB ALL_TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
+add_executable(AllTests ${ALL_TEST_SOURCES})
+target_link_libraries(AllTests PRIVATE StoicheiaLib gtest_main)
+gtest_discover_tests(AllTests)
+#add_executable(StoicheiaTests ${TEST_SOURCES})
+
+#target_link_libraries(StoicheiaTests
+#        PRIVATE
+#        StoicheiaLib
+#        gtest_main
+#)
+
+#include(GoogleTest)
+#gtest_discover_tests(StoicheiaTests)
