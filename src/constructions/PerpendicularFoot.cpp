@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-PerpendicularFoot::PerpendicularFoot(Point *point, Line *line) : Point(0, 0), m_point(point), m_line(line) {
+PerpendicularFoot::PerpendicularFoot(Point *point, LinearObject *line) : Point(0, 0), m_point(point), m_line(line) {
     if (m_point == nullptr || m_line == nullptr) throw std::invalid_argument("null argument");
     m_point->addDependent(this);
     m_line->addDependent(this);

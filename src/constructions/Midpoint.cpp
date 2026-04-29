@@ -10,7 +10,7 @@ Midpoint::Midpoint(Point *a, Point *b) : Point(0, 0), m_a(a), m_b(b) {
     Midpoint::recompute();
 }
 
-Midpoint::Midpoint(const Line *line) : Midpoint(line->p1(), line->p2()) {}
+Midpoint::Midpoint(const LinearObject *line) : Midpoint(line->p1(), line->p2()) {}
 
 void Midpoint::onSourceRemoved(GeoObject *src) {
     m_valid = false;

@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-Perpendicular::Perpendicular(Point* origin, Line* reference)
+Perpendicular::Perpendicular(Point* origin, LinearObject* reference)
         : m_origin(origin), m_reference(reference),
           m_phantom(origin->x() + px(), origin->y() + py()),
           m_line(&m_phantom, origin)
@@ -30,7 +30,7 @@ void Perpendicular::onSourceRemoved(GeoObject* src) {
     if (src == static_cast<GeoObject*>(m_reference)) m_reference = nullptr;
 }
 
-Line* Perpendicular::getLine() { return &m_line; }
+LinearObject* Perpendicular::getLine() { return &m_line; }
 
 double Perpendicular::px() const {
     return -(m_reference->p2()->y() - m_reference->p1()->y());
