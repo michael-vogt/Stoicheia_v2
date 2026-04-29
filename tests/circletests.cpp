@@ -22,11 +22,12 @@ TEST(CircleTest, FixedRadius) {
 }
 
 TEST(CircleTest, UpdatesWhenCenterMoves) {
-    Point center(0, 0), rp(1, 0);
-    Circle C(&center, &rp);
-    // Radius bleibt 1, egal wo center ist
-    center.moveTo(5, 5);
-    EXPECT_NEAR(C.radius(), std::sqrt(41), EPS);
+    // Mit Radiuspunkt: Radius = geometrischer Abstand center→rp.
+    // Bewegt sich center, ändert sich auch der Radius.
+    Point center(0, 0), rp(5, 0);
+    Circle C(&center, &rp); // r=5
+    center.moveTo(2, 0);    // rp bleibt bei (5,0), Abstand = 3
+    EXPECT_NEAR(C.radius(), 3.0, EPS);
     EXPECT_EQ(C.center(), &center);
 }
 
@@ -215,22 +216,6 @@ TEST(CircleCircleTest, UpdatesWhenCircleMoves) {
     EXPECT_TRUE(S.first()->isValid());
 }
 
-TEST(LineLineIntersectionTest, UniformAPIWithLineCircle) {
-    Point p1(-2, 0), p2(2, 0);
-    Point p3(0, -1), p4(0, 1);
-    Line L1(&p1, &p2), L2(&p3, &p4);
-    LineLineIntersection S1(&L1, &L2);
-
-    Point center(0, 0), rp(2, 0);
-    Circle C(&center, &rp);
-    LineCircleIntersection S2(&L1, &C);
-
-    Midpoint M(S1.first(), S2.first());
-    EXPECT_TRUE(M.isValid());
-    EXPECT_NEAR(M.x(), -1.0, EPS);
-    EXPECT_NEAR(M.y(), 0.0, EPS);
-}
-
 // ════════════════════════════════════════════════════════════════════════════
 // Chained: IntersectionPoint als Quelle für weitere Konstruktionen
 // ════════════════════════════════════════════════════════════════════════════
@@ -255,9 +240,10 @@ TEST(ChainedCircleTest, MidpointUpdatesTransitively) {
     CircleCircleIntersection S(&C1, &C2);
     Midpoint M(S.first(), S.second());
 
-    // C2 nach (0.5,0) verschieben → neue Schnittpunkte, neuer Mittelpunkt
-    c2.moveTo(0.5, 0); r2.moveTo(1.5, 0);
-    EXPECT_NEAR(M.x(), 0.25, EPS);
+    // C2 nach (0.5, 0) verschieben → d=0.5, neue Schnittpunkte symmetrisch um x=0.25
+    // a = (0.25 + 1 - 1)/(1) = 0.25 → Schnittpunkte bei x=0.25, Mittelpunkt x=0.25
+    c2.moveTo(0.5, 0); r2.moveTo(1.5, 0); // c2=(0.5,0), r2=1
+    EXPECT_NEAR(M.x(), 0.25, 1e-9);
 }
 
 TEST(ChainedCircleTest, LineCircleIntersectionUsedAsPoint) {

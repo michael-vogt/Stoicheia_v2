@@ -27,6 +27,7 @@ add_library(
         src/geometry/Line.cpp
         src/geometry/Ray.cpp
         src/geometry/Segment.cpp
+        src/geometry/Triangle.cpp
 )
 
 target_include_directories(StoicheiaLib PUBLIC
@@ -72,6 +73,7 @@ add_geo_test(CircleTest tests/circletests.cpp)
 add_geo_test(ConstructionTest tests/constructiontests.cpp)
 add_geo_test(ExtendedTest tests/extendedtests.cpp)
 add_geo_test(GeometryTest tests/geometrytests.cpp)
+add_geo_test(LineTest tests/linetest.cpp)
 add_geo_test(LinearTest tests/lineartest.cpp)
 
 file(GLOB ALL_TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)

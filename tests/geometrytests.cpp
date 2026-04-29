@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 #include <cmath>
-
-#include "../src/geometry/Point.h"
-#include "../src/geometry/Line.h"
-#include "../src/geometry/UpdateGuard.h"
-#include "../src/geometry/Scene.h"
+#include "geometry/geometry.h"
 
 static constexpr double EPS = 1e-9;
 
@@ -100,7 +96,7 @@ TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
     }
 }
 
-/*TEST(PropagationTest, TransitivePropagation) {
+TEST(PropagationTest, TransitivePropagation) {
     // P1, P2 → Line → Triangle
     Point p1(0,0), p2(3,0), p3(0,4);
     Line ab(&p1, &p2);
@@ -108,10 +104,10 @@ TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
     Line ca(&p3, &p1);
     Triangle tri(&ab, &bc, &ca);
 
-    double before = tri.getPerimeter();
+    double before = tri.perimeter();
     p2.moveTo(4, 0); // ab becomes length 4
-    EXPECT_GT(tri.getPerimeter(), before);
-}*/
+    EXPECT_GT(tri.perimeter(), before);
+}
 
 TEST(PropagationTest, TwoLinesSharePoint) {
     Point p1(0,0), p2(3,4), p3(6,0);
@@ -174,7 +170,7 @@ TEST(BatchUpdateTest, NestedGuardsFlushOnce) {
     EXPECT_EQ(L.recomputeCount, before + 1);
 }
 
-/*TEST(BatchUpdateTest, TriangleRecomputedOnceWithGuard) {
+TEST(BatchUpdateTest, TriangleRecomputedOnceWithGuard) {
     Point p1(0,0), p2(3,0), p3(0,4);
     Line ab(&p1, &p2), bc(&p2, &p3), ca(&p3, &p1);
     Triangle tri(&ab, &bc, &ca);
@@ -188,7 +184,7 @@ TEST(BatchUpdateTest, NestedGuardsFlushOnce) {
     }
 
     EXPECT_EQ(tri.recomputeCount, before + 1);
-}*/
+}
 
 // ════════════════════════════════════════════════════════════════════════════
 // 5. SCENE – Ownership & remove()
@@ -234,7 +230,7 @@ TEST(SceneTest, RemoveLine_PointsUnaffected) {
     EXPECT_EQ(scene.size(), 2);
 }
 
-/*TEST(SceneTest, RemoveCascade_DeletesDependents) {
+TEST(SceneTest, RemoveCascade_DeletesDependents) {
     Scene scene;
     auto* p1 = scene.create<Point>(0.0, 0.0);
     auto* p2 = scene.create<Point>(3.0, 0.0);
@@ -254,7 +250,7 @@ TEST(SceneTest, RemoveLine_PointsUnaffected) {
 
     // p1, p3, ca verbleiben = 3
     EXPECT_EQ(scene.size(), 3);
-}*/
+}
 
 TEST(SceneTest, AfterRemove_RemainingObjectsStillUpdate) {
     Scene scene;
@@ -346,7 +342,7 @@ TEST(EdgeCaseTest, EmptyGuardFlushIsNoOp) {
     });
 }
 
-/*TEST(EdgeCaseTest, TrianglePerimeterCorrect) {
+TEST(EdgeCaseTest, TrianglePerimeterCorrect) {
     // 3-4-5 rechtwinkliges Dreieck
     Point p1(0,0), p2(3,0), p3(0,4);
     Line ab(&p1, &p2); // 3
@@ -354,7 +350,5 @@ TEST(EdgeCaseTest, EmptyGuardFlushIsNoOp) {
     Line ca(&p3, &p1); // 4
     Triangle tri(&ab, &bc, &ca);
 
-    EXPECT_NEAR(tri.getPerimeter(), 12.0, EPS);
-}*/
-
-// ════════════════════════════════════════════════════════════════════════════
+    EXPECT_NEAR(tri.perimeter(), 12.0, EPS);
+}

@@ -18,6 +18,7 @@ public:
     }
 
     void remove(GeoObject* target);
+    void removeCascade(GeoObject* target);
 
     size_t size() const;
 };

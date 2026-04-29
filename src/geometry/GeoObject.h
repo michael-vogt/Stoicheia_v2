@@ -3,24 +3,31 @@
 #include <string>
 #include <unordered_set>
 
+class UpdateGuard;
+
+void updateGuardDequeue(class GeoObject* obj);
 
 class GeoObject {
-    void enqueueTransitive() const;
+    friend class UpdateGuard;
 protected:
     std::unordered_set<GeoObject*> m_dependents;
     std::unordered_set<GeoObject*> m_sources;
     bool m_valid = true;
-    void notifyDependents(std::unordered_set<GeoObject*>& visited) const;
+
+    //void notifyDependents(std::unordered_set<GeoObject*>& visited) const;
     void notify();
+    void notifyDirect();
+    void enqueueTransitive() const;
 public:
-    virtual ~GeoObject() = default;
+    virtual ~GeoObject();
     void addDependent(GeoObject* dep);
-    std::unordered_set<GeoObject*> dependents();
-    void detach();
-    bool isValid() const;
-    virtual void onSourceRemoved(GeoObject* src);
     void removeDependent(GeoObject* dep);
+    void detach();
+    virtual void onSourceRemoved(GeoObject* src);
     virtual void recompute() = 0;
+    bool isValid() const;
+    std::unordered_set<GeoObject*> dependents();
+
     virtual std::string toString() = 0;
 };
 

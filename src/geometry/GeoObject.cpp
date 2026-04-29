@@ -2,19 +2,26 @@
 
 #include "UpdateGuard.h"
 
+GeoObject::~GeoObject() {
+    detach();
+}
+
 void GeoObject::addDependent(GeoObject *dep) {
     if (dep == nullptr) return;
     m_dependents.insert(dep);
     dep->m_sources.insert(this); // backward reference
-
 }
 
-std::unordered_set<GeoObject *> GeoObject::dependents() {
-    return m_dependents;
+void GeoObject::removeDependent(GeoObject *dep) {
+    if (dep == nullptr) return;
+    m_dependents.erase(dep);
+    dep->m_sources.erase(this);
 }
 
 // cut connections - for Scene::remove()
 void GeoObject::detach() {
+    updateGuardDequeue(this);
+
     for (GeoObject* src : m_sources) {
         src->m_dependents.erase(this);
     }
@@ -27,17 +34,25 @@ void GeoObject::detach() {
     m_dependents.clear();
 }
 
-void GeoObject::enqueueTransitive() const {
+void GeoObject::onSourceRemoved(GeoObject *src) {
+    m_valid = false;
+}
+
+bool GeoObject::isValid() const {
+    return m_valid;
+}
+
+std::unordered_set<GeoObject *> GeoObject::dependents() {
+    return m_dependents;
+}
+
+/*void GeoObject::enqueueTransitive() const {
     for (GeoObject* dep : m_dependents) {
         if (!UpdateGuard::isPending(dep)) {
             UpdateGuard::enqueue(dep);
             dep->enqueueTransitive();
         }
     }
-}
-
-bool GeoObject::isValid() const {
-    return m_valid;
 }
 
 void GeoObject::notify() {
@@ -48,23 +63,13 @@ void GeoObject::notify() {
         std::unordered_set<GeoObject*> visited;
         notifyDependents(visited);
     }
-}
+}*/
 
-void GeoObject::notifyDependents(std::unordered_set<GeoObject *> &visited) const {
+/*void GeoObject::notifyDependents(std::unordered_set<GeoObject *> &visited) const {
     for (GeoObject* dep : m_dependents) {
         if (visited.contains(dep)) continue;
         visited.insert(dep);
         dep->recompute();
         dep->notifyDependents(visited);
     }
-}
-
-void GeoObject::onSourceRemoved(GeoObject *src) {
-    m_valid = false;
-}
-
-void GeoObject::removeDependent(GeoObject *dep) {
-    if (dep == nullptr) return;
-    m_dependents.erase(dep);
-    dep->m_sources.erase(this);
-}
+}*/
