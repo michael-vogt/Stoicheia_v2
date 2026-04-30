@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Point.h"
 
 /*
@@ -21,3 +23,5 @@ struct LinePoints {
  */
 LineParameters lineParametersFromPoints(const Point* p1, const Point* p2);
 LinePoints linePointsFromParameters(double a, double b, double c);
+
+bool polygonPointsFormConvexPolygon(const std::vector<Point*>& points);

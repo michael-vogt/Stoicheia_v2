@@ -48,3 +48,29 @@ LinePoints linePointsFromParameters(const double a, const double b, const double
         }
     }
 }
+
+bool polygonPointsFormConvexPolygon(const std::vector<Point *>& points) {
+    const size_t n = points.size();
+    if (n < 3) return false;
+
+    int sign = 0;
+    bool foundTurn = false;
+
+    for (int i = 0; i < n; ++i) {
+        const Point* a = points[i];
+        const Point* b = points[(i+1) % n];
+        const Point* c = points[(i+2) % n];
+
+        const double cross = (b->x() - a->x()) * (c->y() - b->y()) - (b->y() - a->y()) * (c->x() - b->x());
+
+        if (cross != 0) {
+            foundTurn = true;
+            if (sign == 0) {
+                sign = (cross > 0) ? 1 : -1;
+            } else if ((cross > 0 && sign < 0) || (cross < 0 && sign > 0))
+                return false;
+        }
+    }
+
+    return foundTurn;
+}
