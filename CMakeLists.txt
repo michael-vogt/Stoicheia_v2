@@ -4,6 +4,12 @@ project(Stoicheia)
 set(CMAKE_CXX_STANDARD 26)
 
 # ---------------------------
+# Qt
+# ---------------------------
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+qt_standard_project_setup()
+
+# ---------------------------
 # Hauptcode als Library
 # ---------------------------
 add_library(
@@ -31,12 +37,43 @@ target_include_directories(StoicheiaLib PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_link_libraries(StoicheiaLib PUBLIC
+        Qt6::Core
+)
+
+# ---------------------------
+# Qt-Oberfläche
+# ---------------------------
+qt_add_executable(Stoicheia WIN32
+        main.cpp
+)
+
+#qt_add_resources(Stoicheia "resources"
+#        PREFIX "/"
+#        FILES
+#)
+
+
+
 # ---------------------------
 # Hauptprogramm
 # ---------------------------
-add_executable(Stoicheia main.cpp)
+#add_executable(Stoicheia main.cpp)
 
-target_link_libraries(Stoicheia PRIVATE StoicheiaLib)
+target_link_libraries(Stoicheia PRIVATE
+        StoicheiaLib
+        Qt6::Core
+        Qt6::Widgets
+)
+
+if (WIN32)
+    add_custom_command(TARGET Stoicheia POST_BUILD
+            COMMAND ${Qt6_DIR}/../../../bin/windeployqt.exe
+            --no-translations
+            $<TARGET_FILE:Stoicheia>
+            COMMENT "Running windeployqt..."
+    )
+endif ()
 
 # ---------------------------
 # GoogleTest
