@@ -3,6 +3,17 @@
 #include <algorithm>
 #include <functional>
 
+template<typename T>
+std::vector<T *> Scene::objectsOfType() const {
+    std::vector<T*> result;
+
+    for (const auto& obj : m_objects) {
+        if (auto* typed = dynamic_cast<T*>(obj.get()))
+            result.push_back(typed);
+    }
+    return result;
+}
+
 void Scene::remove(GeoObject* target) {
     if (target == nullptr) return;
 

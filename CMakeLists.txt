@@ -46,6 +46,10 @@ target_link_libraries(StoicheiaLib PUBLIC
 # ---------------------------
 qt_add_executable(Stoicheia WIN32
         main.cpp
+        src/ui/MainWindow.cpp
+        src/ui/MainWindow.h
+        src/ui/DrawingBoard.cpp
+        src/ui/DrawingBoard.h
 )
 
 #qt_add_resources(Stoicheia "resources"
