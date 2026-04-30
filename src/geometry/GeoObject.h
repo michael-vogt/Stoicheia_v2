@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_GEOOBJECT_H
-#define STOICHEIA_GEOOBJECT_H
+#pragma once
+
 #include <string>
 #include <unordered_set>
 
@@ -19,17 +19,14 @@ protected:
     void notifyDirect();
     void enqueueTransitive() const;
 public:
-    virtual ~GeoObject();
+    virtual ~GeoObject() { detach(); };
     void addDependent(GeoObject* dep);
     void removeDependent(GeoObject* dep);
     void detach();
-    virtual void onSourceRemoved(GeoObject* src);
+    virtual void onSourceRemoved(GeoObject* src) { m_valid = false; };
     virtual void recompute() = 0;
-    bool isValid() const;
-    std::unordered_set<GeoObject*> dependents();
+    bool isValid() const { return m_valid; };
+    std::unordered_set<GeoObject*> dependents() { return m_dependents; };
 
     virtual std::string toString() = 0;
 };
-
-
-#endif //STOICHEIA_GEOOBJECT_H

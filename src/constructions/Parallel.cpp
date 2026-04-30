@@ -22,10 +22,6 @@ double Parallel::dy() const {
     return p2->y() - p1->y();
 }
 
-LinearObject *Parallel::line() {
-    return &m_line;
-}
-
 void Parallel::onSourceRemoved(GeoObject *src) {
     m_valid = false;
     if (src == static_cast<GeoObject*>(m_origin)) m_origin = nullptr;

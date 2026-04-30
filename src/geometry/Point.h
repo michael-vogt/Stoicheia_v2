@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_POINT_H
-#define STOICHEIA_POINT_H
+#pragma once
+
 #include "GeoObject.h"
 
 
@@ -10,13 +10,13 @@ public:
     /*
      * Constructor
      */
-    Point(double x, double y);
+    Point(double x, double y) : m_x(x), m_y(y) {};
 
     /*
      * Getter
      */
-    double x() const;
-    double y() const;
+    double x() const { return m_x; };
+    double y() const { return m_y; };
 
     /*
      * Modifier
@@ -26,10 +26,7 @@ public:
     /*
      * Overridden methods
      */
-    void recompute() override;
+    void recompute() override {};
     std::string toString() override;
 
 };
-
-
-#endif //STOICHEIA_POINT_H

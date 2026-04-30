@@ -16,36 +16,36 @@ void LineCircleIntersection::compute() {
         return;
     }
 
-    double mx = m_circle->center()->x();
-    double my = m_circle->center()->y();
-    double r = m_circle->radius();
+    const double mx = m_circle->center()->x();
+    const double my = m_circle->center()->y();
+    const double r = m_circle->radius();
 
-    double x1 = m_line->p1()->x(), y1 = m_line->p1()->y();
-    double x2 = m_line->p2()->x(), y2 = m_line->p2()->y();
+    const double x1 = m_line->p1()->x();
+    const double y1 = m_line->p1()->y();
+    const double x2 = m_line->p2()->x();
+    const double y2 = m_line->p2()->y();
 
-    double dx = x2 - x1;
-    double dy = y2 - y1;
+    const double dx = x2 - x1;
+    const double dy = y2 - y1;
 
-    double a = dx*dx + dy*dy;
+    const double a = dx*dx + dy*dy;
     if (a < 1e-20) { // degenerated line
         setResults(0);
         return;
     }
 
-    double b = 2.0 * (dx * (x1 - mx) + dy * (y1 - my));
-    double c = (x1 - mx) * (x1 - mx) + (y1 - my) * (y1 - my) - r * r;
+    const double b = 2.0 * (dx * (x1 - mx) + dy * (y1 - my));
+    const double c = (x1 - mx) * (x1 - mx) + (y1 - my) * (y1 - my) - r * r;
 
-    double disc = b*b - 4*a*c;
-
-    if (disc < -1e-10) { // no intersection
+    if (const double disc = b*b - 4*a*c; disc < -1e-10) { // no intersection
         setResults(0);
     } else if (disc < 1e-10) {
-        double t = -b / (2*a);
+        const double t = -b / (2*a);
         setResults(1, x1 + t*dx, y1 + t*dy);
     } else {
-        double sqrtDisc = std::sqrt(disc);
-        double t1 = (-b - sqrtDisc) / (2*a);
-        double t2 = (-b + sqrtDisc) / (2*a);
+        const double sqrtDisc = std::sqrt(disc);
+        const double t1 = (-b - sqrtDisc) / (2*a);
+        const double t2 = (-b + sqrtDisc) / (2*a);
         setResults(2, x1 + t1*dx, y1 + t1*dy,x1 + t2*dx, y1 + t2*dy);
     }
 }

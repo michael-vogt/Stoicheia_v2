@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_INTERSECTIONSET_H
-#define STOICHEIA_INTERSECTIONSET_H
+#pragma once
+
 #include "IntersectionPoint.h"
 #include "geometry/GeoObject.h"
 
@@ -11,13 +11,10 @@ protected:
     virtual void compute() = 0;
 public:
     IntersectionSet();
-    IntersectionPoint* first();
-    IntersectionPoint* second();
+    IntersectionPoint* first() { return &m_pts[0]; };
+    IntersectionPoint* second() { return &m_pts[1]; };
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
     std::string toString() override;
 };
-
-
-#endif //STOICHEIA_INTERSECTIONSET_H

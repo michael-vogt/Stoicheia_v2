@@ -1,5 +1,4 @@
-#ifndef STOICHEIA_GEOMETRY_H
-#define STOICHEIA_GEOMETRY_H
+#pragma once
 
 #include "Circle.h"
 #include "geometryHelper.h"
@@ -12,5 +11,3 @@
 #include "Segment.h"
 #include "Triangle.h"
 #include "UpdateGuard.h"
-
-#endif //STOICHEIA_GEOMETRY_H

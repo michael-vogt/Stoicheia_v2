@@ -14,7 +14,6 @@ add_library(
         src/geometry/geometryHelper.cpp
         src/geometry/UpdateGuard.cpp
         src/geometry/Scene.cpp
-        src/constructions/IntersectionPoint.cpp
         src/constructions/Parallel.cpp
         src/constructions/Midpoint.cpp
         src/constructions/Perpendicular.cpp
@@ -24,9 +23,6 @@ add_library(
         src/constructions/LineCircleIntersection.cpp
         src/constructions/LineLineIntersection.cpp
         src/constructions/CircleCircleIntersection.cpp
-        src/geometry/Line.cpp
-        src/geometry/Ray.cpp
-        src/geometry/Segment.cpp
         src/geometry/Triangle.cpp
 )
 

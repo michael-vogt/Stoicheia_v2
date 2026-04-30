@@ -1,5 +1,4 @@
-#ifndef STOICHEIA_CONSTRUCTIONS_H
-#define STOICHEIA_CONSTRUCTIONS_H
+#pragma once
 
 #include "CircleCircleIntersection.h"
 #include "IntersectionPoint.h"
@@ -10,5 +9,3 @@
 #include "Parallel.h"
 #include "Perpendicular.h"
 #include "PerpendicularFoot.h"
-
-#endif //STOICHEIA_CONSTRUCTIONS_H

@@ -28,7 +28,3 @@ void Scene::removeCascade(GeoObject* target) {
         return std::ranges::contains(toDelete, ptr.get());
     });
 }
-
-size_t Scene::size() const {
-    return m_objects.size();
-}

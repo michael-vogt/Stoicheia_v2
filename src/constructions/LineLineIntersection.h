@@ -1,5 +1,4 @@
-#ifndef STOICHEIA_LINELINEINTERSECTION_H
-#define STOICHEIA_LINELINEINTERSECTION_H
+#pragma once
 
 #include "IntersectionSet.h"
 
@@ -15,6 +14,3 @@ public:
     void onSourceRemoved(GeoObject *src) override;
 
 };
-
-
-#endif //STOICHEIA_LINELINEINTERSECTION_H

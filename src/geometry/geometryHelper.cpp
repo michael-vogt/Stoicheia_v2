@@ -1,6 +1,7 @@
 #include "geometryHelper.h"
 
 #include <cassert>
+#include <stdexcept>
 
 LineParameters lineParametersFromPoints(const Point* p1, const Point* p2) {
     assert(p1 != nullptr);
@@ -16,7 +17,8 @@ LineParameters lineParametersFromPoints(const Point* p1, const Point* p2) {
 }
 
 LinePoints linePointsFromParameters(const double a, const double b, const double c) {
-    assert(a != 0 || b != 0);
+    if (a == 0 && b == 0)
+        throw std::invalid_argument("Either a or b must not be 0");
 
     double x1, x2, y1, y2;
     if (a != 0) {

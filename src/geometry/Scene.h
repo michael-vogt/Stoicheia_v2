@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_SCENE_H
-#define STOICHEIA_SCENE_H
+#pragma once
+
 #include <memory>
 #include <vector>
 
@@ -20,8 +20,5 @@ public:
     void remove(GeoObject* target);
     void removeCascade(GeoObject* target);
 
-    size_t size() const;
+    [[nodiscard]] size_t size() const { return m_objects.size(); };
 };
-
-
-#endif //STOICHEIA_SCENE_H
