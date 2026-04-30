@@ -24,6 +24,7 @@ add_library(
         src/constructions/LineLineIntersection.cpp
         src/constructions/CircleCircleIntersection.cpp
         src/geometry/Triangle.cpp
+        src/geometry/Polygon.cpp
 )
 
 target_include_directories(StoicheiaLib PUBLIC

@@ -5,6 +5,22 @@
 
 static constexpr double EPS = 1e-9;
 
+TEST(ExtendedTest, PolygonBecomesInvalidWhenNonkonvex) {
+    Point P1(0,0);
+    Point P2(0,2);
+    Point P3(2,2);
+    Point P4(2,0);
+    Polygon PG({&P1, &P2, &P3, &P4});
+
+    EXPECT_TRUE(PG.isValid());
+
+    // Tausche P1 und P4 -> selbstschneidendes, nichtkonvexes Polygon
+    P1.moveTo(2, 0);
+    P4.moveTo(0, 0);
+
+    EXPECT_FALSE(PG.isValid());
+}
+
 TEST(ExtendedTest, MultipleObjectsMoving) {
     Point P1(0,0), P2(1,1);
     Point P3(0,0), P4(-1,1);
@@ -33,10 +49,6 @@ TEST(ExtendedTest, MultipleObjectsMoving) {
 
     P1.moveTo(0,1);
     P2.moveTo(1,2);
-
-    /*
-     *
-     */
 
     // L1 ∩ L2 = (-0.5,0.5)
     EXPECT_NEAR(IL1L2.first()->x(), -0.5, EPS);

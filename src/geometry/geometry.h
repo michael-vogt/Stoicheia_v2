@@ -5,6 +5,7 @@
 #include "GeoObject.h"
 #include "Line.h"
 #include "LinearObject.h"
+#include "Polygon.h"
 #include "Point.h"
 #include "Ray.h"
 #include "Scene.h"
