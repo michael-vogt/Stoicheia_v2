@@ -13,6 +13,7 @@ class DrawingBoard : public QGraphicsView {
     int m_minZoom = -10;
     int m_maxZoom = 20;
     double m_zoomFactor = 1.15;
+    int m_gridSize = 50;
 
     void zoomIn();
     void zoomOut();
@@ -28,6 +29,7 @@ protected:
 public:
     DrawingBoard();
     void resetView();
-    int zoomPercent() const;
+    [[nodiscard]] int zoomPercent() const;
+    void updateScene() const;
 };
 

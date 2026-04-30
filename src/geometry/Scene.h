@@ -25,7 +25,15 @@ public:
 
     [[nodiscard]] const std::vector<std::unique_ptr<GeoObject>>& objects() const { return m_objects; }
     template<typename T>
-    std::vector<T*> objectsOfType() const;
+    std::vector<T*> objectsOfType() const {
+        std::vector<T*> result;
+
+        for (const auto& obj : m_objects) {
+            if (auto* typed = dynamic_cast<T*>(obj.get()))
+                result.push_back(typed);
+        }
+        return result;
+    };
     void remove(GeoObject* target);
     void removeCascade(GeoObject* target);
 
