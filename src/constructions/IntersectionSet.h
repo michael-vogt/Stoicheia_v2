@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_INTERSECTIONSET_H
-#define STOICHEIA_INTERSECTIONSET_H
+#pragma once
+
 #include "IntersectionPoint.h"
 #include "geometry/GeoObject.h"
 
@@ -18,6 +18,3 @@ public:
     void recompute() override;
     std::string toString() override;
 };
-
-
-#endif //STOICHEIA_INTERSECTIONSET_H

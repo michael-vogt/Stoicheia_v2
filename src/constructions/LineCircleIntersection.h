@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_LINECIRCLEINTERSECTION_H
-#define STOICHEIA_LINECIRCLEINTERSECTION_H
+#pragma once
+
 #include "IntersectionSet.h"
 
 
@@ -14,6 +14,3 @@ public:
     LineCircleIntersection(LinearObject* line, Circle* circle);
     void onSourceRemoved(GeoObject *src) override;
 };
-
-
-#endif //STOICHEIA_LINECIRCLEINTERSECTION_H

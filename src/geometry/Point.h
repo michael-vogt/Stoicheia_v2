@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_POINT_H
-#define STOICHEIA_POINT_H
+#pragma once
+
 #include "GeoObject.h"
 
 
@@ -30,6 +30,3 @@ public:
     std::string toString() override;
 
 };
-
-
-#endif //STOICHEIA_POINT_H

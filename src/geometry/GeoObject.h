@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_GEOOBJECT_H
-#define STOICHEIA_GEOOBJECT_H
+#pragma once
+
 #include <string>
 #include <unordered_set>
 
@@ -30,6 +30,3 @@ public:
 
     virtual std::string toString() = 0;
 };
-
-
-#endif //STOICHEIA_GEOOBJECT_H

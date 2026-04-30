@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_LINEAROBJECT_H
-#define STOICHEIA_LINEAROBJECT_H
+#pragma once
+
 #include "geometryHelper.h"
 #include "GeoObject.h"
 #include "Point.h"
@@ -45,6 +45,3 @@ public:
     std::string toString() override;
 
 };
-
-
-#endif //STOICHEIA_LINEAROBJECT_H

@@ -1,5 +1,4 @@
-#ifndef STOICHEIA_INTERSECTION_H
-#define STOICHEIA_INTERSECTION_H
+#pragma once
 
 #include "../geometry/geometry.h"
 
@@ -13,6 +12,3 @@ public:
     IntersectionPoint() : Point(0,0) {};
     void recompute() override {};
 };
-
-
-#endif //STOICHEIA_INTERSECTION_H

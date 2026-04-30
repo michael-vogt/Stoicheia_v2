@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_SCENE_H
-#define STOICHEIA_SCENE_H
+#pragma once
+
 #include <memory>
 #include <vector>
 
@@ -22,6 +22,3 @@ public:
 
     [[nodiscard]] size_t size() const { return m_objects.size(); };
 };
-
-
-#endif //STOICHEIA_SCENE_H

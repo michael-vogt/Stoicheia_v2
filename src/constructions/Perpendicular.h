@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_PERPENDICULAR_H
-#define STOICHEIA_PERPENDICULAR_H
+#pragma once
+
 #include "geometry/GeoObject.h"
 #include "geometry/Line.h"
 #include "geometry/LinearObject.h"
@@ -26,6 +26,3 @@ public:
 
     std::string toString() override;
 };
-
-
-#endif //STOICHEIA_PERPENDICULAR_H

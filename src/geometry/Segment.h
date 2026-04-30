@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_SEGMENT_H
-#define STOICHEIA_SEGMENT_H
+#pragma once
+
 #include "LinearObject.h"
 
 
@@ -11,6 +11,3 @@ public:
     Point* start() const { return m_p1; };
     Point* end() const { return m_p2; };
 };
-
-
-#endif //STOICHEIA_SEGMENT_H

@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_GEOMETRYHELPER_H
-#define STOICHEIA_GEOMETRYHELPER_H
+#pragma once
+
 #include "Point.h"
 
 /*
@@ -21,7 +21,3 @@ struct LinePoints {
  */
 LineParameters lineParametersFromPoints(const Point* p1, const Point* p2);
 LinePoints linePointsFromParameters(double a, double b, double c);
-
-
-
-#endif //STOICHEIA_GEOMETRYHELPER_H

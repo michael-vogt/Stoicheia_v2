@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_CIRCLE_H
-#define STOICHEIA_CIRCLE_H
+#pragma once
+
 #include <memory>
 
 #include "GeoObject.h"
@@ -24,6 +24,3 @@ public:
     void recompute() override;
     std::string toString() override;
 };
-
-
-#endif //STOICHEIA_CIRCLE_H

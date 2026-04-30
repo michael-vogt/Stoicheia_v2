@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_PERPENDICULARFOOT_H
-#define STOICHEIA_PERPENDICULARFOOT_H
+#pragma once
+
 #include "geometry/LinearObject.h"
 #include "geometry/Point.h"
 
@@ -15,6 +15,3 @@ public:
     void recompute() override;
     std::string toString() override;
 };
-
-
-#endif //STOICHEIA_PERPENDICULARFOOT_H

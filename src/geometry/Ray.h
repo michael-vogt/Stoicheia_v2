@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_RAY_H
-#define STOICHEIA_RAY_H
+#pragma once
+
 #include "LinearObject.h"
 
 
@@ -11,6 +11,3 @@ public:
     Point* origin() const { return m_p1; };
     Point* direction() const { return m_p2; };
 };
-
-
-#endif //STOICHEIA_RAY_H

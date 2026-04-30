@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_TRIANGLE_H
-#define STOICHEIA_TRIANGLE_H
+#pragma once
+
 #include "GeoObject.h"
 #include "LinearObject.h"
 
@@ -21,6 +21,3 @@ public:
     std::string toString() override;
 
 };
-
-
-#endif //STOICHEIA_TRIANGLE_H

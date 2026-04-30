@@ -1,5 +1,4 @@
-#ifndef STOICHEIA_CIRCLECIRCLEINTERSECTION_H
-#define STOICHEIA_CIRCLECIRCLEINTERSECTION_H
+#pragma once
 
 #include "IntersectionSet.h"
 #include "../geometry/Circle.h"
@@ -25,5 +24,3 @@ public:
 protected:
     void compute() override;
 };
-
-#endif //STOICHEIA_CIRCLECIRCLEINTERSECTION_H

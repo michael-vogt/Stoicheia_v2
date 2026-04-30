@@ -1,5 +1,5 @@
-#ifndef STOICHEIA_UPDATEGUARD_H
-#define STOICHEIA_UPDATEGUARD_H
+#pragma once
+
 #include <unordered_set>
 
 #include "GeoObject.h"
@@ -18,6 +18,3 @@ public:
     static bool isActive() { return depth > 0 || flushing; };
     static bool isPending(GeoObject* obj) { return pending.contains(obj); };
 };
-
-
-#endif //STOICHEIA_UPDATEGUARD_H
