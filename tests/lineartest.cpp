@@ -139,7 +139,7 @@ TEST(LinearObjectTest, PerpendicularToRay) {
     Point origin(2, 0);
     Perpendicular perp(&origin, &r);
     // Senkrechter Richtungsvektor zur x-Richtung muss vertikal sein
-    EXPECT_NEAR(perp.getLine()->dx(), 0.0, EPS);
+    EXPECT_NEAR(perp.line()->dx(), 0.0, EPS);
 }
 
 TEST(LinearObjectTest, PerpendicularFootOnSegment) {

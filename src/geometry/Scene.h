@@ -20,7 +20,7 @@ public:
     void remove(GeoObject* target);
     void removeCascade(GeoObject* target);
 
-    size_t size() const;
+    [[nodiscard]] size_t size() const { return m_objects.size(); };
 };
 
 

@@ -17,7 +17,7 @@ class Parallel : public GeoObject {
 
 public:
     Parallel(Point* origin, LinearObject* reference);
-    LinearObject* line();
+    LinearObject* line() { return &m_line; };
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
     std::string toString() override;

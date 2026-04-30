@@ -21,20 +21,20 @@ void PerpendicularFoot::recompute() {
         return;
     }
 
-    Point* p1 = m_line->p1();
-    Point* p2 = m_line->p2();
-    double dx = p2->x() - p1->x();
-    double dy = p2->y() - p1->y();
-    double len2 = dx*dx + dy*dy;
+    const Point* p1 = m_line->p1();
+    const Point* p2 = m_line->p2();
+    const double dx = p2->x() - p1->x();
+    const double dy = p2->y() - p1->y();
+    const double len2 = dx*dx + dy*dy;
 
     if (len2 < 1e-20) { // degenerate line
         m_valid = false;
         return;
     }
 
-    double px = m_point->x() - p1->x();
-    double py = m_point->y() - p1->y();
-    double t = (px * dx + py * dy) / len2;
+    const double px = m_point->x() - p1->x();
+    const double py = m_point->y() - p1->y();
+    const double t = (px * dx + py * dy) / len2;
 
     m_valid = true;
     moveTo(p1->x() + t * dx, p1->y() + t * dy);

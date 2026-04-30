@@ -26,13 +26,13 @@ public:
     /*
      * Getter
      */
-    Point* p1() const;
-    Point* p2() const;
-    double dx() const;
-    double dy() const;
-    LineParameters parameters() const;
-    LinePoints points() const;
-    double length() const;
+    Point* p1() const { return m_p1; };
+    Point* p2() const { return m_p2; };
+    double dx() const { return m_p2->x() - m_p1->x(); };
+    double dy() const { return m_p2->y() - m_p1->y(); };
+    LineParameters parameters() const { return { m_a, m_b, m_c }; };
+    LinePoints points() const { return { m_p1, m_p2 }; };
+    double length() const { return m_length; };
 
     bool contains(double px, double py, double eps = 1e-9) const;
     double projectParameter(double px, double py) const;

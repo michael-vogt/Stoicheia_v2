@@ -11,16 +11,8 @@ Triangle::Triangle(LinearObject *a, LinearObject *b, LinearObject *c) : m_a(a), 
     Triangle::recompute();
 }
 
-double Triangle::perimeter() const {
-    return m_perimater;
-}
-
-void Triangle::onSourceRemoved(GeoObject *src) {
-    m_valid = false;
-}
-
 void Triangle::recompute() {
-    m_perimater = (m_a ? m_a->length() : 0)
+    m_perimeter = (m_a ? m_a->length() : 0)
                 + (m_b ? m_b->length() : 0)
                 + (m_c ? m_c->length() : 0);
     recomputeCount++;

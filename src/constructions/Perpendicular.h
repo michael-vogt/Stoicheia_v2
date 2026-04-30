@@ -22,7 +22,7 @@ public:
 
     void onSourceRemoved(GeoObject* src) override;
 
-    LinearObject* getLine();
+    LinearObject* line() { return &m_line; };
 
     std::string toString() override;
 };

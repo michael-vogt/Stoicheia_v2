@@ -10,13 +10,13 @@ class UpdateGuard {
     static bool flushing;
     static std::unordered_set<GeoObject*> pending;
 public:
-    UpdateGuard();
-    ~UpdateGuard();
-    static void enqueue(GeoObject* obj);
-    static void dequeue(GeoObject* obj);
+    UpdateGuard() { ++depth; };
+    ~UpdateGuard() { if (--depth == 0) flush(); };
+    static void enqueue(GeoObject* obj) { pending.insert(obj); };
+    static void dequeue(GeoObject* obj) { pending.erase(obj); };
     static void flush();
-    static bool isActive();
-    static bool isPending(GeoObject* obj);
+    static bool isActive() { return depth > 0 || flushing; };
+    static bool isPending(GeoObject* obj) { return pending.contains(obj); };
 };
 
 

@@ -10,8 +10,8 @@ class IntersectionPoint : public Point {
     using Point::moveTo;
 
 public:
-    IntersectionPoint();
-    void recompute() override;
+    IntersectionPoint() : Point(0,0) {};
+    void recompute() override {};
 };
 
 

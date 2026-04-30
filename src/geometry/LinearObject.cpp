@@ -63,37 +63,6 @@ bool LinearObject::contains(double px, double py, double eps) const {
     return std::sqrt(qx*qx + qy*qy) < eps;
 }
 
-/*
- * Getter
- */
-double LinearObject::dx() const {
-    return (m_p1 != nullptr && m_p2 != nullptr) ? m_p2->x() - m_p1->x() : 0;
-}
-
-double LinearObject::dy() const {
-    return (m_p1 != nullptr && m_p2 != nullptr) ? m_p2->y() - m_p1->y() : 0;
-}
-
-double LinearObject::length() const {
-    return m_length;
-}
-
-Point *LinearObject::p1() const {
-    return m_p1;
-}
-
-Point *LinearObject::p2() const {
-    return m_p2;
-}
-
-LineParameters LinearObject::parameters() const {
-    return { m_a, m_b, m_c };
-}
-
-LinePoints LinearObject::points() const {
-    return { m_p1, m_p2 };
-}
-
 double LinearObject::projectParameter(double px, double py) const {
     double ddx = dx();
     double ddy = dy();

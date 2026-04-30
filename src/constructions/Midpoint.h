@@ -11,7 +11,7 @@ class Midpoint : public Point {
 public:
     Midpoint(Point *a, Point *b);
 
-    explicit Midpoint(const LinearObject* line);
+    explicit Midpoint(const LinearObject* line) : Midpoint(line->p1(), line->p2()) {};
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;

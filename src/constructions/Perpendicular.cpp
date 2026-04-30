@@ -30,8 +30,6 @@ void Perpendicular::onSourceRemoved(GeoObject* src) {
     if (src == static_cast<GeoObject*>(m_reference)) m_reference = nullptr;
 }
 
-LinearObject* Perpendicular::getLine() { return &m_line; }
-
 double Perpendicular::px() const {
     return -(m_reference->p2()->y() - m_reference->p1()->y());
 }

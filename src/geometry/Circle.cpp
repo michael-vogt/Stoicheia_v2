@@ -23,14 +23,6 @@ Circle::Circle(Point *center, double radius)
     Circle::recompute();
 }
 
-Point* Circle::center() const {
-    return m_center;
-}
-
-double Circle::radius() const {
-    return m_radius;
-}
-
 void Circle::onSourceRemoved(GeoObject *src) {
     m_valid = false;
     if (src == static_cast<GeoObject*>(m_center)) m_center = nullptr;

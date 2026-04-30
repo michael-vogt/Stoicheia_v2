@@ -5,7 +5,7 @@
 
 class Line : public LinearObject {
 protected:
-    bool containsT(double) const override;
+    bool containsT(double) const override { return true; };
 public:
     using LinearObject::LinearObject;
 
