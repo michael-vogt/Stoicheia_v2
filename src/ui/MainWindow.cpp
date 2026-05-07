@@ -2,10 +2,10 @@
 #include <QMenuBar>
 #include <QStatusBar>
 
-MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(parent), m_adapter(&m_geoScene, &m_qtScene) {
+MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(title);
 
-    m_drawingBoard = new DrawingBoard(&m_qtScene, this);
+    m_drawingBoard = new DrawingBoard(this);
     setCentralWidget(m_drawingBoard);
 
     setupMenu();
