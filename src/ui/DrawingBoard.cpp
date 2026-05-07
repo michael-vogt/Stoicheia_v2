@@ -1,0 +1,238 @@
+#include "DrawingBoard.h"
+
+#include <iostream>
+#include <QMouseEvent>
+#include <QScrollBar>
+#include <QTimer>
+
+#include "MainWindow.h"
+#include "geometry/Point.h"
+
+DrawingBoard::DrawingBoard(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
+    setRenderHint(QPainter::Antialiasing);
+    setRenderHint(QPainter::SmoothPixmapTransform);
+    setBackgroundBrush(QColor(245,245,245));
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setSceneRect(-10000,-10000,20000,20000);
+
+    QTransform transform;
+    transform.scale(1.0, -1.0);
+    setTransform(transform);
+
+    setDragMode(QGraphicsView::NoDrag);
+    setFocusPolicy(Qt::StrongFocus);
+}
+
+void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
+    QGraphicsView::drawBackground(painter, rect);
+    if (m_gridVisible) {
+        drawGrid(painter, rect);
+    }
+}
+
+void DrawingBoard::drawGrid(QPainter* painter, const QRectF& rect) const {
+    // Axes
+    QPen axisPen(QColor(160,160,160), 1.5);
+    painter->setPen(axisPen);
+    painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
+    painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
+
+    // grid lines
+    QPen gridPen(QColor(220,220,220), 0.5);
+    painter->setPen(gridPen);
+
+    double left = std::floor(rect.left() / m_gridSpacing) * m_gridSpacing;
+    double top = std::floor(rect.top() / m_gridSpacing) * m_gridSpacing;
+    double right = rect.right();
+    double bottom = rect.bottom();
+
+    for (double x = left; x <= right; x += m_gridSpacing) {
+        if (std::abs(x) > 0.1)
+            painter->drawLine(QPointF(x, top), QPointF(x, bottom));
+    }
+
+    for (double y = top; y <= bottom; y += m_gridSpacing) {
+        if (std::abs(y) > 0.1)
+            painter->drawLine(QPointF(left, y), QPointF(right, y));
+    }
+}
+
+void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
+    QGraphicsView::drawForeground(painter, rect);
+    if (!m_gridVisible) return;
+
+    painter->save();
+    painter->setTransform(QTransform());
+
+    /*QPoint originViewport = viewport()->mapFromGlobal(mapToGlobal(mapFromScene(QPointF(0, 0))));
+    int ox = originViewport.x();
+    int oy = originViewport.y();*/
+
+    QFont font = painter->font();
+    font.setPointSize(8);
+    painter->setFont(font);
+    painter->setPen(QColor(120,120,120));
+
+    const int margin = 4;
+    const int tickSize = 4;
+
+    double left = std::floor(rect.left() / m_gridSpacing) * m_gridSpacing;
+    double top = std::floor(rect.top() / m_gridSpacing) * m_gridSpacing;
+    double right = rect.right();
+    double bottom = rect.bottom();
+
+    QPointF originView = viewport()->mapFrom(this, mapFromScene(QPointF(0, 0))); // mapFromScene(QPointF(0,0));
+    int ox = static_cast<int>(originView.x());
+    int oy = static_cast<int>(originView.y());
+
+    int labelY = static_cast<int>(std::clamp(
+        static_cast<double>(oy + margin + 12),
+        static_cast<double>(margin + 12),
+        static_cast<double>(height() - margin)
+        ));
+
+    for (double x = left; x <= right; x += m_gridSpacing) {
+        if (std::abs(x) < 0.1) continue;
+        int px = static_cast<int>(mapFromScene(QPointF(x, 0)).x());
+        painter->drawLine(px, oy - tickSize, px, oy + tickSize);
+        QString label = QString::number(static_cast<int>(std::round(x)));
+        painter->drawText(QRect(px - 20, labelY - 12, 40, 14), Qt::AlignHCenter, label);
+    }
+
+    int labelX = static_cast<int>(std::clamp(
+        static_cast<double>(ox + margin),
+        static_cast<double>(margin),
+        static_cast<double>(width() - 40 - margin)
+        ));
+
+    for (double y = top; y <= bottom; y += m_gridSpacing) {
+        if (std::abs(y) < 0.1) continue;
+        int py = static_cast<int>(mapFromScene(QPointF(0, y)).y());
+        painter->drawLine(ox - tickSize, py, ox + tickSize, py);
+        QString label = QString::number(static_cast<int>(std::round(y)));
+        painter->drawText(QRect(labelX, py-7,38,14), Qt::AlignLeft | Qt::AlignVCenter, label);
+    }
+
+    painter->drawText(QRect(ox + margin, oy + margin, 20, 14), Qt::AlignLeft, "0");
+
+    painter->restore();
+}
+
+void DrawingBoard::setGridVisible(bool visible) {
+    m_gridVisible = visible;
+    viewport()->update();
+}
+
+void DrawingBoard::setGridSpacing(double spacing) {
+    m_gridSpacing = spacing;
+    viewport()->update();
+}
+
+// --- Pan -------------------------------------------------------------------------------------------------------------
+void DrawingBoard::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        m_spacePressed = true;
+        setCursor(Qt::OpenHandCursor);
+        event->accept();
+        return;
+    } else if (event->key() == Qt::Key_M && !event->isAutoRepeat()) {
+        if (auto* wnd = dynamic_cast<MainWindow*>(parentWidget())) {
+            //std::unordered_map<GeoObject*, GeoGraphicsItem*> map = wnd->adapter()->geoGraphicsItems();
+            const auto& map = wnd->adapter()->geoGraphicsItems();
+            for (const auto &key: map | std::views::keys) {
+                if (key && typeid(*key) == typeid(Point)) {
+                    auto* p = dynamic_cast<Point*>(key);
+                    p->moveTo(p->x() - 100, p->y());
+                    break;
+                }
+            }
+        }
+    } else if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
+        resetView();
+    }
+
+    QGraphicsView::keyPressEvent(event);
+}
+
+void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        m_spacePressed = false;
+        if (!m_panning)
+            setCursor(Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::keyReleaseEvent(event);
+}
+
+void DrawingBoard::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::MiddleButton ||
+        (event->button() == Qt::LeftButton && m_spacePressed)) {
+        m_panning = true;
+        m_panStart = event->pos();
+        setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
+void DrawingBoard::mouseMoveEvent(QMouseEvent *event) {
+    if (m_panning) {
+        QPoint delta = event->pos() - m_panStart;
+        m_panStart = event->pos();
+
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
+
+        event->accept();
+        viewport()->update();
+        return;
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
+    if (m_panning) {
+        m_panning = false;
+        setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+// --- Zoom ------------------------------------------------------------------------------------------------------------
+void DrawingBoard::wheelEvent(QWheelEvent *event) {
+    double factor = event->angleDelta().y() > 0 ? 1.15 : 1.0 / 1.15;
+    scale(factor, factor);
+    event->accept();
+}
+
+
+void DrawingBoard::showEvent(QShowEvent *event) {
+    QGraphicsView::showEvent(event);
+    QTimer::singleShot(100, this, [this]() {
+        QPointF origin = mapFromScene(QPointF(0, 0));
+        QPointF center = viewport()->rect().center();
+        QPointF delta  = origin - center;
+
+        horizontalScrollBar()->setValue(
+            horizontalScrollBar()->value() + static_cast<int>(delta.x()));
+        verticalScrollBar()->setValue(
+            verticalScrollBar()->value() + static_cast<int>(delta.y()));
+    });
+}
+
+void DrawingBoard::resetView() {
+    QTransform t = transform();
+    double scaleX = t.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
+    double scaleY = t.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
+    centerOn(0, 0);
+    scale(1.0 / scaleX, -1.0 / scaleY);
+}

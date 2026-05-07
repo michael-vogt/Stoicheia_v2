@@ -28,5 +28,5 @@ public:
     bool isValid() const { return m_valid; };
     std::unordered_set<GeoObject*> dependents() { return m_dependents; };
 
-    virtual std::string toString() = 0;
+    virtual std::string toString() { return ""; };
 };
