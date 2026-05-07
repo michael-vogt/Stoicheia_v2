@@ -7,8 +7,17 @@ SceneAdapter::SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene)
     : m_geoScene(geoScene), m_qtScene(qtScene)
 {}
 
-GeoPointItem* SceneAdapter::addPoint(Point* point) {
+GeoPointItem* SceneAdapter::addPoint(Point* point, QPen pen) {
     auto* item = new GeoPointItem(point);
+    item->setPen(pen);
+    m_qtScene->addItem(item);
+    m_map[point] = item;
+    return item;
+}
+
+GeoIntersectionPointItem* SceneAdapter::addIntersectionPoint(IntersectionPoint *point, QPen pen) {
+    auto* item = new GeoIntersectionPointItem(point);
+    item->setPen(pen);
     m_qtScene->addItem(item);
     m_map[point] = item;
     return item;
@@ -20,8 +29,8 @@ std::pair<GeoPointItem *, GeoPointItem *> SceneAdapter::addIntersectionSet(Inter
         result.first = nullptr;
         result.second = nullptr;
     } else {
-        result.first = addPoint(intersectionSet->first());
-        result.second = addPoint(intersectionSet->second());
+        result.first = addIntersectionPoint(intersectionSet->first());
+        result.second = addIntersectionPoint(intersectionSet->second());
     }
     return result;
 }

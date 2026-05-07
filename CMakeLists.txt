@@ -36,6 +36,7 @@ add_library(
         src/ui/GeoLinearObjectItem.cpp
         src/ui/GeoCircleItem.cpp
         src/ui/SceneAdapter.cpp
+        src/ui/GeoIntersectionPointItem.cpp
 )
 
 target_include_directories(StoicheiaLib PUBLIC
