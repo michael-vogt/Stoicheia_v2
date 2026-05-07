@@ -31,6 +31,11 @@ add_library(
         src/constructions/CircleCircleIntersection.cpp
         src/geometry/Triangle.cpp
         src/geometry/Polygon.cpp
+        src/ui/GeoGraphicsItem.cpp
+        src/ui/GeoPointItem.cpp
+        src/ui/GeoLinearObjectItem.cpp
+        src/ui/GeoCircleItem.cpp
+        src/ui/SceneAdapter.cpp
 )
 
 target_include_directories(StoicheiaLib PUBLIC
@@ -39,6 +44,7 @@ target_include_directories(StoicheiaLib PUBLIC
 
 target_link_libraries(StoicheiaLib PUBLIC
         Qt6::Core
+        Qt6::Widgets
 )
 
 # ---------------------------

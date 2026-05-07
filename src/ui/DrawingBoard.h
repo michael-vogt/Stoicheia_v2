@@ -5,31 +5,31 @@
 #include "geometry/Scene.h"
 
 class DrawingBoard : public QGraphicsView {
-    QGraphicsScene* m_graphicsScene = nullptr;
-    //Scene* m_scene = nullptr;
     bool m_panning = false;
-    QPoint m_lastMousePos;
-    int m_zoomLevel = 0;
-    int m_minZoom = -10;
-    int m_maxZoom = 20;
-    double m_zoomFactor = 1.15;
-    int m_gridSize = 50;
+    bool m_spacePressed = false;
+    QPoint m_panStart;
 
-    void zoomIn();
-    void zoomOut();
+
+    bool m_gridVisible = true;
+    double m_gridSpacing = 50.0;
+
+    void drawGrid(QPainter* painter, const QRectF& rect) const;
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
+    void drawForeground(QPainter *painter, const QRectF &rect) override;
+
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 public:
-    DrawingBoard();
+    explicit DrawingBoard(QGraphicsScene* scene, QWidget* parent = nullptr);
+    void setGridVisible(bool visible);
+    void setGridSpacing(double spacing);
     void resetView();
-    [[nodiscard]] int zoomPercent() const;
-    void updateScene() const;
 };
 
