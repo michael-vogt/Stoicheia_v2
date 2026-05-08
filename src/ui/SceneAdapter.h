@@ -33,6 +33,8 @@ public:
     GeoGraphicsItem* itemFor(GeoObject* geoObject) const;
     std::unordered_map<GeoObject*, GeoGraphicsItem*> geoGraphicsItems() { return m_map; }
 
+    Scene* geoScene() const { return m_geoScene; }
+
 private:
     Scene*          m_geoScene;
     QGraphicsScene* m_qtScene;

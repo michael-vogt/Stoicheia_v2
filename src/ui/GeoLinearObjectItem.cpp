@@ -30,20 +30,21 @@ QLineF GeoLinearObjectItem::computeVisibleLine() const {
         // Strecke: exakt von p1 nach p2
         return QLineF(x1, y1, x2, y2);
 
-    } else if (dynamic_cast<Ray*>(m_linearObject)) {
+    }
+    if (dynamic_cast<Ray*>(m_linearObject)) {
         // Halbgerade: von p1 in Richtung p2, weit genug
         return QLineF(x1, y1,
                       x1 + ux * m_extent,
                       y1 + uy * m_extent);
 
-    } else {
-        // Gerade (Line): in beide Richtungen
-        return QLineF(x1 - ux * m_extent, y1 - uy * m_extent,
-                      x1 + ux * m_extent, y1 + uy * m_extent);
     }
+    // Gerade (Line): in beide Richtungen
+    return QLineF(x1 - ux * m_extent, y1 - uy * m_extent,
+                  x1 + ux * m_extent, y1 + uy * m_extent);
 }
 
 void GeoLinearObjectItem::updateGeometry() {
+    setVisible(isValid());
     m_line = computeVisibleLine();
 }
 

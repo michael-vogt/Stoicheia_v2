@@ -9,6 +9,7 @@ GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
 }
 
 void GeoCircleItem::updateGeometry() {
+    setVisible(isValid());
     // Kreis zentriert auf Mittelpunkt – Position in Szene setzen
     setPos(m_circle->center()->x(), m_circle->center()->y());
 }

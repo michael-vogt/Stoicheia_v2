@@ -9,6 +9,7 @@ public:
     explicit GeoPointItem(Point* point, QGraphicsItem* parent = nullptr);
 
     QRectF boundingRect() const override;
+    Point*  point() const { return m_point; };
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;

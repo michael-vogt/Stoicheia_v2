@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 
     DrawingBoard* board = window.drawingBoard();
 
-    Point* P1 = board->geoScene()->create<Point>(-500,-500);
+    /*Point* P1 = board->geoScene()->create<Point>(-500,-500);
     Point* P2 = board->geoScene()->create<Point>(500,500);
     Point* P3 = board->geoScene()->create<Point>(-500,500);
     Point* P4 = board->geoScene()->create<Point>(500,-500);
@@ -32,9 +32,10 @@ int main(int argc, char *argv[]) {
     board->adapter()->addLinearObject(L2);
 
     board->adapter()->addIntersectionSet(IL1L2);
-    board->adapter()->addIntersectionSet(IL1C);
+
+    /*board->adapter()->addIntersectionSet(IL1C);
     board->adapter()->addIntersectionSet(IL2C);
-    board->adapter()->addCircle(C);
+    board->adapter()->addCircle(C);*/
 
     window.showMaximized();
 

@@ -51,12 +51,20 @@ target_link_libraries(StoicheiaLib PUBLIC
 # ---------------------------
 # Qt-Oberfläche
 # ---------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
         src/ui/MainWindow.cpp
         src/ui/MainWindow.h
         src/ui/DrawingBoard.cpp
         src/ui/DrawingBoard.h
+        src/ui/commands/CommandStack.cpp
+        src/ui/commands/CreatePointCommand.cpp
+        src/ui/commands/MovePointCommand.cpp
+        src/ui/commands/DeleteObjectCommand.cpp
+        src/ui/tools/SelectTool.cpp
+        src/ui/tools/CreatePointTool.cpp
+        src/ui/tools/CreateLineTool.cpp
+        src/ui/commands/CreateLineCommand.cpp
 )
 
 #qt_add_resources(Stoicheia "resources"
