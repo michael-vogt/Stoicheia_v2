@@ -18,11 +18,11 @@ public:
     void setBrush(const QBrush& brush);
 
 protected:
+    QPen    m_pen     = QPen(Qt::black, 1.5);
+    QBrush  m_brush   = QBrush(Qt::white);
+    double  m_radius  = 4.0;
     void updateGeometry() override;
 
 private:
     Point*  m_point;
-    double  m_radius  = 4.0;
-    QPen    m_pen     = QPen(Qt::black, 1.5);
-    QBrush  m_brush   = QBrush(Qt::white);
 };

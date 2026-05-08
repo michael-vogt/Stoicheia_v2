@@ -8,13 +8,14 @@
 #include "MainWindow.h"
 #include "geometry/Point.h"
 
-DrawingBoard::DrawingBoard(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent) {
+DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
+    setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
     setRenderHint(QPainter::SmoothPixmapTransform);
-    setBackgroundBrush(QColor(245,245,245));
+    setBackgroundBrush(QColor(245, 245, 245));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setSceneRect(-10000,-10000,20000,20000);
+    setSceneRect(-10000, -10000, 20000, 20000);
 
     QTransform transform;
     transform.scale(1.0, -1.0);
@@ -135,17 +136,12 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
         m_spacePressed = true;
         setCursor(Qt::OpenHandCursor);
         event->accept();
-        return;
     } else if (event->key() == Qt::Key_M && !event->isAutoRepeat()) {
-        if (auto* wnd = dynamic_cast<MainWindow*>(parentWidget())) {
-            //std::unordered_map<GeoObject*, GeoGraphicsItem*> map = wnd->adapter()->geoGraphicsItems();
-            const auto& map = wnd->adapter()->geoGraphicsItems();
-            for (const auto &key: map | std::views::keys) {
-                if (key && typeid(*key) == typeid(Point)) {
-                    auto* p = dynamic_cast<Point*>(key);
-                    p->moveTo(p->x() - 100, p->y());
-                    break;
-                }
+        for (const auto& map = m_adapter.geoGraphicsItems(); const auto &key: map | std::views::keys) {
+            if (key && typeid(*key) == typeid(Point)) {
+                auto* p = dynamic_cast<Point*>(key);
+                p->moveTo(p->x() - 100, p->y());
+                break;
             }
         }
     } else if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
@@ -215,9 +211,10 @@ void DrawingBoard::wheelEvent(QWheelEvent *event) {
 }
 
 
-void DrawingBoard::showEvent(QShowEvent *event) {
-    QGraphicsView::showEvent(event);
-    QTimer::singleShot(100, this, [this]() {
+void DrawingBoard::resizeEvent(QResizeEvent *event) {
+    QGraphicsView::resizeEvent(event);
+    if (m_resizeCount < 2) {
+        ++m_resizeCount;
         QPointF origin = mapFromScene(QPointF(0, 0));
         QPointF center = viewport()->rect().center();
         QPointF delta  = origin - center;
@@ -226,7 +223,8 @@ void DrawingBoard::showEvent(QShowEvent *event) {
             horizontalScrollBar()->value() + static_cast<int>(delta.x()));
         verticalScrollBar()->setValue(
             verticalScrollBar()->value() + static_cast<int>(delta.y()));
-    });
+    }
+    viewport()->update();
 }
 
 void DrawingBoard::resetView() {

@@ -6,6 +6,7 @@
 #include "GeoPointItem.h"
 #include "GeoLinearObjectItem.h"
 #include "GeoCircleItem.h"
+#include "GeoIntersectionPointItem.h"
 #include "constructions/IntersectionSet.h"
 
 // Verwaltet die Zuordnung zwischen geometrischen Objekten (Scene)
@@ -19,7 +20,8 @@ public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
 
     // Geometrie-Objekt + grafische Repräsentation hinzufügen
-    GeoPointItem*         addPoint(Point* point);
+    GeoPointItem*         addPoint(Point* point, QPen pen = QPen(QColor(0,0,0), 1.5));
+    GeoIntersectionPointItem* addIntersectionPoint(IntersectionPoint* point, QPen pen = QPen(QColor(64,64,64), 1.5));
     GeoLinearObjectItem*  addLinearObject(LinearObject* linearObject);
     GeoCircleItem*        addCircle(Circle* circle);
     std::pair<GeoPointItem*, GeoPointItem*> addIntersectionSet(IntersectionSet* intersectionSet);
