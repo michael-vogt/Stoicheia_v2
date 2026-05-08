@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QStatusBar>
 #include <QTimer>
 
 #include "MainWindow.h"
@@ -154,8 +155,9 @@ void DrawingBoard::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::MiddleButton || (event->button() == Qt::LeftButton && m_spacePressed)) {
         m_panning = true;
         m_panStart = event->pos();
-        setCursor(Qt::ClosedHandCursor);
+        viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
+        emit statusMessageChanged(tr("Panning"));
         return;
     }
 
@@ -194,8 +196,9 @@ void DrawingBoard::mouseMoveEvent(QMouseEvent *event) {
 void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
     if (m_panning) {
         m_panning = false;
-        setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
+        viewport()->setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
         event->accept();
+        emit statusMessageChanged("");
         return;
     }
 
@@ -209,6 +212,9 @@ void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void DrawingBoard::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Alt) {
+        emit statusMessageChanged(tr("Snapping"));
+    }
     // Undo/Redo
     if (event->matches(QKeySequence::Undo)) {
         m_commandStack.undo();
@@ -222,8 +228,9 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
     // Pan-Modus
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        emit statusMessageChanged(tr("Panning"));
         m_spacePressed = true;
-        viewport()->setCursor(Qt::OpenHandCursor);
+        viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
         return;
     }
@@ -255,10 +262,15 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
 }
 
 void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Alt) {
+        emit statusMessageChanged("");
+    }
+
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        emit statusMessageChanged("");
         m_spacePressed = false;
         if (!m_panning)
-            setCursor(Qt::ArrowCursor);
+            viewport()->setCursor(Qt::ArrowCursor);
         event->accept();
         return;
     }

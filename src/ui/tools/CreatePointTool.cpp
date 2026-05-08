@@ -20,8 +20,11 @@ void CreatePointTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    QPointF pos = m_ctx.drawingBoard->mapToScene(event->pos());
-    m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, pos.x(), pos.y()));
+    bool snapActive = event->modifiers() & Qt::AltModifier;
+    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+
+    m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y()));
     event->accept();
 }
 

@@ -51,8 +51,12 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF newPos = scenePos - m_dragOffset;
+    bool snapActive = event->modifiers() & Qt::AltModifier;
+    //QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    //QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+
+    //QPointF newPos = scenePos - m_dragOffset;
+    QPointF newPos = m_ctx.snapHelper->snap(m_ctx.drawingBoard->mapToScene(event->pos()) - m_dragOffset, snapActive);
 
     m_activeMove->setTarget(newPos.x(), newPos.y());
     m_draggedPoint->moveTo(newPos.x(), newPos.y());

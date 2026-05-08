@@ -9,6 +9,7 @@
 #include "tools/Tool.h"
 
 class DrawingBoard : public QGraphicsView {
+    Q_OBJECT
     // Geometrie (Reihenfolge wichtig für Initialisierung!)
     Scene m_geoScene;
     QGraphicsScene m_qtScene;
@@ -30,8 +31,10 @@ class DrawingBoard : public QGraphicsView {
     // Aktives Tool
     std::unique_ptr<Tool> m_activeTool;
 
+    SnapHelper m_snapHelper{&m_qtScene, m_gridSpacing};
+
     void drawGrid(QPainter* painter, const QRectF& rect) const;
-    ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack}; }
+    ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper }; }
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -65,5 +68,8 @@ public:
     QGraphicsScene* qtScene() { return &m_qtScene; }
     SceneAdapter* adapter() { return &m_adapter; }
     CommandStack* commandStack() { return &m_commandStack; }
+
+    signals:
+    void statusMessageChanged(const QString& text, int timeout = 0);
 };
 

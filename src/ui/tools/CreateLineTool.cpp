@@ -52,13 +52,15 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
+    bool snapActive = event->modifiers() & Qt::AltModifier;
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
 
     if (!m_firstPoint) {
         // Erster Klick: bestehenden Punkt nehmen oder neuen erzeugen
-        m_firstPoint = pointAt(scenePos);
+        m_firstPoint = pointAt(snapped);
         if (!m_firstPoint) {
-            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, scenePos.x(), scenePos.y());
+            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
             auto* rawCmd = cmd.get();
             m_ctx.commandStack->execute(std::move(cmd));
             m_firstPoint = rawCmd->point();
@@ -67,14 +69,14 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
 
         // Vorschaulinie starten
         m_preview = new QGraphicsLineItem(
-            QLineF(m_firstPoint->x(), m_firstPoint->y(), scenePos.x(), scenePos.y()));
+            QLineF(m_firstPoint->x(), m_firstPoint->y(), snapped.x(), snapped.y()));
         m_preview->setPen(QPen(Qt::gray, 1, Qt::DashLine));
         m_ctx.drawingBoard->scene()->addItem(m_preview);
     } else {
         // Zweiter Klick: Endpunkt + Linie erzeugen
-        Point* second = pointAt(scenePos);
+        Point* second = pointAt(snapped);
         if (!second) {
-            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, scenePos.x(), scenePos.y());
+            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
             auto* rawCmd = cmd.get();
             m_ctx.commandStack->execute(std::move(cmd));
             second = rawCmd->point();
@@ -95,8 +97,11 @@ void CreateLineTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
+    bool snapActive = event->modifiers() & Qt::AltModifier;
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    m_preview->setLine(QLineF(m_firstPoint->x(), m_firstPoint->y(), scenePos.x(), scenePos.y()));
+    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+
+    m_preview->setLine(QLineF(m_firstPoint->x(), m_firstPoint->y(), snapped.x(), snapped.y()));
     m_ctx.drawingBoard->viewport()->update();
     event->accept();
 }

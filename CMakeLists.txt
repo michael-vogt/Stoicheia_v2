@@ -51,7 +51,7 @@ target_link_libraries(StoicheiaLib PUBLIC
 # ---------------------------
 # Qt-Oberfläche
 # ---------------------------
-qt_add_executable(Stoicheia
+qt_add_executable(Stoicheia WIN32
         main.cpp
         src/ui/MainWindow.cpp
         src/ui/MainWindow.h
@@ -65,6 +65,7 @@ qt_add_executable(Stoicheia
         src/ui/tools/CreatePointTool.cpp
         src/ui/tools/CreateLineTool.cpp
         src/ui/commands/CreateLineCommand.cpp
+        src/ui/SnapHelper.cpp
 )
 
 #qt_add_resources(Stoicheia "resources"

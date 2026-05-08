@@ -7,6 +7,7 @@
 #include "SceneAdapter.h"
 
 class MainWindow : public QMainWindow {
+    Q_OBJECT
     DrawingBoard* m_drawingBoard = nullptr;
     QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;

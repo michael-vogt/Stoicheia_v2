@@ -14,6 +14,7 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     setCentralWidget(m_drawingBoard);
 
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
+    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
 
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>();
