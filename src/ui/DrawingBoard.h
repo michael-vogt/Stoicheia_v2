@@ -15,6 +15,7 @@ class DrawingBoard : public QGraphicsView {
     QPoint m_panStart;
     bool m_gridVisible = true;
     double m_gridSpacing = 50.0;
+    int m_resizeCount = 0;
 
     void drawGrid(QPainter* painter, const QRectF& rect) const;
 
@@ -27,7 +28,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void showEvent(QShowEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 public:
     explicit DrawingBoard(QWidget* parent = nullptr);

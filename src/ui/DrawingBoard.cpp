@@ -211,9 +211,10 @@ void DrawingBoard::wheelEvent(QWheelEvent *event) {
 }
 
 
-void DrawingBoard::showEvent(QShowEvent *event) {
-    QGraphicsView::showEvent(event);
-    QTimer::singleShot(100, this, [this]() {
+void DrawingBoard::resizeEvent(QResizeEvent *event) {
+    QGraphicsView::resizeEvent(event);
+    if (m_resizeCount < 2) {
+        ++m_resizeCount;
         QPointF origin = mapFromScene(QPointF(0, 0));
         QPointF center = viewport()->rect().center();
         QPointF delta  = origin - center;
@@ -222,7 +223,8 @@ void DrawingBoard::showEvent(QShowEvent *event) {
             horizontalScrollBar()->value() + static_cast<int>(delta.x()));
         verticalScrollBar()->setValue(
             verticalScrollBar()->value() + static_cast<int>(delta.y()));
-    });
+    }
+    viewport()->update();
 }
 
 void DrawingBoard::resetView() {
