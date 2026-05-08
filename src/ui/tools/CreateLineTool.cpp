@@ -5,7 +5,7 @@
 #include "ui/commands/CreateLineCommand.h"
 #include "ui/commands/CreatePointCommand.h"
 
-CreateLineTool::CreateLineTool(const ToolContext &ctx) : Tool(ctx) {}
+CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : Tool(ctx), m_type(type) {}
 
 void CreateLineTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
@@ -81,7 +81,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         }
 
         // Linie als Command erzeugen
-        m_ctx.commandStack->execute(std::make_unique<CreateLineCommand>(m_ctx.adapter, m_firstPoint, second));
+        m_ctx.commandStack->execute(std::make_unique<CreateLineCommand>(m_ctx.adapter, m_firstPoint, second, m_type));
         removePreview();
         m_firstPoint = nullptr;
         m_firstIsNew = false;

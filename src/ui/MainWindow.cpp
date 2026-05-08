@@ -44,12 +44,29 @@ void MainWindow::setupToolBar() {
         toggleTools(pointAction);
     });
 
-    auto* lineAction = m_toolbar->addAction(tr("Linie"));
+
+    auto* lineAction = m_toolbar->addAction(tr("Gerade"));
     lineAction->setCheckable(true);
     lineAction->setShortcut(Qt::Key_L);
     connect(lineAction, &QAction::triggered, [this, lineAction]() {
-        m_drawingBoard->setTool<CreateLineTool>();
+        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Line);
         toggleTools(lineAction);
+    });
+
+    auto* rayAction = m_toolbar->addAction(tr("Halbgerade"));
+    rayAction->setCheckable(true);
+    rayAction->setShortcut(Qt::Key_R);
+    connect(rayAction, &QAction::triggered, [this, rayAction]() {
+        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Ray);
+        toggleTools(rayAction);
+    });
+
+    auto* segmentAction = m_toolbar->addAction(tr("Strecke"));
+    segmentAction->setCheckable(true);
+    segmentAction->setShortcut(Qt::Key_S);
+    connect(segmentAction, &QAction::triggered, [this, segmentAction]() {
+        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Segment);
+        toggleTools(segmentAction);
     });
 }
 
