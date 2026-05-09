@@ -1,7 +1,10 @@
 #include "MainWindow.h"
+
+#include <QApplication>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QLineEdit>
 
 #include "tools/CreateLineTool.h"
 #include "tools/CreatePointTool.h"
@@ -13,15 +16,19 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     m_drawingBoard = new DrawingBoard(this);
     setCentralWidget(m_drawingBoard);
 
-    connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
-    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
-
     // Standard-Tool: Auswählen
-    m_drawingBoard->setTool<SelectTool>();
+    m_drawingBoard->setTool<SelectTool>(ToolType::Select);
 
     setupToolBar();
     setupMenu();
     setupStatusBar();
+
+    connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
+    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
+    connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
+        const bool isDrawing = (type == ToolType::CreateLine);
+        m_lineAction->setShortcut(isDrawing ? QKeySequence() : QKeySequence(Qt::Key_L));
+    });
 }
 
 void MainWindow::setupToolBar() {
@@ -33,7 +40,7 @@ void MainWindow::setupToolBar() {
     selectAction->setChecked(true);
     selectAction->setShortcut(Qt::Key_Escape);
     connect(selectAction, &QAction::triggered, [this, selectAction]() {
-        m_drawingBoard->setTool<SelectTool>();
+        m_drawingBoard->setTool<SelectTool>(ToolType::Select);
         toggleTools(selectAction);
     });
 
@@ -41,33 +48,17 @@ void MainWindow::setupToolBar() {
     pointAction->setCheckable(true);
     pointAction->setShortcut(Qt::Key_P);
     connect(pointAction, &QAction::triggered, [this, pointAction]() {
-        m_drawingBoard->setTool<CreatePointTool>();
+        m_drawingBoard->setTool<CreatePointTool>(ToolType::CreatePoint);
         toggleTools(pointAction);
     });
 
 
-    auto* lineAction = m_toolbar->addAction(tr("Gerade"));
-    lineAction->setCheckable(true);
-    lineAction->setShortcut(Qt::Key_L);
-    connect(lineAction, &QAction::triggered, [this, lineAction]() {
-        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Line);
-        toggleTools(lineAction);
-    });
-
-    auto* rayAction = m_toolbar->addAction(tr("Halbgerade"));
-    rayAction->setCheckable(true);
-    rayAction->setShortcut(Qt::Key_R);
-    connect(rayAction, &QAction::triggered, [this, rayAction]() {
-        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Ray);
-        toggleTools(rayAction);
-    });
-
-    auto* segmentAction = m_toolbar->addAction(tr("Strecke"));
-    segmentAction->setCheckable(true);
-    segmentAction->setShortcut(Qt::Key_S);
-    connect(segmentAction, &QAction::triggered, [this, segmentAction]() {
-        m_drawingBoard->setTool<CreateLineTool>(LinearObjectType::Segment);
-        toggleTools(segmentAction);
+    m_lineAction = m_toolbar->addAction(tr("Linie"));
+    m_lineAction->setCheckable(true);
+    m_lineAction->setShortcut(Qt::Key_L);
+    connect(m_lineAction, &QAction::triggered, [this]() {
+        m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
+        toggleTools(m_lineAction);
     });
 }
 

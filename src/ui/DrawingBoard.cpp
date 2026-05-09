@@ -212,6 +212,12 @@ void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void DrawingBoard::keyPressEvent(QKeyEvent *event) {
+    if (m_activeTool) {
+        m_activeTool->keyPressEvent(event);
+        if (event->isAccepted())
+            return;
+    }
+
     if (event->key() == Qt::Key_Alt) {
         emit statusMessageChanged(tr("Snapping"));
     }
@@ -250,12 +256,6 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
         resetView();
         event->accept();
         return;
-    }
-
-    if (m_activeTool) {
-        m_activeTool->keyPressEvent(event);
-        if (event->isAccepted())
-            return;
     }
 
     QGraphicsView::keyPressEvent(event);

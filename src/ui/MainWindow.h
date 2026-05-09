@@ -11,6 +11,7 @@ class MainWindow : public QMainWindow {
     DrawingBoard* m_drawingBoard = nullptr;
     QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;
+    QAction* m_lineAction = nullptr;
     QToolBar* m_toolbar = nullptr;
 
     void setupToolBar();

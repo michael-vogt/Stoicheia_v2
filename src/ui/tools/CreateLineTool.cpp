@@ -38,6 +38,12 @@ Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
     return nullptr;
 }
 
+void CreateLineTool::setType(const LinearObjectType type) {
+    m_type = type;
+    if (m_preview)
+        m_preview->setLine(computePreviewLine(m_lastScenePos));
+}
+
 void CreateLineTool::removePreview() {
     if (m_preview) {
         m_ctx.drawingBoard->scene()->removeItem(m_preview);
@@ -101,7 +107,53 @@ void CreateLineTool::mouseMoveEvent(QMouseEvent *event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
 
-    m_preview->setLine(QLineF(m_firstPoint->x(), m_firstPoint->y(), snapped.x(), snapped.y()));
+    //m_preview->setLine(QLineF(m_firstPoint->x(), m_firstPoint->y(), snapped.x(), snapped.y()));
+    m_lastScenePos = snapped;
+    m_preview->setLine(computePreviewLine(snapped));
     m_ctx.drawingBoard->viewport()->update();
     event->accept();
+}
+
+void CreateLineTool::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+        case Qt::Key_L:
+            setType(LinearObjectType::Line);
+            event->accept();
+            return;
+        case Qt::Key_R:
+            setType(LinearObjectType::Ray);
+            event->accept();
+            return;
+        case Qt::Key_S:
+            setType(LinearObjectType::Segment);
+            event->accept();
+            return;
+        default:
+            event->ignore();
+    }
+}
+
+QLineF CreateLineTool::computePreviewLine(const QPointF &endPos) const {
+    if (!m_firstPoint) return {};
+
+    QPointF p1(m_firstPoint->x(), m_firstPoint->y());
+    QPointF p2 = endPos;
+
+    double dx = p2.x() - p1.x();
+    double dy = p2.y() - p1.y();
+    double len = std::sqrt(dx*dx + dy*dy);
+    if (len < 1e-10) return QLineF(p1, p2);
+
+    QPointF u(dx / len, dy / len);
+    const double extent = 10000.0;
+
+    switch (m_type) {
+        case LinearObjectType::Segment:
+            return QLineF(p1, p2);
+        case LinearObjectType::Ray:
+            return QLineF(p1, p1 + u * extent);
+        case LinearObjectType::Line:
+            return QLineF(p1 - u * extent, p1 + u * extent);
+    }
+    return QLineF(p1, p2);
 }

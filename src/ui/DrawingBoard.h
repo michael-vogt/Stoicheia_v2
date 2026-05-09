@@ -8,6 +8,12 @@
 #include "geometry/Scene.h"
 #include "tools/Tool.h"
 
+enum class ToolType {
+    Select,
+    CreatePoint,
+    CreateLine
+};
+
 class DrawingBoard : public QGraphicsView {
     Q_OBJECT
     // Geometrie (Reihenfolge wichtig für Initialisierung!)
@@ -30,6 +36,7 @@ class DrawingBoard : public QGraphicsView {
 
     // Aktives Tool
     std::unique_ptr<Tool> m_activeTool;
+    ToolType m_activeToolType;
 
     SnapHelper m_snapHelper{&m_qtScene, m_gridSpacing};
 
@@ -52,11 +59,16 @@ public:
 
     // Tool setzen - übernimmt Ownership
     template<typename T, typename... Args>
-    void setTool(Args&&... args) {
+    void setTool(ToolType type, Args&&... args) {
         if (m_activeTool) m_activeTool->deactivate();
         m_activeTool = std::make_unique<T>(makeContext(), std::forward<Args>(args)...);
+        m_activeToolType = type;
         m_activeTool->activate();
+        emit toolChanged(type);
     }
+
+    Tool* activeTool() const { return m_activeTool.get(); }
+    ToolType activeToolType() const { return m_activeToolType; }
 
     // Raster
     void setGridVisible(bool visible);
@@ -71,5 +83,6 @@ public:
 
     signals:
     void statusMessageChanged(const QString& text, int timeout = 0);
+    void toolChanged(ToolType type);
 };
 
