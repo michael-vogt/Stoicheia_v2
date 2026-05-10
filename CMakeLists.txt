@@ -66,6 +66,7 @@ qt_add_executable(Stoicheia WIN32
         src/ui/tools/CreateLineTool.cpp
         src/ui/commands/CreateLineCommand.cpp
         src/ui/SnapHelper.cpp
+        src/ui/commands/MacroCommand.cpp
 )
 
 #qt_add_resources(Stoicheia "resources"

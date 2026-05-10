@@ -3,17 +3,19 @@
 #include "Tool.h"
 #include "geometry/Point.h"
 #include "ui/GeoGraphicsItem.h"
+#include "ui/commands/CreatePointCommand.h"
 
 class CreateLineTool : public Tool {
-    Point* m_firstPoint = nullptr;
-    bool m_firstIsNew = false;
-    QGraphicsLineItem* m_preview = nullptr;
     LinearObjectType m_type;
+    Point* m_firstPoint = nullptr;
+    QPointF m_firstScenePos;
+    bool m_firstIsNew = false;
+    std::unique_ptr<CreatePointCommand> m_firstPointCmd;
+    QGraphicsLineItem* m_preview = nullptr;
     QPointF m_lastScenePos;
 
     Point* pointAt(const QPointF& scenePos) const;
     void setType(const LinearObjectType type);
-    void updatePreview(const QPointF& currentScreenPos);
     QLineF computePreviewLine(const QPointF& endPos) const;
     void removePreview();
 

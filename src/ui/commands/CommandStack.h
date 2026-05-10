@@ -14,6 +14,7 @@ class CommandStack : public QObject {
 public:
     explicit CommandStack(QObject *parent = nullptr) : QObject(parent) {};
     void execute(std::unique_ptr<Command> command);
+    void pushWithoutExecute(std::unique_ptr<Command> cmd);
 
     void undo();
     void redo();

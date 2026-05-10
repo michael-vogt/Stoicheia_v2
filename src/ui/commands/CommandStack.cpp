@@ -7,6 +7,12 @@ void CommandStack::execute(std::unique_ptr<Command> command) {
     emit changed();
 }
 
+void CommandStack::pushWithoutExecute(std::unique_ptr<Command> cmd) {
+    m_undoStack.push_back(std::move(cmd));
+    m_redoStack.clear();
+    emit changed();
+}
+
 void CommandStack::undo() {
     if (!canUndo()) return;
     auto& cmd = m_undoStack.back();
