@@ -69,6 +69,7 @@ public:
 
     Tool* activeTool() const { return m_activeTool.get(); }
     ToolType activeToolType() const { return m_activeToolType; }
+    void showStatus(const QString& message) { emit statusMessageChanged(message); }
 
     // Raster
     void setGridVisible(bool visible);

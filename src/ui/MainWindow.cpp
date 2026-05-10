@@ -16,9 +16,6 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     m_drawingBoard = new DrawingBoard(this);
     setCentralWidget(m_drawingBoard);
 
-    // Standard-Tool: Auswählen
-    m_drawingBoard->setTool<SelectTool>(ToolType::Select);
-
     setupToolBar();
     setupMenu();
     setupStatusBar();
@@ -29,6 +26,9 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
         const bool isDrawing = (type == ToolType::CreateLine);
         m_lineAction->setShortcut(isDrawing ? QKeySequence() : QKeySequence(Qt::Key_L));
     });
+
+    // Standard-Tool: Auswählen
+    m_drawingBoard->setTool<SelectTool>(ToolType::Select);
 }
 
 void MainWindow::setupToolBar() {
@@ -99,7 +99,7 @@ void MainWindow::setupMenu() {
 }
 
 void MainWindow::setupStatusBar() const {
-    statusBar()->showMessage(tr("Bereit"));
+    //statusBar()->showMessage(tr("Bereit"));
 }
 
 void MainWindow::updateUndoRedo() const {

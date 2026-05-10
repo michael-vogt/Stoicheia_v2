@@ -8,6 +8,11 @@ CreatePointTool::CreatePointTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void CreatePointTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
+    m_ctx.drawingBoard->showStatus(QObject::tr("Punkt durch Klicken hinzufügen"));
+}
+
+void CreatePointTool::deactivate() {
+    m_ctx.drawingBoard->showStatus("");
 }
 
 QCursor CreatePointTool::cursor() const {

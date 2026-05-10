@@ -6,6 +6,7 @@ public:
     explicit CreatePointTool(const ToolContext& ctx);
 
     void activate() override;
+    void deactivate() override;
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

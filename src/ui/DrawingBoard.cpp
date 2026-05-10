@@ -219,7 +219,7 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
 
     if (event->key() == Qt::Key_Alt) {
-        emit statusMessageChanged(tr("Snapping"));
+        showStatus(tr("Snapping"));
     }
     // Undo/Redo
     if (event->matches(QKeySequence::Undo)) {
@@ -234,7 +234,7 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
     // Pan-Modus
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        emit statusMessageChanged(tr("Panning"));
+        showStatus(tr("Panning"));
         m_spacePressed = true;
         viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
@@ -254,6 +254,11 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
     if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
         resetView();
+        event->accept();
+        return;
+    }
+    if (event->key() == Qt::Key_NumberSign && !event->isAutoRepeat()) {
+        setGridVisible(!m_gridVisible);
         event->accept();
         return;
     }
