@@ -15,7 +15,14 @@
 // Ist die zentrale Anlaufstelle um Objekte hinzuzufügen und zu entfernen –
 // beide Welten bleiben dadurch synchron.
 
-class SceneAdapter {
+class SceneAdapter : public QObject {
+    Q_OBJECT
+    Scene*          m_geoScene;
+    QGraphicsScene* m_qtScene;
+
+    std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
+    std::unordered_set<GeoObject*> m_selection;
+
 public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
 
@@ -37,9 +44,12 @@ public:
 
     Scene* geoScene() const { return m_geoScene; }
 
-private:
-    Scene*          m_geoScene;
-    QGraphicsScene* m_qtScene;
+    void select(GeoObject* geoObject);
+    void deselect(GeoObject* geoObject);
+    void clearSelection();
+    const std::unordered_set<GeoObject*>& selection() const { return m_selection; }
 
-    std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
+    signals:
+    void selectionChanged();
+
 };

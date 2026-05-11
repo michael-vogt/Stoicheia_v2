@@ -1,7 +1,7 @@
 #include "GeoGraphicsItem.h"
 
-GeoGraphicsItem::GeoGraphicsItem(QGraphicsItem* parent)
-    : QGraphicsItem(parent)
+GeoGraphicsItem::GeoGraphicsItem(GeoObject* object, QGraphicsItem* parent)
+    : QGraphicsItem(parent), m_object(object)
 {
     // Damit Qt das Item korrekt neu zeichnet wenn sich die Position ändert
     setFlag(QGraphicsItem::ItemSendsGeometryChanges);

@@ -13,6 +13,7 @@ class SelectTool : public Tool {
     std::unique_ptr<MoveCommand> m_activeMove;
     QPointF m_dragOffset;
     Point* pointAt(const QPointF& scenePos) const;
+    GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
 
 public:
     explicit SelectTool(const ToolContext& ctx);

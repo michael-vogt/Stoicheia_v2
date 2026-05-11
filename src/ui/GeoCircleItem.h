@@ -16,6 +16,8 @@ public:
     void setPen(const QPen& pen);
     void setBrush(const QBrush& brush);
 
+    bool contains(const QPointF &point) override;
+
 protected:
     void updateGeometry() override;
 

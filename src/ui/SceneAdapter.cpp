@@ -74,3 +74,31 @@ Point *SceneAdapter::radiusPointFor(const Point *centerPoint) const {
     }
     return nullptr;
 }
+
+void SceneAdapter::select(GeoObject* geoObject) {
+    if (m_map.contains(geoObject)) {
+        m_map[geoObject]->setGeoSelected(true);
+    }
+
+    if (!m_selection.contains(geoObject))
+        m_selection.insert(geoObject);
+    emit selectionChanged();
+}
+
+void SceneAdapter::deselect(GeoObject* geoObject) {
+    if (m_map.contains(geoObject)) {
+        m_map[geoObject]->setGeoSelected(false);
+    }
+    if (m_selection.contains(geoObject))
+        m_selection.erase(geoObject);
+    emit selectionChanged();
+}
+
+void SceneAdapter::clearSelection() {
+    for (const auto& geo : m_selection) {
+        if (m_map.contains(geo))
+            m_map[geo]->setGeoSelected(false);
+    }
+    m_selection.clear();
+    emit selectionChanged();
+}

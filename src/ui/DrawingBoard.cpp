@@ -38,6 +38,10 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
         emit escapePressed();
     });
     escShortcut.release();
+
+    connect(&m_adapter, &SceneAdapter::selectionChanged, [this]() {
+        viewport()->update();
+    });
 }
 
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
