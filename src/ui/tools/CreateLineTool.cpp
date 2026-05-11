@@ -23,7 +23,6 @@ void CreateLineTool::deactivate() {
 
     m_firstPoint = nullptr;
     m_firstIsNew = false;
-    m_firstPointCmd = nullptr;
 }
 
 QCursor CreateLineTool::cursor() const {
@@ -85,10 +84,10 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         if (m_firstIsNew)
             m_ctx.adapter->remove(m_firstPoint);
 
-        auto macro = std::make_unique<MacroCommand>(
+        auto macro = std::make_unique<MacroCommand>(QObject::tr(
             m_type == LinearObjectType::Line ? "Gerade erstellen" :
             m_type == LinearObjectType::Ray ?  "Halbgerade erstellen" :
-                                               "Strecke erstellen");
+                                               "Strecke erstellen"));
 
         // Ersten Punkt ins Macro, falls wir ihn erstellt haben
         CreatePointCommand* p1Cmd = nullptr;
@@ -118,7 +117,6 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         removePreview();
         m_firstPoint = nullptr;
         m_firstIsNew = false;
-        m_firstPointCmd = nullptr;
     }
     event->accept();
 }

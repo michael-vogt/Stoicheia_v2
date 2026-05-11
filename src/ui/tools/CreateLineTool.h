@@ -10,7 +10,6 @@ class CreateLineTool : public Tool {
     Point* m_firstPoint = nullptr;
     QPointF m_firstScenePos;
     bool m_firstIsNew = false;
-    std::unique_ptr<CreatePointCommand> m_firstPointCmd;
     QGraphicsLineItem* m_preview = nullptr;
     QPointF m_lastScenePos;
 

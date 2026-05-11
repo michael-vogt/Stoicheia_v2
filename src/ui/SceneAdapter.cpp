@@ -64,3 +64,13 @@ GeoGraphicsItem* SceneAdapter::itemFor(GeoObject* geoObject) const {
     auto it = m_map.find(geoObject);
     return it != m_map.end() ? it->second : nullptr;
 }
+
+Point *SceneAdapter::radiusPointFor(const Point *centerPoint) const {
+    for (const auto &geo: m_map | std::views::keys) {
+        if (const auto* circle = dynamic_cast<Circle*>(geo))
+            if (circle->center() == centerPoint) {
+                return circle->radiusPoint();
+            }
+    }
+    return nullptr;
+}

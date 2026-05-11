@@ -11,7 +11,8 @@
 enum class ToolType {
     Select,
     CreatePoint,
-    CreateLine
+    CreateLine,
+    CreateCircle
 };
 
 class DrawingBoard : public QGraphicsView {
@@ -83,6 +84,7 @@ public:
     CommandStack* commandStack() { return &m_commandStack; }
 
     signals:
+    void escapePressed();
     void statusMessageChanged(const QString& text, int timeout = 0);
     void toolChanged(ToolType type);
 };

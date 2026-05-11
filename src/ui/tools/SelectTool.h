@@ -10,7 +10,7 @@
 
 class SelectTool : public Tool {
     Point* m_draggedPoint = nullptr;
-    std::unique_ptr<MovePointCommand> m_activeMove;
+    std::unique_ptr<MoveCommand> m_activeMove;
     QPointF m_dragOffset;
     Point* pointAt(const QPointF& scenePos) const;
 
