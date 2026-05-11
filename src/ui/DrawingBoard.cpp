@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QTimer>
+#include <QShortcut>
 
 #include "MainWindow.h"
 #include "geometry/Point.h"
@@ -25,6 +26,18 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
 
     setDragMode(QGraphicsView::NoDrag);
     setFocusPolicy(Qt::StrongFocus);
+
+    auto escShortcut = std::make_unique<QShortcut>(Qt::Key_Escape, this);
+    escShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(escShortcut.get(), &QShortcut::activated, [this]() {
+        if (m_activeTool) {
+            QKeyEvent escEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+            m_activeTool->keyPressEvent(&escEvent);
+            if (escEvent.isAccepted()) return;
+        }
+        emit escapePressed();
+    });
+    escShortcut.release();
 }
 
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {

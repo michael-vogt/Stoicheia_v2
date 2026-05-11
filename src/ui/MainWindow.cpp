@@ -6,6 +6,7 @@
 #include <QToolBar>
 #include <QLineEdit>
 
+#include "tools/CreateCircleTool.h"
 #include "tools/CreateLineTool.h"
 #include "tools/CreatePointTool.h"
 #include "tools/SelectTool.h"
@@ -38,7 +39,7 @@ void MainWindow::setupToolBar() {
     auto* selectAction = m_toolbar->addAction(tr("Auswählen"));
     selectAction->setCheckable(true);
     selectAction->setChecked(true);
-    selectAction->setShortcut(Qt::Key_Escape);
+    connect(m_drawingBoard, &DrawingBoard::escapePressed, selectAction, &QAction::trigger);
     connect(selectAction, &QAction::triggered, [this, selectAction]() {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
         toggleTools(selectAction);
@@ -59,6 +60,14 @@ void MainWindow::setupToolBar() {
     connect(m_lineAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
         toggleTools(m_lineAction);
+    });
+
+    auto* circleAction = m_toolbar->addAction(tr("Kreis"));
+    circleAction->setCheckable(true);
+    circleAction->setShortcut(Qt::Key_C);
+    connect(circleAction, &QAction::triggered, [this, circleAction]() {
+        m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle);
+        toggleTools(circleAction);
     });
 }
 

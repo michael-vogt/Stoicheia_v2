@@ -33,6 +33,8 @@ public:
     GeoGraphicsItem* itemFor(GeoObject* geoObject) const;
     std::unordered_map<GeoObject*, GeoGraphicsItem*> geoGraphicsItems() { return m_map; }
 
+    Point* radiusPointFor(const Point* centerPoint) const;
+
     Scene* geoScene() const { return m_geoScene; }
 
 private:

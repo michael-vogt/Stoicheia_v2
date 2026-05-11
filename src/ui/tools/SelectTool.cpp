@@ -2,6 +2,7 @@
 
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
+#include "ui/commands/MoveCenterCommand.h"
 
 SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
 
@@ -40,8 +41,12 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
     m_draggedPoint = pointAt(scenePos);
 
     if (m_draggedPoint) {
+        if (Point* radiusPoint = m_ctx.adapter->radiusPointFor(m_draggedPoint)) {
+            m_activeMove = std::make_unique<MoveCenterCommand>(m_draggedPoint, radiusPoint, m_draggedPoint->x(), m_draggedPoint->y());
+        } else {
+            m_activeMove = std::make_unique<MovePointCommand>(m_draggedPoint, m_draggedPoint->x(), m_draggedPoint->y());
+        }
         m_dragOffset = scenePos - QPointF(m_draggedPoint->x(), m_draggedPoint->y());
-        m_activeMove = std::make_unique<MovePointCommand>(m_draggedPoint, m_draggedPoint->x(), m_draggedPoint->y());
         m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
     }
@@ -53,15 +58,11 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = event->modifiers() & Qt::AltModifier;
-    //QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    //QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    const bool snapActive = event->modifiers() & Qt::AltModifier;
 
-    //QPointF newPos = scenePos - m_dragOffset;
-    QPointF newPos = m_ctx.snapHelper->snap(m_ctx.drawingBoard->mapToScene(event->pos()) - m_dragOffset, snapActive);
-
+    const QPointF newPos = m_ctx.snapHelper->snap(m_ctx.drawingBoard->mapToScene(event->pos()) - m_dragOffset, snapActive);
     m_activeMove->setTarget(newPos.x(), newPos.y());
-    m_draggedPoint->moveTo(newPos.x(), newPos.y());
+    m_activeMove->execute();
     event->accept();
 }
 
@@ -71,7 +72,7 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
         return;
     }
 
-    m_ctx.commandStack->execute(std::move(m_activeMove));
+    m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMove));
     m_draggedPoint = nullptr;
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     event->accept();
@@ -80,6 +81,14 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
 void SelectTool::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
         // Ausgewähles Objekt löschen, noch nicht implementiert
+        event->accept();
+        return;
+    }
+    if (event->key() == Qt::Key_Escape && m_activeMove) {
+        m_activeMove->undo();
+        m_activeMove = nullptr;
+        m_draggedPoint = nullptr;
+        m_ctx.drawingBoard->viewport()->setCursor(cursor());
         event->accept();
         return;
     }
