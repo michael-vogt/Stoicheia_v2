@@ -43,10 +43,10 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
         // Erster Klick: Bestehenden Punkt nehmen oder neuen erzeugen
         m_centerPoint = pointAt(snapped);
         if (!m_centerPoint) {
-            m_centerPoint = m_ctx.adapter->geoScene()->create<Point>(scenePos.x(), scenePos.y());
+            m_centerPoint = m_ctx.adapter->geoScene()->create<Point>(snapped.x(), snapped.y());
             m_ctx.adapter->addPoint(m_centerPoint);
             m_centerIsNew = true;
-            m_centerScenePos = scenePos;
+            m_centerScenePos = snapped;
         }
 
         m_ctx.drawingBoard->showStatus(QObject::tr("Punkt auf dem Kreis klicken"));
@@ -75,7 +75,7 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
         Point* p2 = pointAt(scenePos);
 
         if (!p2) {
-            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, scenePos.x(), scenePos.y());
+            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
             p2Cmd = cmd.get();
             p2 = nullptr;
             macro->add(std::move(cmd));

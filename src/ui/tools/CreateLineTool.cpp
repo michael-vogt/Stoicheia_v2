@@ -67,16 +67,16 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         // Erster Klick: bestehenden Punkt nehmen oder neuen erzeugen
         m_firstPoint = pointAt(snapped);
         if (!m_firstPoint) {
-            m_firstPoint = m_ctx.adapter->geoScene()->create<Point>(scenePos.x(), scenePos.y());
+            m_firstPoint = m_ctx.adapter->geoScene()->create<Point>(snapped.x(), snapped.y());
             m_ctx.adapter->addPoint(m_firstPoint);
             m_firstIsNew = true;
-            m_firstScenePos = scenePos;
+            m_firstScenePos = snapped;
         }
 
         m_ctx.drawingBoard->showStatus(QObject::tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 
         // Vorschaulinie starten
-        m_preview = new QGraphicsLineItem(computePreviewLine(scenePos));
+        m_preview = new QGraphicsLineItem(computePreviewLine(snapped));
         m_preview->setPen(QPen(Qt::gray, 1, Qt::DashLine));
         m_ctx.drawingBoard->scene()->addItem(m_preview);
     } else {
@@ -105,7 +105,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         Point* p2 = pointAt(scenePos);
 
         if (!p2) {
-            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, scenePos.x(), scenePos.y());
+            auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
             p2Cmd = cmd.get();
             p2 = nullptr;
             macro->add(std::move(cmd));
