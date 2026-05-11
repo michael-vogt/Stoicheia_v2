@@ -4,7 +4,7 @@
 #include <functional>
 
 void Scene::remove(GeoObject* target) {
-    if (target == nullptr) return;
+    //if (target == nullptr) return;
 
     target->detach();
     std::erase_if(m_objects, [target](const auto& ptr) {

@@ -18,6 +18,7 @@ public:
     Circle(Point* center, double radius);
 
     Point* center() const { return m_center; };
+    Point* radiusPoint() const { return m_radiusPoint; };
     double radius() const { return m_radius; };
 
     void onSourceRemoved(GeoObject *src) override;
