@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QStatusBar>
 #include <QTimer>
 
 #include "MainWindow.h"
@@ -20,6 +21,7 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     QTransform transform;
     transform.scale(1.0, -1.0);
     setTransform(transform);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
     setDragMode(QGraphicsView::NoDrag);
     setFocusPolicy(Qt::StrongFocus);
@@ -65,10 +67,6 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
 
     painter->save();
     painter->setTransform(QTransform());
-
-    /*QPoint originViewport = viewport()->mapFromGlobal(mapToGlobal(mapFromScene(QPointF(0, 0))));
-    int ox = originViewport.x();
-    int oy = originViewport.y();*/
 
     QFont font = painter->font();
     font.setPointSize(8);
@@ -130,47 +128,44 @@ void DrawingBoard::setGridSpacing(double spacing) {
     viewport()->update();
 }
 
-// --- Pan -------------------------------------------------------------------------------------------------------------
-void DrawingBoard::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        m_spacePressed = true;
-        setCursor(Qt::OpenHandCursor);
-        event->accept();
-    } else if (event->key() == Qt::Key_M && !event->isAutoRepeat()) {
-        for (const auto& map = m_adapter.geoGraphicsItems(); const auto &key: map | std::views::keys) {
-            if (key && typeid(*key) == typeid(Point)) {
-                auto* p = dynamic_cast<Point*>(key);
-                p->moveTo(p->x() - 100, p->y());
-                break;
-            }
-        }
-    } else if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
-        resetView();
-    }
+/*
+   ─────────────────────────────────────────────────────────────────────────────
+   ── Zoom ─────────────────────────────────────────────────────────────────────
+   ─────────────────────────────────────────────────────────────────────────────
+*/
 
-    QGraphicsView::keyPressEvent(event);
-}
-
-void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        m_spacePressed = false;
-        if (!m_panning)
-            setCursor(Qt::ArrowCursor);
-        event->accept();
+void DrawingBoard::wheelEvent(QWheelEvent *event) {
+    // Pan hat Vorrang wenn Space gedrückt
+    if (m_spacePressed) {
+        event->ignore();
         return;
     }
-
-    QGraphicsView::keyReleaseEvent(event);
+    double factor = event->angleDelta().y() > 0 ? 1.15 : 1.0 / 1.15;
+    scale(factor, factor);
+    event->accept();
 }
+
+/*
+   ─────────────────────────────────────────────────────────────────────────────
+   ── Maus- und Tastaturereignisse: Pan zuerst, dann Tool ──────────────────────
+   ─────────────────────────────────────────────────────────────────────────────
+*/
 
 void DrawingBoard::mousePressEvent(QMouseEvent *event) {
-    if (event->button() == Qt::MiddleButton ||
-        (event->button() == Qt::LeftButton && m_spacePressed)) {
+    if (event->button() == Qt::MiddleButton || (event->button() == Qt::LeftButton && m_spacePressed)) {
         m_panning = true;
         m_panStart = event->pos();
-        setCursor(Qt::ClosedHandCursor);
+        viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
+        emit statusMessageChanged(tr("Panning"));
         return;
+    }
+
+    // An aktives Tool delegieren
+    if (m_activeTool) {
+        m_activeTool->mousePressEvent(event);
+        if (event->isAccepted())
+            return;
     }
 
     QGraphicsView::mousePressEvent(event);
@@ -189,27 +184,112 @@ void DrawingBoard::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
+    if (m_activeTool) {
+        m_activeTool->mouseMoveEvent(event);
+        if (event->isAccepted())
+            return;
+    }
+
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
     if (m_panning) {
         m_panning = false;
-        setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
+        viewport()->setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
         event->accept();
+        emit statusMessageChanged("");
         return;
+    }
+
+    if (m_activeTool) {
+        m_activeTool->mouseReleaseEvent(event);
+        if (event->isAccepted())
+            return;
     }
 
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-// --- Zoom ------------------------------------------------------------------------------------------------------------
-void DrawingBoard::wheelEvent(QWheelEvent *event) {
-    double factor = event->angleDelta().y() > 0 ? 1.15 : 1.0 / 1.15;
-    scale(factor, factor);
-    event->accept();
+void DrawingBoard::keyPressEvent(QKeyEvent *event) {
+    if (m_activeTool) {
+        m_activeTool->keyPressEvent(event);
+        if (event->isAccepted())
+            return;
+    }
+
+    if (event->key() == Qt::Key_Alt) {
+        showStatus(tr("Snapping"));
+    }
+    // Undo/Redo
+    if (event->matches(QKeySequence::Undo)) {
+        m_commandStack.undo();
+        event->accept();
+        return;
+    }
+    if (event->matches(QKeySequence::Redo)) {
+        m_commandStack.redo();
+        event->accept();
+        return;
+    }
+    // Pan-Modus
+    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        showStatus(tr("Panning"));
+        m_spacePressed = true;
+        viewport()->setCursor(Qt::ClosedHandCursor);
+        event->accept();
+        return;
+    }
+
+    if (event->key() == Qt::Key_M && !event->isAutoRepeat()) {
+        for (const auto& map = m_adapter.geoGraphicsItems(); const auto &key: map | std::views::keys) {
+            if (key && typeid(*key) == typeid(Point)) {
+                auto* p = dynamic_cast<Point*>(key);
+                p->moveTo(p->x() - 100, p->y());
+                break;
+            }
+        }
+        event->accept();
+        return;
+    }
+    if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
+        resetView();
+        event->accept();
+        return;
+    }
+    if (event->key() == Qt::Key_NumberSign && !event->isAutoRepeat()) {
+        setGridVisible(!m_gridVisible);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::keyPressEvent(event);
 }
 
+void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Alt) {
+        emit statusMessageChanged("");
+    }
+
+    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
+        emit statusMessageChanged("");
+        m_spacePressed = false;
+        if (!m_panning)
+            viewport()->setCursor(Qt::ArrowCursor);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::keyReleaseEvent(event);
+}
+
+
+
+/*
+   ─────────────────────────────────────────────────────────────────────────────
+   ── Zentrierung ───────────────────────────────────────────────────────────────
+   ─────────────────────────────────────────────────────────────────────────────
+*/
 
 void DrawingBoard::resizeEvent(QResizeEvent *event) {
     QGraphicsView::resizeEvent(event);
@@ -228,9 +308,11 @@ void DrawingBoard::resizeEvent(QResizeEvent *event) {
 }
 
 void DrawingBoard::resetView() {
+    setTransformationAnchor(QGraphicsView::NoAnchor);
     QTransform t = transform();
     double scaleX = t.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
     double scaleY = t.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
     centerOn(0, 0);
     scale(1.0 / scaleX, -1.0 / scaleY);
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }

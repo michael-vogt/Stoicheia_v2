@@ -10,7 +10,6 @@ protected:
     void setResults(int count, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0);
     virtual void compute() = 0;
 public:
-    IntersectionSet();
     IntersectionPoint* first() { return &m_pts[0]; };
     IntersectionPoint* second() { return &m_pts[1]; };
 

@@ -1,10 +1,5 @@
 #include "IntersectionSet.h"
 
-IntersectionSet::IntersectionSet() {
-    this->addDependent(&m_pts[0]);
-    this->addDependent(&m_pts[1]);
-}
-
 void IntersectionSet::onSourceRemoved(GeoObject *src) {
     m_valid = false;
     m_pts[0].m_valid = false;

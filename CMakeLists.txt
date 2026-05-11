@@ -57,6 +57,16 @@ qt_add_executable(Stoicheia WIN32
         src/ui/MainWindow.h
         src/ui/DrawingBoard.cpp
         src/ui/DrawingBoard.h
+        src/ui/commands/CommandStack.cpp
+        src/ui/commands/CreatePointCommand.cpp
+        src/ui/commands/MovePointCommand.cpp
+        src/ui/commands/DeleteObjectCommand.cpp
+        src/ui/tools/SelectTool.cpp
+        src/ui/tools/CreatePointTool.cpp
+        src/ui/tools/CreateLineTool.cpp
+        src/ui/commands/CreateLineCommand.cpp
+        src/ui/SnapHelper.cpp
+        src/ui/commands/MacroCommand.cpp
 )
 
 #qt_add_resources(Stoicheia "resources"

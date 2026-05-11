@@ -17,6 +17,7 @@ void GeoPointItem::paint(QPainter* painter,
                           const QStyleOptionGraphicsItem*,
                           QWidget*)
 {
+    if (!m_point->isValid()) return;
     painter->setPen(m_pen);
     painter->setBrush(m_brush);
     painter->drawEllipse(QPointF(0, 0), m_radius, m_radius);
@@ -24,6 +25,7 @@ void GeoPointItem::paint(QPainter* painter,
 
 void GeoPointItem::updateGeometry() {
     // Punkt-Position in Qt-Szene aktualisieren
+    setVisible(m_point->isValid());
     setPos(m_point->x(), m_point->y());
 }
 

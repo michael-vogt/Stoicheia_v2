@@ -23,7 +23,7 @@ public:
         return ptr;
     }
 
-    //[[nodiscard]] const std::vector<std::unique_ptr<GeoObject>>& objects() const { return m_objects; }
+    [[nodiscard]] const std::vector<std::unique_ptr<GeoObject>>& objects() const { return m_objects; }
     /*template<typename T>
     std::vector<T*> objectsOfType() const {
         std::vector<T*> result;
