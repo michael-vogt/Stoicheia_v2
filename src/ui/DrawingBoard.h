@@ -2,6 +2,7 @@
 
 #include <QGraphicsView>
 
+#include "HitTest.h"
 #include "SceneAdapter.h"
 #include "ToolContext.h"
 #include "commands/CommandStack.h"
@@ -12,7 +13,12 @@ enum class ToolType {
     Select,
     CreatePoint,
     CreateLine,
-    CreateCircle
+    CreateCircle,
+    CreateIntersection,
+    CreateMidpoint,
+    CreateParallel,
+    CreatePerpendicular,
+    CreatePerpendicularFoot
 };
 
 class DrawingBoard : public QGraphicsView {
@@ -22,6 +28,7 @@ class DrawingBoard : public QGraphicsView {
     QGraphicsScene m_qtScene;
     SceneAdapter m_adapter;
     CommandStack m_commandStack;
+    HitTest m_hitTest{&m_qtScene, 8.0};
 
     // Pan
     bool m_panning = false;
@@ -42,7 +49,7 @@ class DrawingBoard : public QGraphicsView {
     SnapHelper m_snapHelper{&m_qtScene, m_gridSpacing};
 
     void drawGrid(QPainter* painter, const QRectF& rect) const;
-    ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper }; }
+    ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;

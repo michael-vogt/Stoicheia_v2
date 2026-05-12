@@ -20,6 +20,8 @@ public:
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
 
+    LinearObject* linearObject() const { return m_linearObject; }
+
     void setPen(const QPen& pen);
     bool contains(const QPointF &point) override;
 
