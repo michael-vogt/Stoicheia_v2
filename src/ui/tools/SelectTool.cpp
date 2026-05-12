@@ -53,7 +53,7 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     m_draggedPoint = pointAt(scenePos);
 
-    if (m_draggedPoint) {
+    if (m_draggedPoint && typeid(*m_draggedPoint) != typeid(IntersectionPoint)) {
         if (!(event->modifiers() & Qt::ControlModifier))
             m_ctx.adapter->clearSelection();
         m_ctx.adapter->select(static_cast<GeoObject*>(m_draggedPoint));
