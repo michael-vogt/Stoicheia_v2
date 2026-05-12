@@ -13,3 +13,9 @@ void GeoGraphicsItem::recompute() {
     updateGeometry();
     update();                // Neuzeichnen anfordern
 }
+
+void GeoGraphicsItem::setHighlighted(bool highlighted) {
+    if (m_highlighted == highlighted) return;
+    m_highlighted = highlighted;
+    update();
+}

@@ -79,6 +79,7 @@ add_library(StoicheiaGui STATIC
         src/ui/GeoCircleItem.cpp
         src/ui/GeoIntersectionPointItem.cpp
         src/ui/SceneAdapter.cpp
+        src/ui/HitTest.cpp
 )
 
 target_include_directories(StoicheiaGui PUBLIC
@@ -94,7 +95,7 @@ target_link_libraries(StoicheiaGui PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
 
         src/ui/MainWindow.cpp
@@ -117,6 +118,17 @@ qt_add_executable(Stoicheia WIN32
         src/ui/tools/CreateCircleTool.cpp
 
         src/ui/SnapHelper.cpp
+        src/ui/commands/CreateMidpointCommand.cpp
+        src/ui/commands/CreateIntersectionCommand.cpp
+        src/ui/commands/CreateParallelCommand.cpp
+        src/ui/commands/CreatePerpendicularCommand.cpp
+        src/ui/commands/CreatePerpendicularFootCommand.cpp
+        src/ui/tools/ConstructionTool.cpp
+        src/ui/tools/CreateIntersectionTool.cpp
+        src/ui/tools/CreateMidpointTool.cpp
+        src/ui/tools/CreateParallelTool.cpp
+        src/ui/tools/CreatePerpendicularTool.cpp
+        src/ui/tools/CreatePerpendicularFootTool.cpp
 )
 
 target_link_libraries(Stoicheia PRIVATE

@@ -38,7 +38,7 @@ public:
 
     // Zugriff auf das grafische Objekt zu einem Geometrie-Objekt
     GeoGraphicsItem* itemFor(GeoObject* geoObject) const;
-    std::unordered_map<GeoObject*, GeoGraphicsItem*> geoGraphicsItems() { return m_map; }
+    std::unordered_map<GeoObject*, GeoGraphicsItem*>& geoGraphicsItems() { return m_map; }
 
     Point* radiusPointFor(const Point* centerPoint) const;
 
@@ -48,6 +48,8 @@ public:
     void deselect(GeoObject* geoObject);
     void clearSelection();
     const std::unordered_set<GeoObject*>& selection() const { return m_selection; }
+
+    void highlight(GeoObject* obj, bool on);
 
     signals:
     void selectionChanged();

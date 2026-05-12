@@ -7,7 +7,12 @@
 #include <QLineEdit>
 
 #include "tools/CreateCircleTool.h"
+#include "tools/CreateIntersectionTool.h"
 #include "tools/CreateLineTool.h"
+#include "tools/CreateMidpointTool.h"
+#include "tools/CreateParallelTool.h"
+#include "tools/CreatePerpendicularFootTool.h"
+#include "tools/CreatePerpendicularTool.h"
 #include "tools/CreatePointTool.h"
 #include "tools/SelectTool.h"
 
@@ -69,6 +74,44 @@ void MainWindow::setupToolBar() {
         m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle);
         toggleTools(circleAction);
     });
+
+    QAction* construction = nullptr;
+    construction = m_toolbar->addAction(tr("Schnittpunkt"));
+    connect(construction, &QAction::triggered, [this, construction]() {
+        m_drawingBoard->setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
+        toggleTools(construction);
+    });
+    construction->setCheckable(true);
+
+    construction = m_toolbar->addAction(tr("Mittelpunkt"));
+    connect(construction, &QAction::triggered, [this, construction]() {
+        m_drawingBoard->setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
+        toggleTools(construction);
+    });
+    construction->setCheckable(true);
+
+    construction = m_toolbar->addAction(tr("Parallele"));
+    connect(construction, &QAction::triggered, [this, construction]() {
+        m_drawingBoard->setTool<CreateParallelTool>(ToolType::CreateParallel);
+        toggleTools(construction);
+    });
+    construction->setCheckable(true);
+
+    construction = m_toolbar->addAction(tr("Senkrechte"));
+    connect(construction, &QAction::triggered, [this, construction]() {
+        m_drawingBoard->setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
+        toggleTools(construction);
+    });
+    construction->setCheckable(true);
+
+    construction = m_toolbar->addAction(tr("Lotfußpunkt"));
+    connect(construction, &QAction::triggered, [this, construction]() {
+        m_drawingBoard->setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
+        toggleTools(construction);
+    });
+    construction->setCheckable(true);
+
+    construction = nullptr;
 }
 
 void MainWindow::setupMenu() {

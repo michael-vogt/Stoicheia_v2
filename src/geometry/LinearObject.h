@@ -35,6 +35,7 @@ public:
     double length() const { return m_length; };
 
     bool contains(double px, double py, double eps = 1e-9) const;
+    bool containsParameter(const double t) const { return containsT(t); }
     double projectParameter(double px, double py) const;
 
     /*
