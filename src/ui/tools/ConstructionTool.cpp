@@ -53,6 +53,7 @@ void ConstructionTool::setPreviewEllipse(const QRectF& rect) {
 }
 
 void ConstructionTool::removePreview() {
+    clearHighlights();
     if (m_previewLine) {
         m_ctx.drawingBoard->scene()->removeItem(m_previewLine);
         delete m_previewLine;
@@ -63,4 +64,16 @@ void ConstructionTool::removePreview() {
         delete m_previewEllipse;
         m_previewEllipse = nullptr;
     }
+}
+
+void ConstructionTool::highlightObject(GeoObject *obj, bool on) {
+    m_ctx.adapter->highlight(obj, on);
+    if (on)
+        m_highlighted.push_back(obj);
+}
+
+void ConstructionTool::clearHighlights() {
+    for (GeoObject* obj : m_highlighted)
+        m_ctx.adapter->highlight(obj, false);
+    m_highlighted.clear();
 }

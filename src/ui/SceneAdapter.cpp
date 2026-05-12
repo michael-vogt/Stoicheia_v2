@@ -102,3 +102,11 @@ void SceneAdapter::clearSelection() {
     m_selection.clear();
     emit selectionChanged();
 }
+
+void SceneAdapter::highlight(GeoObject *obj, bool on) {
+    auto it = m_map.find(obj);
+    if (it == m_map.end()) {
+        return;
+    }
+    it->second->setHighlighted(on);
+}

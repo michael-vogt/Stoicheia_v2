@@ -1,6 +1,5 @@
 #include "MoveCenterCommand.h"
 #include <QObject>
-#include <QDebug>
 
 MoveCenterCommand::MoveCenterCommand(Point *centerPoint, Point *radiusPoint, double newX, double newY)
     : m_centerPoint(centerPoint), m_radiusPoint(radiusPoint),

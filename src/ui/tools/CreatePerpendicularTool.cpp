@@ -22,8 +22,10 @@ void CreatePerpendicularTool::mousePressEvent(QMouseEvent* event) {
 
     if (!m_reference) {
         m_reference = m_ctx.hitTest->linearObjectAt(scenePos);
-        if (m_reference)
+        if (m_reference) {
+            highlightObject(m_reference, true);
             showStatus(QObject::tr("Punkt klicken durch den die Senkrechte läuft"));
+        }
     } else {
         Point* origin = m_ctx.hitTest->pointAt(scenePos);
         if (origin) {

@@ -18,8 +18,13 @@ void GeoPointItem::paint(QPainter* painter,
                           QWidget*)
 {
     if (!m_point->isValid()) return;
-    painter->setPen(m_selected ? QPen(Qt::blue, 2.5) : m_pen);
-    painter->setBrush(m_selected ? QBrush(Qt::cyan) : m_brush);
+    if (m_highlighted)
+        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
+    else if (m_selected)
+        painter->setPen(QPen(Qt::blue, 2.5));
+    else
+        painter->setPen(m_pen);
+    //painter->setBrush(m_selected ? QBrush(Qt::cyan) : m_brush);
     painter->drawEllipse(QPointF(0, 0), m_radius, m_radius);
 }
 

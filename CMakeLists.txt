@@ -95,7 +95,7 @@ target_link_libraries(StoicheiaGui PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
 
         src/ui/MainWindow.cpp

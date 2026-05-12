@@ -12,6 +12,7 @@
 class ConstructionTool : public Tool {
     QGraphicsLineItem* m_previewLine = nullptr;
     QGraphicsEllipseItem* m_previewEllipse = nullptr;
+    std::vector<GeoObject*> m_highlighted;
 
 protected:
     // Unterklassen implementieren diese Methoden
@@ -25,6 +26,9 @@ protected:
     void setPreviewLine(const QLineF& line);
     void setPreviewEllipse(const QRectF& rect);
     void removePreview();
+
+    void highlightObject(GeoObject* obj, bool on);
+    void clearHighlights();
 
 public:
     explicit ConstructionTool(const ToolContext& ctx);

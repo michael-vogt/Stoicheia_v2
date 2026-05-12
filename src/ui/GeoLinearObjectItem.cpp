@@ -64,7 +64,13 @@ void GeoLinearObjectItem::paint(QPainter* painter,
                                  const QStyleOptionGraphicsItem*,
                                  QWidget*)
 {
-    painter->setPen(m_selected ? QPen(Qt::blue, 2.5) : m_pen);
+    if (!m_linearObject->isValid()) return;
+    if (m_highlighted)
+        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
+    else if (m_selected)
+        painter->setPen(QPen(Qt::blue, 2.5));
+    else
+        painter->setPen(m_pen);
     painter->drawLine(m_line);
 }
 

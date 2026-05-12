@@ -13,18 +13,22 @@ class GeoGraphicsItem : public QGraphicsItem, public GeoObject {
 public:
     explicit GeoGraphicsItem(GeoObject* object, QGraphicsItem* parent = nullptr);
 
-    GeoObject* geoObject() const { return m_object; };
+    GeoObject* geoObject() const { return m_object; }
 
-    virtual bool contains(const QPointF& point) { return true; };
+    virtual bool contains(const QPointF& point) { return true; }
 
     // GeoObject::recompute() – wird aufgerufen wenn eine Quelle sich ändert.
     // Leitet die Änderung an Qt weiter.
     void recompute() override;
-    void setGeoSelected(bool selected) { m_selected = selected; };
+    void setGeoSelected(bool selected) { m_selected = selected; }
     bool isGeoSelected() const { return m_selected; }
+
+    void setHighlighted(bool highlighted);
+    bool isHighlighted() const { return m_highlighted; }
 
 protected:
     bool m_selected = false;
+    bool m_highlighted = false;
     GeoObject* m_object = nullptr;
     // Unterklassen implementieren die eigentliche Geometrie-Aktualisierung.
     // Wird von recompute() aufgerufen, vor prepareGeometryChange().

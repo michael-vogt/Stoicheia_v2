@@ -25,6 +25,7 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
 
     if (!m_firstPoint) {
         m_firstPoint = hit;
+        highlightObject(m_firstPoint, true);
         showStatus(QObject::tr("Zweiten Punkt klicken"));
     } else {
         if (hit != m_firstPoint) {

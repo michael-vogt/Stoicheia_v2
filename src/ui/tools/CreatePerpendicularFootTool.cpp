@@ -21,8 +21,10 @@ void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
 
     if (!m_point) {
         m_point = m_ctx.hitTest->pointAt(scenePos);
-        if (m_point)
+        if (m_point) {
+            highlightObject(m_point, true);
             showStatus(QObject::tr("Gerade klicken"));
+        }
     } else {
         LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
         if (line) {

@@ -28,6 +28,7 @@ void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
 
     if (!m_firstObject) {
         m_firstObject = hit;
+        highlightObject(m_firstObject, true);
         showStatus(QObject::tr("Zweites Objekt klicken (Gerade oder Kreis)"));
     } else {
         if (hit != m_firstObject) {

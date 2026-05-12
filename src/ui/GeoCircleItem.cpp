@@ -5,7 +5,7 @@ GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
     : GeoGraphicsItem(circle, parent), m_circle(circle)
 {
     m_circle->addDependent(this);
-    updateGeometry();
+    GeoCircleItem::updateGeometry();
 }
 
 void GeoCircleItem::updateGeometry() {
@@ -25,9 +25,17 @@ void GeoCircleItem::paint(QPainter* painter,
                            const QStyleOptionGraphicsItem*,
                            QWidget*)
 {
-    double r = m_circle->radius();
-    painter->setPen(m_selected ? QPen(Qt::blue, 2.5) : m_pen);
-    painter->setBrush(m_selected ? QBrush(QColor(0,255,255,128)) : m_brush);
+    if (!m_circle->isValid()) return;
+    if (m_highlighted)
+        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
+    else if (m_selected)
+        painter->setPen(QPen(Qt::blue, 2.5));
+    else
+        painter->setPen(m_pen);
+    //painter->setPen(m_selected ? QPen(Qt::blue, 2.5) : m_pen);
+    //painter->setBrush(m_selected ? QBrush(QColor(0,255,255,128)) : m_brush);
+
+    const double r = m_circle->radius();
     painter->drawEllipse(QPointF(0, 0), r, r);
 }
 
