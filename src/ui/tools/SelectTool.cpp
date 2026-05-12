@@ -53,7 +53,7 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     m_draggedPoint = pointAt(scenePos);
 
-    if (m_draggedPoint && typeid(*m_draggedPoint) != typeid(IntersectionPoint)) {
+    if (m_draggedPoint && isDraggable(m_draggedPoint)) {
         if (!(event->modifiers() & Qt::ControlModifier))
             m_ctx.adapter->clearSelection();
         m_ctx.adapter->select(static_cast<GeoObject*>(m_draggedPoint));
@@ -125,4 +125,8 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
         return;
     }
     event->ignore();
+}
+
+bool SelectTool::isDraggable(Point* point) const {
+    return typeid(*point) == typeid(Point);
 }
