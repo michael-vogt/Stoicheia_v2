@@ -12,6 +12,7 @@ void SelectTool::activate() {
 }
 
 void SelectTool::deactivate() {
+    m_ctx.adapter->clearSelection();
     m_ctx.drawingBoard->showStatus("");
     m_draggedPoint = nullptr;
     m_activeMove = nullptr;
@@ -31,6 +32,18 @@ Point *SelectTool::pointAt(const QPointF &scenePos) const {
     return nullptr;
 }
 
+GeoGraphicsItem* SelectTool::itemAt(const QPointF &scenePos, const std::type_info& type) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(8, 8), QSize(16, 16)));
+    for (QGraphicsItem *item : items) {
+        if (auto* gi = dynamic_cast<GeoGraphicsItem*>(item)) {
+            if (typeid(*gi) == type && gi->contains(scenePos))
+                return gi;
+        }
+    }
+    return nullptr;
+}
+
 void SelectTool::mousePressEvent(QMouseEvent *event) {
     if (event->button() != Qt::LeftButton) {
         event->ignore();
@@ -41,6 +54,10 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
     m_draggedPoint = pointAt(scenePos);
 
     if (m_draggedPoint) {
+        if (!(event->modifiers() & Qt::ControlModifier))
+            m_ctx.adapter->clearSelection();
+        m_ctx.adapter->select(static_cast<GeoObject*>(m_draggedPoint));
+
         if (Point* radiusPoint = m_ctx.adapter->radiusPointFor(m_draggedPoint)) {
             m_activeMove = std::make_unique<MoveCenterCommand>(m_draggedPoint, radiusPoint, m_draggedPoint->x(), m_draggedPoint->y());
         } else {
@@ -49,6 +66,21 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
         m_dragOffset = scenePos - QPointF(m_draggedPoint->x(), m_draggedPoint->y());
         m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
+    } else {
+        GeoGraphicsItem* hit = itemAt(scenePos, typeid(GeoLinearObjectItem));
+        if (!hit)
+            hit = itemAt(scenePos, typeid(GeoCircleItem));
+
+        if (hit) {
+            if (!(event->modifiers() & Qt::ControlModifier))
+                m_ctx.adapter->clearSelection();
+            m_ctx.adapter->select(hit->geoObject());
+            hit->setGeoSelected(true);
+            event->accept();
+        } else {
+            m_ctx.adapter->clearSelection();
+            event->accept();
+        }
     }
 }
 

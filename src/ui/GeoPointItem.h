@@ -14,6 +14,8 @@ public:
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
 
+    bool contains(const QPointF& point) override;
+
     void setRadius(double r);
     void setPen(const QPen& pen);
     void setBrush(const QBrush& brush);
@@ -25,5 +27,5 @@ protected:
     void updateGeometry() override;
 
 private:
-    Point*  m_point;
+    Point*  m_point = nullptr;
 };
