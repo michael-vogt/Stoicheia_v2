@@ -31,7 +31,10 @@ void CreateIntersectionCommand::execute() {
 
 void CreateIntersectionCommand::undo() {
     if (m_result) {
-        m_adapter->remove(m_result);
+        if (m_result->first())
+            m_adapter->remove(m_result->first());
+        if (m_result->second())
+            m_adapter->remove(m_result->second());
         m_result = nullptr;
     }
 }

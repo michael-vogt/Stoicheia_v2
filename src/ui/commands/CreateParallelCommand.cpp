@@ -13,7 +13,7 @@ void CreateParallelCommand::execute() {
 
 void CreateParallelCommand::undo() {
     if (m_result) {
-        m_adapter->remove(m_result);
+        m_adapter->remove(m_result->line());
         m_result = nullptr;
     }
 }
