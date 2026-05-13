@@ -1,5 +1,7 @@
+#include <iostream>
 #include <QApplication>
 #include <qevent.h>
+#include <QTranslator>
 
 #include "geometry/geometry.h"
 #include "constructions/constructions.h"
@@ -7,6 +9,13 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    QTranslator translator;
+    if (translator.load(":/i18n/app_en.qm")) {
+        app.installTranslator(&translator);
+    } else {
+        std::cerr << "Error loading translator" << std::endl;
+    }
+
     MainWindow window("Στοιχεῖα");
 
     DrawingBoard* board = window.drawingBoard();

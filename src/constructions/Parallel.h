@@ -17,6 +17,8 @@ class Parallel : public GeoObject {
 
 public:
     Parallel(Point* origin, LinearObject* reference);
+    Point* origin() const { return m_origin; }
+    LinearObject* reference() const { return m_reference; }
     LinearObject* line() { return &m_line; };
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;

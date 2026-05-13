@@ -2,7 +2,7 @@
 #include <QPainter>
 
 GeoPointItem::GeoPointItem(Point* point, QGraphicsItem* parent)
-    : GeoGraphicsItem(parent), m_point(point)
+    : GeoGraphicsItem(point, parent), m_point(point)
 {
     m_point->addDependent(this);
     setPos(m_point->x(), m_point->y());
@@ -18,9 +18,20 @@ void GeoPointItem::paint(QPainter* painter,
                           QWidget*)
 {
     if (!m_point->isValid()) return;
-    painter->setPen(m_pen);
-    painter->setBrush(m_brush);
+    if (m_highlighted)
+        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
+    else if (m_selected)
+        painter->setPen(QPen(Qt::blue, 2.5));
+    else
+        painter->setPen(m_pen);
+    //painter->setBrush(m_selected ? QBrush(Qt::cyan) : m_brush);
     painter->drawEllipse(QPointF(0, 0), m_radius, m_radius);
+}
+
+bool GeoPointItem::contains(const QPointF &point) {
+    if (!m_point) return false;
+
+    return boundingRect().contains(point);
 }
 
 void GeoPointItem::updateGeometry() {

@@ -1,0 +1,81 @@
+# =========================
+# Build folders (CMake)
+# =========================
+build/
+cmake-build-*/
+out/
+bin/
+debug/
+release/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+Testing/
+
+# =========================
+# Qt
+# =========================
+*.pro.user
+*.pro.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+*.qmlcache
+*.qrc.depends
+
+# Qt Creator
+*.autosave
+
+# Qt build artifacts
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+
+# Translation build outputs
+*.qm
+
+# =========================
+# Visual Studio Code
+# =========================
+.vscode/*
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+
+# =========================
+# CLion / JetBrains IDEs
+# =========================
+.idea/
+*.iml
+cmake-build-*/
+
+# =========================
+# Windows
+# =========================
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================
+# MinGW / GCC
+# =========================
+*.o
+*.obj
+*.exe
+*.dll
+*.a
+*.lib
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Tests (optional)
+# =========================
+TestResults/
