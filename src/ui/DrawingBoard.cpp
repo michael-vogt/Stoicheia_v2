@@ -46,12 +46,13 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
 
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
-    if (m_gridVisible) {
+    m_grid.drawBackground(painter, rect);
+    /*if (m_gridVisible) {
         drawGrid(painter, rect);
-    }
+    }*/
 }
 
-void DrawingBoard::drawGrid(QPainter* painter, const QRectF& rect) const {
+/*void DrawingBoard::drawGrid(QPainter* painter, const QRectF& rect) const {
     // Axes
     QPen axisPen(QColor(160,160,160), 1.5);
     painter->setPen(axisPen);
@@ -76,16 +77,23 @@ void DrawingBoard::drawGrid(QPainter* painter, const QRectF& rect) const {
         if (std::abs(y) > 0.1)
             painter->drawLine(QPointF(left, y), QPointF(right, y));
     }
-}
+}*/
 
 void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawForeground(painter, rect);
-    if (!m_gridVisible) return;
+    if (!m_grid.isVisible()) return;
 
     painter->save();
     painter->setTransform(QTransform());
 
-    QFont font = painter->font();
+    auto toViewport = [this](QPointF p) -> QPointF {
+        return viewport()->mapFrom(this, mapFromScene(p));
+    };
+
+    m_grid.drawLabels(painter, toViewport, viewport()->width(), viewport()->height());
+    painter->restore();
+
+    /*QFont font = painter->font();
     font.setPointSize(8);
     painter->setFont(font);
     painter->setPen(QColor(120,120,120));
@@ -132,7 +140,7 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
 
     painter->drawText(QRect(ox + margin, oy + margin, 20, 14), Qt::AlignLeft, "0");
 
-    painter->restore();
+    painter->restore();*/
 }
 
 void DrawingBoard::setGridVisible(bool visible) {

@@ -4,13 +4,13 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="177"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="254"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="185"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="262"/>
         <source>Panning</source>
         <translation>Verschieben</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="239"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="247"/>
         <source>Snapping</source>
         <translation>Einrasten</translation>
     </message>
@@ -84,13 +84,13 @@
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="127"/>
-        <location filename="../src/ui/MainWindow.cpp" line="164"/>
+        <location filename="../src/ui/MainWindow.cpp" line="173"/>
         <source>Rückgängig</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="135"/>
-        <location filename="../src/ui/MainWindow.cpp" line="165"/>
+        <location filename="../src/ui/MainWindow.cpp" line="174"/>
         <source>Wiederholen</source>
         <translation>Wiederholen</translation>
     </message>
@@ -101,16 +101,21 @@
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="146"/>
+        <source>Immer einrasten</source>
+        <translation>Immer einrasten</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="153"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="164"/>
+        <location filename="../src/ui/MainWindow.cpp" line="173"/>
         <source>Rückgängig: </source>
         <translation>Rückgängig: </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="165"/>
+        <location filename="../src/ui/MainWindow.cpp" line="174"/>
         <source>Wiederholen: </source>
         <translation>Wiederholen: </translation>
     </message>
@@ -118,9 +123,14 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/ui/tools/SelectTool.cpp" line="11"/>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="13"/>
         <source>Objekt auswählen und/oder verschieben</source>
         <translation>Objekt auswählen und/oder verschieben</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="119"/>
+        <source>Objekte löschen</source>
+        <translation>Objekte löschen</translation>
     </message>
     <message>
         <location filename="../src/ui/tools/CreatePointTool.cpp" line="11"/>
@@ -169,7 +179,7 @@
         <translation>Kreis erstellen</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/MoveCenterCommand.cpp" line="28"/>
+        <location filename="../src/ui/commands/MoveCenterCommand.cpp" line="27"/>
         <source>Mittelpunkt verschieben</source>
         <translation>Mittelpunkt verschieben</translation>
     </message>
@@ -179,7 +189,7 @@
         <translation>Mittelpunkt erstellen</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/CreateIntersectionCommand.cpp" line="40"/>
+        <location filename="../src/ui/commands/CreateIntersectionCommand.cpp" line="43"/>
         <source>Schnittpunkt erstellen</source>
         <translation>Schnittpunkt erstellen</translation>
     </message>
@@ -200,54 +210,59 @@
     </message>
     <message>
         <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="40"/>
+        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="41"/>
         <source>Erstes Objekt klicken (Gerade oder Kreis)</source>
         <translation>Erstes Objekt klicken (Gerade oder Kreis)</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="31"/>
+        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="32"/>
         <source>Zweites Objekt klicken (Gerade oder Kreis)</source>
         <translation>Zweites Objekt klicken (Gerade oder Kreis)</translation>
     </message>
     <message>
         <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="11"/>
-        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="37"/>
+        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="38"/>
         <source>Ersten Punkt klicken</source>
         <translation>Ersten Punkt klicken</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="28"/>
+        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="29"/>
         <source>Zweiten Punkt klicken</source>
         <translation>Zweiten Punkt klicken</translation>
     </message>
     <message>
         <location filename="../src/ui/tools/CreateParallelTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="34"/>
+        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="36"/>
         <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="11"/>
-        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="35"/>
+        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="37"/>
         <source>Referenzgerade klicken</source>
         <translation>Referenzgerade klicken</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="25"/>
+        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="26"/>
         <source>Punkt klicken durch den die Parallele läuft</source>
         <translation>Punkt klicken durch den die Parallele läuft</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="26"/>
+        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="27"/>
         <source>Punkt klicken durch den die Senkrechte läuft</source>
         <translation>Punkt klicken durch den die Senkrechte läuft</translation>
     </message>
     <message>
         <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="34"/>
+        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="36"/>
         <source>Punkt klicken</source>
         <translation>Punkt klicken</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="25"/>
+        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="26"/>
         <source>Gerade klicken</source>
         <translation>Gerade klicken</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/commands/DeleteObjectCommand.cpp" line="151"/>
+        <source>Objekt löschen</source>
+        <translation>Objekt löschen</translation>
     </message>
 </context>
 </TS>

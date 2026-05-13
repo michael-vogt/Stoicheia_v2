@@ -129,6 +129,7 @@ qt_add_executable(Stoicheia
         src/ui/tools/CreateParallelTool.cpp
         src/ui/tools/CreatePerpendicularTool.cpp
         src/ui/tools/CreatePerpendicularFootTool.cpp
+        src/ui/Grid.cpp
 )
 
 target_link_libraries(Stoicheia PRIVATE
