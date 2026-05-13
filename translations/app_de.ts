@@ -4,13 +4,13 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="177"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="254"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="185"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="262"/>
         <source>Panning</source>
         <translation>Verschieben</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="239"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="247"/>
         <source>Snapping</source>
         <translation>Einrasten</translation>
     </message>
@@ -84,13 +84,13 @@
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="127"/>
-        <location filename="../src/ui/MainWindow.cpp" line="164"/>
+        <location filename="../src/ui/MainWindow.cpp" line="173"/>
         <source>Rückgängig</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="135"/>
-        <location filename="../src/ui/MainWindow.cpp" line="165"/>
+        <location filename="../src/ui/MainWindow.cpp" line="174"/>
         <source>Wiederholen</source>
         <translation>Wiederholen</translation>
     </message>
@@ -101,16 +101,21 @@
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="146"/>
+        <source>Immer einrasten</source>
+        <translation>Immer einrasten</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="153"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="164"/>
+        <location filename="../src/ui/MainWindow.cpp" line="173"/>
         <source>Rückgängig: </source>
         <translation>Rückgängig: </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="165"/>
+        <location filename="../src/ui/MainWindow.cpp" line="174"/>
         <source>Wiederholen: </source>
         <translation>Wiederholen: </translation>
     </message>

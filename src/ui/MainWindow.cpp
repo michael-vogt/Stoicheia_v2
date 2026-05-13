@@ -143,11 +143,20 @@ void MainWindow::setupMenu() {
 
     QMenu* viewMenu = menuBar()->addMenu(tr("Ansicht"));
 
+    QAction* snapAction = viewMenu->addAction(tr("Immer einrasten"));
+    snapAction->setCheckable(true);
+    snapAction->setChecked(false);
+    connect(snapAction, &QAction::toggled, [this](bool on) {
+        m_drawingBoard->grid()->setSnapEnabled(on);
+    });
+
     QAction* gridAction = viewMenu->addAction(tr("Raster"));
     gridAction->setCheckable(true);
     gridAction->setChecked(true);
-    connect(gridAction, &QAction::toggled,
-            m_drawingBoard, &DrawingBoard::setGridVisible);
+    connect(gridAction, &QAction::toggled, [this](bool on) {
+        m_drawingBoard->grid()->setVisible(on);
+        m_drawingBoard->viewport()->update();
+    });
 }
 
 void MainWindow::setupStatusBar() const {

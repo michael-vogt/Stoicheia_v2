@@ -8,6 +8,7 @@
 #include "commands/CommandStack.h"
 #include "geometry/Scene.h"
 #include "tools/Tool.h"
+#include "Grid.h"
 
 enum class ToolType {
     Select,
@@ -36,6 +37,7 @@ class DrawingBoard : public QGraphicsView {
     QPoint m_panStart;
 
     // Raster
+    Grid m_grid;
     bool m_gridVisible = true;
     double m_gridSpacing = 50.0;
 
@@ -46,7 +48,7 @@ class DrawingBoard : public QGraphicsView {
     std::unique_ptr<Tool> m_activeTool;
     ToolType m_activeToolType;
 
-    SnapHelper m_snapHelper{&m_qtScene, m_gridSpacing};
+    SnapHelper m_snapHelper{&m_qtScene, &m_grid};
 
     void drawGrid(QPainter* painter, const QRectF& rect) const;
     ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
@@ -83,6 +85,7 @@ public:
     void setGridVisible(bool visible);
     void setGridSpacing(double spacing);
     void resetView();
+    Grid* grid() { return &m_grid; }
 
     // Geometrie und Adapter
     Scene* geoScene() { return &m_geoScene; }
