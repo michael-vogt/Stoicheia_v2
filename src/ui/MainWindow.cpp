@@ -5,6 +5,8 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QMetaEnum>
 
 #include "tools/CreateCircleTool.h"
 #include "tools/CreateIntersectionTool.h"
@@ -15,6 +17,7 @@
 #include "tools/CreatePerpendicularTool.h"
 #include "tools/CreatePointTool.h"
 #include "tools/SelectTool.h"
+#include <magic_enum/magic_enum.hpp>
 
 MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(title);
@@ -27,10 +30,20 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     setupStatusBar();
 
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
-    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
+    //connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
+    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, [this](const QString& str) {
+        statusBar()->showMessage(str);
+        if (str.isEmpty()) {
+            QMessageBox::information(this, "", "leer");
+        }
+    });
     connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
         const bool isDrawing = (type == ToolType::CreateLine);
         m_lineAction->setShortcut(isDrawing ? QKeySequence() : QKeySequence(Qt::Key_L));
+        //QString name = QString::fromStdString(std::string(magic_enum::enum_name(type)));
+        //QMessageBox::information(this, "Info", name);
+        checkTool(type);
+        m_drawingBoard->activeTool()->activate();
     });
 
     // Standard-Tool: Auswählen
@@ -41,21 +54,21 @@ void MainWindow::setupToolBar() {
     m_toolbar = addToolBar(tr("Werkzeuge"));
     m_toolbar->setMovable(false);
 
-    auto* selectAction = m_toolbar->addAction(tr("Auswählen"));
-    selectAction->setCheckable(true);
-    selectAction->setChecked(true);
-    connect(m_drawingBoard, &DrawingBoard::escapePressed, selectAction, &QAction::trigger);
-    connect(selectAction, &QAction::triggered, [this, selectAction]() {
+    m_selectAction = m_toolbar->addAction(tr("Auswählen"));
+    m_selectAction->setCheckable(true);
+    m_selectAction->setChecked(true);
+    connect(m_drawingBoard, &DrawingBoard::escapePressed, m_selectAction, &QAction::trigger);
+    connect(m_selectAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
-        toggleTools(selectAction);
+        toggleTools(m_selectAction);
     });
 
-    auto* pointAction = m_toolbar->addAction(tr("Punkt"));
-    pointAction->setCheckable(true);
-    pointAction->setShortcut(Qt::Key_P);
-    connect(pointAction, &QAction::triggered, [this, pointAction]() {
+    m_pointAction = m_toolbar->addAction(tr("Punkt"));
+    m_pointAction->setCheckable(true);
+    m_pointAction->setShortcut(Qt::Key_P);
+    connect(m_pointAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreatePointTool>(ToolType::CreatePoint);
-        toggleTools(pointAction);
+        toggleTools(m_pointAction);
     });
 
 
@@ -67,51 +80,50 @@ void MainWindow::setupToolBar() {
         toggleTools(m_lineAction);
     });
 
-    auto* circleAction = m_toolbar->addAction(tr("Kreis"));
-    circleAction->setCheckable(true);
-    circleAction->setShortcut(Qt::Key_C);
-    connect(circleAction, &QAction::triggered, [this, circleAction]() {
+    m_circleAction = m_toolbar->addAction(tr("Kreis"));
+    m_circleAction->setCheckable(true);
+    m_circleAction->setShortcut(Qt::Key_C);
+    connect(m_circleAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle);
-        toggleTools(circleAction);
+        toggleTools(m_circleAction);
     });
 
-    QAction* construction = nullptr;
-    construction = m_toolbar->addAction(tr("Schnittpunkt"));
-    connect(construction, &QAction::triggered, [this, construction]() {
+    m_intersectionAction = m_toolbar->addAction(tr("Schnittpunkt"));
+    m_intersectionAction->setCheckable(true);
+    connect(m_intersectionAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
-        toggleTools(construction);
+        toggleTools(m_intersectionAction);
     });
-    construction->setCheckable(true);
 
-    construction = m_toolbar->addAction(tr("Mittelpunkt"));
-    connect(construction, &QAction::triggered, [this, construction]() {
+    m_midpointAction = m_toolbar->addAction(tr("Mittelpunkt"));
+    m_midpointAction->setCheckable(true);
+    connect(m_midpointAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
-        toggleTools(construction);
+        toggleTools(m_midpointAction);
     });
-    construction->setCheckable(true);
 
-    construction = m_toolbar->addAction(tr("Parallele"));
-    connect(construction, &QAction::triggered, [this, construction]() {
+    m_parallelAction = m_toolbar->addAction(tr("Parallele"));
+    m_parallelAction->setCheckable(true);
+    connect(m_parallelAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateParallelTool>(ToolType::CreateParallel);
-        toggleTools(construction);
+        toggleTools(m_parallelAction);
     });
-    construction->setCheckable(true);
+    
 
-    construction = m_toolbar->addAction(tr("Senkrechte"));
-    connect(construction, &QAction::triggered, [this, construction]() {
+    m_perpendicularAction = m_toolbar->addAction(tr("Senkrechte"));
+    m_perpendicularAction->setCheckable(true);
+    connect(m_perpendicularAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
-        toggleTools(construction);
+        toggleTools(m_perpendicularAction);
     });
-    construction->setCheckable(true);
+    
 
-    construction = m_toolbar->addAction(tr("Lotfußpunkt"));
-    connect(construction, &QAction::triggered, [this, construction]() {
+    m_perpendicularFootAction = m_toolbar->addAction(tr("Lotfußpunkt"));
+    m_perpendicularFootAction->setCheckable(true);
+    connect(m_perpendicularFootAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
-        toggleTools(construction);
+        toggleTools(m_perpendicularFootAction);
     });
-    construction->setCheckable(true);
-
-    construction = nullptr;
 }
 
 void MainWindow::setupMenu() {
@@ -175,11 +187,46 @@ void MainWindow::updateUndoRedo() const {
 }
 
 void MainWindow::toggleTools(const QAction *selectedAction) const {
-    for (auto* action : m_toolbar->actions()) {
+    /*for (auto* action : m_toolbar->actions()) {
         if (action == selectedAction) {
             action->setChecked(true);
         } else {
             action->setChecked(false);
         }
-    }
+    }*/
+}
+
+void MainWindow::checkTool(ToolType type) {
+    for (auto* action : m_toolbar->actions())
+        action->setChecked(false);
+    
+        switch (type) {
+            case ToolType::Select:
+                m_selectAction->setChecked(true);
+                break;
+            case ToolType::CreatePoint:
+                m_pointAction->setChecked(true);
+                break;
+            case ToolType::CreateLine:
+                m_lineAction->setChecked(true);
+                break;
+            case ToolType::CreateCircle:
+                m_circleAction->setChecked(true);
+                break;
+            case ToolType::CreateIntersection:
+                m_intersectionAction->setChecked(true);
+                break;
+            case ToolType::CreateMidpoint:
+                m_midpointAction->setChecked(true);
+                break;
+            case ToolType::CreateParallel:
+                m_parallelAction->setChecked(true);
+                break;
+            case ToolType::CreatePerpendicular:
+                m_perpendicularAction->setChecked(true);
+                break;
+            case ToolType::CreatePerpendicularFoot:
+                m_perpendicularFootAction->setChecked(true);
+                break;
+        }
 }

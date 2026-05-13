@@ -63,6 +63,7 @@ add_library(StoicheiaLib STATIC
 
 target_include_directories(StoicheiaLib PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${magic_enum_SOURCE_DIR}/include
 )
 
 target_link_libraries(StoicheiaLib PUBLIC
@@ -157,6 +158,17 @@ if (WIN32)
             COMMENT "Running windeployqt..."
     )
 endif()
+
+# -------------------------------------------------
+# magic_enum
+# -------------------------------------------------
+include(FetchContent)
+FetchContent_Declare(
+        magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+        GIT_TAG v0.9.7
+)
+FetchContent_MakeAvailable(magic_enum)
 
 # -------------------------------------------------
 # GoogleTest
