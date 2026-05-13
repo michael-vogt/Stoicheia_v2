@@ -18,6 +18,9 @@ class Perpendicular : public GeoObject {
 public:
     Perpendicular(Point* origin, LinearObject* reference);
 
+    Point* origin() const { return m_origin; }
+    LinearObject* reference() const { return m_reference; }
+
     void recompute() override;
 
     void onSourceRemoved(GeoObject* src) override;

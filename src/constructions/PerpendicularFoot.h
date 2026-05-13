@@ -11,6 +11,9 @@ class PerpendicularFoot : public Point {
 public:
     PerpendicularFoot(Point* point, LinearObject* line);
 
+    Point* point() const { return m_point; }
+    LinearObject* line() const { return m_line; }
+
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
     std::string toString() override;

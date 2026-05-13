@@ -3,6 +3,8 @@
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/MoveCenterCommand.h"
+#include <ui/commands/MacroCommand.h>
+#include <ui/commands/DeleteObjectCommand.h>
 
 SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
 
@@ -112,7 +114,15 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
 
 void SelectTool::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
-        // Ausgewähles Objekt löschen, noch nicht implementiert
+        const auto selection = m_ctx.adapter->selection();
+        if (!selection.empty()) {
+            auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte löschen"));
+            for (GeoObject* obj : selection) {
+                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, obj));
+            }
+            m_ctx.adapter->clearSelection();
+            m_ctx.commandStack->execute(std::move(macro));
+        }
         event->accept();
         return;
     }

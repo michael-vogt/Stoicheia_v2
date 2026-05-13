@@ -11,6 +11,8 @@ protected:
 
 public:
     LineLineIntersection(LinearObject* line1, LinearObject* line2);
+    LinearObject* L1() const { return m_line1; }
+    LinearObject* L2() const { return m_line2; }
     void onSourceRemoved(GeoObject *src) override;
 
 };

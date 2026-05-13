@@ -19,6 +19,9 @@ class CircleCircleIntersection : public IntersectionSet {
 public:
     CircleCircleIntersection(Circle* c1, Circle* c2);
 
+    Circle* c1() const { return m_c1; }
+    Circle* c2() const { return m_c2; }
+
     void onSourceRemoved(GeoObject* src) override;
 
 protected:

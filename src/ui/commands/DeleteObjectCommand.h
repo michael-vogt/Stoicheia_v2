@@ -5,6 +5,9 @@
 class DeleteObjectCommand : public Command {
     SceneAdapter* m_adapter;
     GeoObject* m_object;
+    std::function<void()> m_undoFactory;
+
+    std::function<void()> buildUndoFactory();
 
 public:
     DeleteObjectCommand(SceneAdapter* adapter, GeoObject* object);
