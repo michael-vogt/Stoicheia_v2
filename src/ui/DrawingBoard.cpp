@@ -38,6 +38,10 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     auto escShortcut = std::make_unique<QShortcut>(Qt::Key_Escape, this);
     escShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(escShortcut.get(), &QShortcut::activated, [this]() {
+        if (m_shortcutMode != ShortcutMode::None) {
+            setShortcutMode(ShortcutMode::None);
+            return;
+        }
         if (m_activeTool) {
             QKeyEvent escEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
             m_activeTool->keyPressEvent(&escEvent);
@@ -275,6 +279,7 @@ void DrawingBoard::resetView() {
 
 void DrawingBoard::setShortcutMode(ShortcutMode mode) {
     m_shortcutMode = mode;
+    emit shortcutModeChanged(mode);
     switch (mode) {
         case ShortcutMode::None:
             showStatus("");
@@ -319,10 +324,10 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
                 setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
                 break;
             case Qt::Key_R:
-                setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Ray);
+                setTool<CreateLineTool>(ToolType::CreateRay, LinearObjectType::Ray);
                 break;
             case Qt::Key_S:
-                setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Segment);
+                setTool<CreateLineTool>(ToolType::CreateSegment, LinearObjectType::Segment);
                 break;
             case Qt::Key_C:
                 setTool<CreateCircleTool>(ToolType::CreateCircle);
@@ -360,4 +365,9 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
         event->accept();
         return;
     }
+}
+
+void DrawingBoard::updateToolType(ToolType type) {
+    m_activeToolType = type;
+    emit toolChanged(type);
 }

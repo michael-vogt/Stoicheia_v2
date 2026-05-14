@@ -14,6 +14,8 @@ enum class ToolType {
     Select,
     CreatePoint,
     CreateLine,
+    CreateRay,
+    CreateSegment,
     CreateCircle,
     CreateIntersection,
     CreateMidpoint,
@@ -91,6 +93,7 @@ public:
     Tool* activeTool() const { return m_activeTool.get(); }
     ToolType activeToolType() const { return m_activeToolType; }
     void showStatus(const QString& message) { emit statusMessageChanged(message); }
+    void updateToolType(ToolType type);
 
     // Raster
     void setGridVisible(bool visible);
@@ -108,5 +111,6 @@ public:
     void escapePressed();
     void statusMessageChanged(const QString& text, int timeout = 0);
     void toolChanged(ToolType type);
+    void shortcutModeChanged(ShortcutMode mode);
 };
 

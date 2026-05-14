@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include <QActionGroup>
+#include <QLabel>
 
 #include "tools/CreateCircleTool.h"
 #include "tools/CreateIntersectionTool.h"
@@ -29,21 +31,83 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     setupMenu();
     setupStatusBar();
 
+    connect(m_drawingBoard, &DrawingBoard::toolChanged, this, &MainWindow::onToolChanged);
+    connect(m_drawingBoard, &DrawingBoard::shortcutModeChanged, this, &MainWindow::onShortcutModeChanged);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
     connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
-    connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
-        checkTool(type);
+    connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() {
+        m_drawingBoard->setTool<SelectTool>(ToolType::Select);
+        m_selectAction->setChecked(true);
     });
+    /*connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
+        checkTool(type);
+    });*/
 
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>(ToolType::Select);
+
 }
 
 void MainWindow::setupToolBar() {
-    m_toolbar = addToolBar(tr("Werkzeuge"));
-    m_toolbar->setMovable(false);
+    // ── Geometrie-Toolbar ────────────────────────────────────────────────────
+    m_geoToolBar = addToolBar(tr("Geometrie"));
+    m_geoToolBar->setMovable(false);
 
-    m_selectAction = m_toolbar->addAction(tr("Auswählen"));
+    auto* geoLabel = new QLabel(tr("Geometrie [G] >>"));
+    geoLabel->setStyleSheet("font-weight: bold; color: gray;");
+    m_geoToolBar->addWidget(geoLabel);
+    m_geoToolBar->addSeparator();
+
+    auto* geoGroup = new QActionGroup(this);
+    geoGroup->setExclusive(true);
+
+    auto addGeoAction = [&](const QString& label, auto slot) -> QAction* {
+        auto* action = m_geoToolBar->addAction(label);
+        action->setCheckable(true);
+        geoGroup->addAction(action);
+        connect(action, &QAction::triggered, this, slot);
+        return action;
+    };
+
+    m_selectAction = addGeoAction(tr("Auswählen"), [this]() { m_drawingBoard->setTool<SelectTool>(ToolType::Select); });
+    m_pointAction = addGeoAction(tr("Punkt [P]"), [this]() { m_drawingBoard->setTool<CreatePointTool>(ToolType::CreatePoint); });
+    m_lineAction = addGeoAction(tr("Gerade [L]"), [this]() { m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line); });
+    m_rayAction = addGeoAction(tr("Halbgerade [R]"), [this]() { m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateRay, LinearObjectType::Ray); });
+    m_segmentAction = addGeoAction(tr("Strecke [S]"), [this]() { m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateSegment, LinearObjectType::Segment); });
+    m_circleAction = addGeoAction(tr("Kreis [C]"), [this]() { m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle); });
+    m_selectAction->setChecked(true);
+
+    // ── Konstruktions-Toolbar ────────────────────────────────────────────────────
+    m_conToolBar = addToolBar(tr("Konstruktionen"));
+    m_conToolBar->setMovable(false);
+
+    auto* conLabel = new QLabel(tr("Konstruktionen [K] >>"));
+    conLabel->setStyleSheet("font-weight: bold; color: gray;");
+    m_conToolBar->addWidget(conLabel);
+    m_conToolBar->addSeparator();
+
+    auto* conGroup = new QActionGroup(this);
+    conGroup->setExclusive(true);
+
+    auto addConAction = [&](const QString& label, auto slot) -> QAction* {
+        auto* action = m_conToolBar->addAction(label);
+        action->setCheckable(true);
+        conGroup->addAction(action);
+        connect(action, &QAction::triggered, this, slot);
+        return action;
+    };
+
+    m_intersectionAction = addConAction(tr("Schnittpunkt [S]"), [this]() { m_drawingBoard->setTool<CreateIntersectionTool>(ToolType::CreateIntersection); });
+    m_midpointAction = addConAction(tr("Mittelpunkt [M]"), [this]() { m_drawingBoard->setTool<CreateMidpointTool>(ToolType::CreateMidpoint); });
+    m_parallelAction = addConAction(tr("Parallele [P]"), [this]() { m_drawingBoard->setTool<CreateParallelTool>(ToolType::CreateParallel); });
+    m_perpendicularAction = addConAction(tr("Senkrechte [E]"), [this]() { m_drawingBoard->setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular); });
+    m_perpFootAction = addConAction(tr("Lotfußpunkt [L]"), [this]() { m_drawingBoard->setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot); });
+
+    // beim Start: Geometrie-Toolbar aktiv, Konstruktions-Toolbar deaktiviert
+    m_geoToolBar->setEnabled(true);
+    m_conToolBar->setEnabled(false);
+
+    /*m_selectAction = m_toolbar->addAction(tr("Auswählen"));
     m_selectAction->setCheckable(true);
     m_selectAction->setChecked(true);
     connect(m_drawingBoard, &DrawingBoard::escapePressed, m_selectAction, &QAction::trigger);
@@ -112,7 +176,41 @@ void MainWindow::setupToolBar() {
     connect(m_perpendicularFootAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
         toggleTools(m_perpendicularFootAction);
-    });
+    });*/
+}
+
+void MainWindow::onShortcutModeChanged(ShortcutMode mode) {
+    switch (mode) {
+        case ShortcutMode::None:
+            m_geoToolBar->setEnabled(true);
+            m_conToolBar->setEnabled(true);
+            break;
+        case ShortcutMode::Geometry:
+            m_geoToolBar->setEnabled(true);
+            m_conToolBar->setEnabled(false);
+            break;
+        case ShortcutMode::Construction:
+            m_geoToolBar->setEnabled(false);
+            m_conToolBar->setEnabled(true);
+            break;
+    }
+}
+
+void MainWindow::onToolChanged(ToolType type) {
+    auto check = [](QAction* a, bool on) { if (a) a->setChecked(on); };
+
+    check(m_selectAction,        type == ToolType::Select);
+    check(m_pointAction,         type == ToolType::CreatePoint);
+    check(m_lineAction,          type == ToolType::CreateLine);
+    check(m_rayAction,           type == ToolType::CreateRay);
+    check(m_segmentAction,       type == ToolType::CreateSegment);
+    check(m_circleAction,        type == ToolType::CreateCircle);
+    check(m_intersectionAction,  type == ToolType::CreateIntersection);
+    check(m_midpointAction,      type == ToolType::CreateMidpoint);
+    check(m_parallelAction,      type == ToolType::CreateParallel);
+    check(m_perpendicularAction, type == ToolType::CreatePerpendicular);
+    check(m_perpFootAction,      type == ToolType::CreatePerpendicularFoot);
+
 }
 
 void MainWindow::setupMenu() {
@@ -185,7 +283,7 @@ void MainWindow::toggleTools(const QAction *selectedAction) const {
     }*/
 }
 
-void MainWindow::checkTool(ToolType type) {
+/*void MainWindow::checkTool(ToolType type) {
     for (auto* action : m_toolbar->actions())
         action->setChecked(false);
     
@@ -218,4 +316,4 @@ void MainWindow::checkTool(ToolType type) {
                 m_perpendicularFootAction->setChecked(true);
                 break;
         }
-}
+}*/
