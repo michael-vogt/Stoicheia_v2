@@ -11,6 +11,8 @@ protected:
     void onActivate() override;
     void onCancel() override;
 
+    bool hasIntermediateState() const override { return m_firstObject != nullptr; }
+
 public:
     explicit CreateIntersectionTool(const ToolContext& ctx);
 

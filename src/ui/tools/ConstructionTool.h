@@ -29,6 +29,7 @@ protected:
 
     void highlightObject(GeoObject* obj, bool on);
     void clearHighlights();
+    virtual bool hasIntermediateState() const = 0;
 
 public:
     explicit ConstructionTool(const ToolContext& ctx);

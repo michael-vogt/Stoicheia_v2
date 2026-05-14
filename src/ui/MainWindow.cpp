@@ -30,20 +30,9 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     setupStatusBar();
 
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
-    //connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
-    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, [this](const QString& str) {
-        statusBar()->showMessage(str);
-        if (str.isEmpty()) {
-            QMessageBox::information(this, "", "leer");
-        }
-    });
+    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
     connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
-        const bool isDrawing = (type == ToolType::CreateLine);
-        m_lineAction->setShortcut(isDrawing ? QKeySequence() : QKeySequence(Qt::Key_L));
-        //QString name = QString::fromStdString(std::string(magic_enum::enum_name(type)));
-        //QMessageBox::information(this, "Info", name);
         checkTool(type);
-        m_drawingBoard->activeTool()->activate();
     });
 
     // Standard-Tool: Auswählen
@@ -65,7 +54,7 @@ void MainWindow::setupToolBar() {
 
     m_pointAction = m_toolbar->addAction(tr("Punkt"));
     m_pointAction->setCheckable(true);
-    m_pointAction->setShortcut(Qt::Key_P);
+    //m_pointAction->setShortcut(Qt::Key_P);
     connect(m_pointAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreatePointTool>(ToolType::CreatePoint);
         toggleTools(m_pointAction);
@@ -74,7 +63,7 @@ void MainWindow::setupToolBar() {
 
     m_lineAction = m_toolbar->addAction(tr("Linie"));
     m_lineAction->setCheckable(true);
-    m_lineAction->setShortcut(Qt::Key_L);
+    //m_lineAction->setShortcut(Qt::Key_L);
     connect(m_lineAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
         toggleTools(m_lineAction);
@@ -82,7 +71,7 @@ void MainWindow::setupToolBar() {
 
     m_circleAction = m_toolbar->addAction(tr("Kreis"));
     m_circleAction->setCheckable(true);
-    m_circleAction->setShortcut(Qt::Key_C);
+    //m_circleAction->setShortcut(Qt::Key_C);
     connect(m_circleAction, &QAction::triggered, [this]() {
         m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle);
         toggleTools(m_circleAction);

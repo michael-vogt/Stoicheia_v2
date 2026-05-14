@@ -310,6 +310,7 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
     }
 
     if (m_shortcutMode == ShortcutMode::Geometry) {
+        setShortcutMode(ShortcutMode::None);
         switch (event->key()) {
             case Qt::Key_P:
                 setTool<CreatePointTool>(ToolType::CreatePoint);
@@ -330,12 +331,12 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
                 event->ignore();
                 return;
         }
-        setShortcutMode(ShortcutMode::None);
         event->accept();
         return;
     }
 
     if (m_shortcutMode == ShortcutMode::Construction) {
+        setShortcutMode(ShortcutMode::None);
         switch (event->key()) {
             case Qt::Key_S:
                 setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
@@ -356,7 +357,6 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
                 event->ignore();
                 return;
         }
-        setShortcutMode(ShortcutMode::None);
         event->accept();
         return;
     }
