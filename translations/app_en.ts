@@ -4,118 +4,189 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="185"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="262"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="118"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="205"/>
         <source>Panning</source>
         <translation>Panning</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="247"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="187"/>
         <source>Snapping</source>
         <translation>Snapping</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DrawingBoard.cpp" line="288"/>
+        <source>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</source>
+        <translation>Geometry: [P] Point [L] Line [R] Ray [S] Segment [C] Circle [Esc] Abort</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/DrawingBoard.cpp" line="291"/>
+        <source>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</source>
+        <translation>Construction: [S] Intersection [M] Midpoint [P] Parallel [E] Perpendicular [L] Perpendicular foot [Esc] Abort</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="41"/>
         <source>Werkzeuge</source>
-        <translation>Tools</translation>
+        <translation type="vanished">Tools</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="44"/>
+        <location filename="../src/ui/MainWindow.cpp" line="72"/>
         <source>Auswählen</source>
         <translation>Select</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="53"/>
         <source>Punkt</source>
-        <translation>Point</translation>
+        <translation type="vanished">Point</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="62"/>
         <source>Linie</source>
-        <translation>Line</translation>
+        <translation type="vanished">Line</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="70"/>
         <source>Kreis</source>
-        <translation>Circle</translation>
+        <translation type="vanished">Circle</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="79"/>
         <source>Schnittpunkt</source>
-        <translation>Intersection</translation>
+        <translation type="vanished">Intersection</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="86"/>
         <source>Mittelpunkt</source>
-        <translation>Midpoint</translation>
+        <translation type="vanished">Midpoint</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="93"/>
         <source>Parallele</source>
-        <translation>Parallel</translation>
+        <translation type="vanished">Parallel</translation>
+    </message>
+    <message>
+        <source>Senkrechte</source>
+        <translation type="vanished">Perpendicular</translation>
+    </message>
+    <message>
+        <source>Lotfußpunkt</source>
+        <translation type="vanished">Perpendicular foot</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="53"/>
+        <source>Geometrie</source>
+        <translation>Geometry</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="56"/>
+        <source>Geometrie [G] &gt;&gt;</source>
+        <translation>Geometry [G] &gt;&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="73"/>
+        <source>Punkt [P]</source>
+        <translation>Point [P]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="74"/>
+        <source>Gerade [L]</source>
+        <translation>Line [L]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="75"/>
+        <source>Halbgerade [R]</source>
+        <translation>Ray [R]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="76"/>
+        <source>Strecke [S]</source>
+        <translation>Segment [S]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="77"/>
+        <source>Kreis [C]</source>
+        <translation>Circle [C]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="81"/>
+        <source>Konstruktionen</source>
+        <translation>Constructions</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="84"/>
+        <source>Konstruktionen [K] &gt;&gt;</source>
+        <translation>Constructions [K] &gt;&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="100"/>
-        <source>Senkrechte</source>
-        <translation>Perpendicular</translation>
+        <source>Schnittpunkt [S]</source>
+        <translation>Intersection [S]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="107"/>
-        <source>Lotfußpunkt</source>
-        <translation>Perpendicular foot</translation>
+        <location filename="../src/ui/MainWindow.cpp" line="101"/>
+        <source>Mittelpunkt [M]</source>
+        <translation>Midpoint [M]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="118"/>
+        <location filename="../src/ui/MainWindow.cpp" line="102"/>
+        <source>Parallele [P]</source>
+        <translation>Parallel [P]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="103"/>
+        <source>Senkrechte [E]</source>
+        <translation>Perpendicular [E]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="104"/>
+        <source>Lotfußpunkt [L]</source>
+        <translation>Perpendicular foot [L]</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="217"/>
         <source>Datei</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="120"/>
+        <location filename="../src/ui/MainWindow.cpp" line="219"/>
         <source>Beenden</source>
         <translation>Quit</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="125"/>
+        <location filename="../src/ui/MainWindow.cpp" line="224"/>
         <source>Bearbeiten</source>
         <translation>Edit</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="127"/>
-        <location filename="../src/ui/MainWindow.cpp" line="173"/>
+        <location filename="../src/ui/MainWindow.cpp" line="226"/>
+        <location filename="../src/ui/MainWindow.cpp" line="272"/>
         <source>Rückgängig</source>
         <translation>Undo</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="135"/>
-        <location filename="../src/ui/MainWindow.cpp" line="174"/>
+        <location filename="../src/ui/MainWindow.cpp" line="234"/>
+        <location filename="../src/ui/MainWindow.cpp" line="273"/>
         <source>Wiederholen</source>
         <translation>Redo</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="144"/>
+        <location filename="../src/ui/MainWindow.cpp" line="243"/>
         <source>Ansicht</source>
         <translation>View</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="146"/>
+        <location filename="../src/ui/MainWindow.cpp" line="245"/>
         <source>Immer einrasten</source>
         <translation>Always snap</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="153"/>
+        <location filename="../src/ui/MainWindow.cpp" line="252"/>
         <source>Raster</source>
         <translation>Grid</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="173"/>
+        <location filename="../src/ui/MainWindow.cpp" line="272"/>
         <source>Rückgängig: </source>
         <translation>Undo: </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="174"/>
+        <location filename="../src/ui/MainWindow.cpp" line="273"/>
         <source>Wiederholen: </source>
         <translation>Redo: </translation>
     </message>
@@ -143,7 +214,7 @@
         <translation>Create first point - L: Line, R: Ray, S: Segment</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateLineTool.cpp" line="76"/>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="80"/>
         <source>Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke</source>
         <translation>Create second point - L: Line, R: Ray, S: Segment</translation>
     </message>

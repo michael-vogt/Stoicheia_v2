@@ -11,6 +11,8 @@ protected:
     void onActivate() override;
     void onCancel() override;
 
+    bool hasIntermediateState() const override { return m_firstPoint != nullptr; }
+
 public:
     explicit CreateMidpointTool(const ToolContext& ctx);
 

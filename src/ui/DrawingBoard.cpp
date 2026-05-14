@@ -9,6 +9,14 @@
 
 #include "MainWindow.h"
 #include "geometry/Point.h"
+#include "tools/CreatePointTool.h"
+#include "tools/CreateLineTool.h"
+#include "tools/CreateCircleTool.h"
+#include "tools/CreateIntersectionTool.h"
+#include "tools/CreateMidpointTool.h"
+#include "tools/CreateParallelTool.h"
+#include "tools/CreatePerpendicularTool.h"
+#include "tools/CreatePerpendicularFootTool.h"
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
     setScene(&m_qtScene);
@@ -30,6 +38,10 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     auto escShortcut = std::make_unique<QShortcut>(Qt::Key_Escape, this);
     escShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(escShortcut.get(), &QShortcut::activated, [this]() {
+        if (m_shortcutMode != ShortcutMode::None) {
+            setShortcutMode(ShortcutMode::None);
+            return;
+        }
         if (m_activeTool) {
             QKeyEvent escEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
             m_activeTool->keyPressEvent(&escEvent);
@@ -47,37 +59,7 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
     m_grid.drawBackground(painter, rect);
-    /*if (m_gridVisible) {
-        drawGrid(painter, rect);
-    }*/
 }
-
-/*void DrawingBoard::drawGrid(QPainter* painter, const QRectF& rect) const {
-    // Axes
-    QPen axisPen(QColor(160,160,160), 1.5);
-    painter->setPen(axisPen);
-    painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
-    painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
-
-    // grid lines
-    QPen gridPen(QColor(220,220,220), 0.5);
-    painter->setPen(gridPen);
-
-    double left = std::floor(rect.left() / m_gridSpacing) * m_gridSpacing;
-    double top = std::floor(rect.top() / m_gridSpacing) * m_gridSpacing;
-    double right = rect.right();
-    double bottom = rect.bottom();
-
-    for (double x = left; x <= right; x += m_gridSpacing) {
-        if (std::abs(x) > 0.1)
-            painter->drawLine(QPointF(x, top), QPointF(x, bottom));
-    }
-
-    for (double y = top; y <= bottom; y += m_gridSpacing) {
-        if (std::abs(y) > 0.1)
-            painter->drawLine(QPointF(left, y), QPointF(right, y));
-    }
-}*/
 
 void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawForeground(painter, rect);
@@ -92,55 +74,6 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
 
     m_grid.drawLabels(painter, toViewport, viewport()->width(), viewport()->height());
     painter->restore();
-
-    /*QFont font = painter->font();
-    font.setPointSize(8);
-    painter->setFont(font);
-    painter->setPen(QColor(120,120,120));
-
-    const int margin = 4;
-    const int tickSize = 4;
-
-    double left = std::floor(rect.left() / m_gridSpacing) * m_gridSpacing;
-    double top = std::floor(rect.top() / m_gridSpacing) * m_gridSpacing;
-    double right = rect.right();
-    double bottom = rect.bottom();
-
-    QPointF originView = viewport()->mapFrom(this, mapFromScene(QPointF(0, 0))); // mapFromScene(QPointF(0,0));
-    int ox = static_cast<int>(originView.x());
-    int oy = static_cast<int>(originView.y());
-
-    int labelY = static_cast<int>(std::clamp(
-        static_cast<double>(oy + margin + 12),
-        static_cast<double>(margin + 12),
-        static_cast<double>(height() - margin)
-        ));
-
-    for (double x = left; x <= right; x += m_gridSpacing) {
-        if (std::abs(x) < 0.1) continue;
-        int px = static_cast<int>(mapFromScene(QPointF(x, 0)).x());
-        painter->drawLine(px, oy - tickSize, px, oy + tickSize);
-        QString label = QString::number(static_cast<int>(std::round(x)));
-        painter->drawText(QRect(px - 20, labelY - 12, 40, 14), Qt::AlignHCenter, label);
-    }
-
-    int labelX = static_cast<int>(std::clamp(
-        static_cast<double>(ox + margin),
-        static_cast<double>(margin),
-        static_cast<double>(width() - 40 - margin)
-        ));
-
-    for (double y = top; y <= bottom; y += m_gridSpacing) {
-        if (std::abs(y) < 0.1) continue;
-        int py = static_cast<int>(mapFromScene(QPointF(0, y)).y());
-        painter->drawLine(ox - tickSize, py, ox + tickSize, py);
-        QString label = QString::number(static_cast<int>(std::round(y)));
-        painter->drawText(QRect(labelX, py-7,38,14), Qt::AlignLeft | Qt::AlignVCenter, label);
-    }
-
-    painter->drawText(QRect(ox + margin, oy + margin, 20, 14), Qt::AlignLeft, "0");
-
-    painter->restore();*/
 }
 
 void DrawingBoard::setGridVisible(bool visible) {
@@ -237,6 +170,13 @@ void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void DrawingBoard::keyPressEvent(QKeyEvent *event) {
+    // Aktiver Shortcut-Modus hat absoluten Vorrang
+    if (m_shortcutMode != ShortcutMode::None) {
+        handleShortcutKey(event);
+        if (event->isAccepted()) return;
+    }
+
+    // Tool zuerst
     if (m_activeTool) {
         m_activeTool->keyPressEvent(event);
         if (event->isAccepted())
@@ -246,17 +186,20 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Alt) {
         showStatus(tr("Snapping"));
     }
+
     // Undo/Redo
     if (event->matches(QKeySequence::Undo)) {
         m_commandStack.undo();
         event->accept();
         return;
     }
+
     if (event->matches(QKeySequence::Redo)) {
         m_commandStack.redo();
         event->accept();
         return;
     }
+    
     // Pan-Modus
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
         showStatus(tr("Panning"));
@@ -266,27 +209,19 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
         return;
     }
 
-    if (event->key() == Qt::Key_M && !event->isAutoRepeat()) {
-        for (const auto& map = m_adapter.geoGraphicsItems(); const auto &key: map | std::views::keys) {
-            if (key && typeid(*key) == typeid(Point)) {
-                auto* p = dynamic_cast<Point*>(key);
-                p->moveTo(p->x() - 100, p->y());
-                break;
-            }
-        }
-        event->accept();
-        return;
-    }
     if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
         resetView();
         event->accept();
         return;
     }
+
     if (event->key() == Qt::Key_NumberSign && !event->isAutoRepeat()) {
-        setGridVisible(!m_gridVisible);
+        m_grid.setVisible(!m_grid.isVisible());
         event->accept();
         return;
     }
+
+    handleShortcutKey(event);
 
     QGraphicsView::keyPressEvent(event);
 }
@@ -340,4 +275,99 @@ void DrawingBoard::resetView() {
     centerOn(0, 0);
     scale(1.0 / scaleX, -1.0 / scaleY);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+}
+
+void DrawingBoard::setShortcutMode(ShortcutMode mode) {
+    m_shortcutMode = mode;
+    emit shortcutModeChanged(mode);
+    switch (mode) {
+        case ShortcutMode::None:
+            showStatus("");
+            break;
+        case ShortcutMode::Geometry:
+            showStatus(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
+            break;
+        case ShortcutMode::Construction:
+            showStatus(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
+            break;
+    }
+}
+
+void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
+    if (m_shortcutMode == ShortcutMode::None) {
+        switch(event->key()) {
+            case Qt::Key_G:
+                setShortcutMode(ShortcutMode::Geometry);
+                event->accept();
+                return;
+            case Qt::Key_K:
+                setShortcutMode(ShortcutMode::Construction);
+                event->accept();
+                return;
+        }
+        return;
+    }
+
+    if (event->key() == Qt::Key_Escape) {
+        setShortcutMode(ShortcutMode::None);
+        event->accept();
+        return;
+    }
+
+    if (m_shortcutMode == ShortcutMode::Geometry) {
+        setShortcutMode(ShortcutMode::None);
+        switch (event->key()) {
+            case Qt::Key_P:
+                setTool<CreatePointTool>(ToolType::CreatePoint);
+                break;
+            case Qt::Key_L:
+                setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
+                break;
+            case Qt::Key_R:
+                setTool<CreateLineTool>(ToolType::CreateRay, LinearObjectType::Ray);
+                break;
+            case Qt::Key_S:
+                setTool<CreateLineTool>(ToolType::CreateSegment, LinearObjectType::Segment);
+                break;
+            case Qt::Key_C:
+                setTool<CreateCircleTool>(ToolType::CreateCircle);
+                break;
+            default:
+                event->ignore();
+                return;
+        }
+        event->accept();
+        return;
+    }
+
+    if (m_shortcutMode == ShortcutMode::Construction) {
+        setShortcutMode(ShortcutMode::None);
+        switch (event->key()) {
+            case Qt::Key_S:
+                setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
+                break;
+            case Qt::Key_M:
+                setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
+                break;
+            case Qt::Key_P:
+                setTool<CreateParallelTool>(ToolType::CreateParallel);
+                break;
+            case Qt::Key_E:
+                setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
+                break;
+            case Qt::Key_L:
+                setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
+                break;
+            default:
+                event->ignore();
+                return;
+        }
+        event->accept();
+        return;
+    }
+}
+
+void DrawingBoard::updateToolType(ToolType type) {
+    m_activeToolType = type;
+    emit toolChanged(type);
 }

@@ -14,12 +14,20 @@ enum class ToolType {
     Select,
     CreatePoint,
     CreateLine,
+    CreateRay,
+    CreateSegment,
     CreateCircle,
     CreateIntersection,
     CreateMidpoint,
     CreateParallel,
     CreatePerpendicular,
     CreatePerpendicularFoot
+};
+
+enum class ShortcutMode {
+    None,
+    Geometry,
+    Construction
 };
 
 class DrawingBoard : public QGraphicsView {
@@ -50,6 +58,10 @@ class DrawingBoard : public QGraphicsView {
 
     SnapHelper m_snapHelper{&m_qtScene, &m_grid};
 
+    ShortcutMode m_shortcutMode = ShortcutMode::None;
+    void handleShortcutKey(QKeyEvent* event);
+    void setShortcutMode(ShortcutMode mode);
+
     void drawGrid(QPainter* painter, const QRectF& rect) const;
     ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
 
@@ -73,6 +85,7 @@ public:
         if (m_activeTool) m_activeTool->deactivate();
         m_activeTool = std::make_unique<T>(makeContext(), std::forward<Args>(args)...);
         m_activeToolType = type;
+        m_shortcutMode = ShortcutMode::None;
         m_activeTool->activate();
         emit toolChanged(type);
     }
@@ -80,6 +93,7 @@ public:
     Tool* activeTool() const { return m_activeTool.get(); }
     ToolType activeToolType() const { return m_activeToolType; }
     void showStatus(const QString& message) { emit statusMessageChanged(message); }
+    void updateToolType(ToolType type);
 
     // Raster
     void setGridVisible(bool visible);
@@ -97,5 +111,6 @@ public:
     void escapePressed();
     void statusMessageChanged(const QString& text, int timeout = 0);
     void toolChanged(ToolType type);
+    void shortcutModeChanged(ShortcutMode mode);
 };
 

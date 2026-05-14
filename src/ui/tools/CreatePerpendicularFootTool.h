@@ -11,6 +11,8 @@ protected:
     void onActivate() override;
     void onCancel() override;
 
+    bool hasIntermediateState() const override { return m_point != nullptr; }
+
 public:
     explicit CreatePerpendicularFootTool(const ToolContext& ctx);
 
