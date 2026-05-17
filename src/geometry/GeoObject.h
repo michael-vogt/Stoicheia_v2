@@ -27,6 +27,7 @@ public:
     virtual void recompute() = 0;
     bool isValid() const { return m_valid; };
     std::unordered_set<GeoObject*> dependents() { return m_dependents; };
+    std::unordered_set<GeoObject*>& sources() { return m_sources; }
 
     virtual std::string toString() { return ""; };
 };

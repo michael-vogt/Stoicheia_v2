@@ -25,6 +25,8 @@ public:
     QString nextUndoDescription() const;
     QString nextRedoDescription() const;
 
+    void clear();
+
     signals:
     void changed();
 };

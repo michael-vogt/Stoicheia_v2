@@ -5,10 +5,12 @@
 
 #include "DrawingBoard.h"
 #include "SceneAdapter.h"
+#include "import-export/FileManager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
     DrawingBoard* m_drawingBoard = nullptr;
+    FileManager* m_fileManager = nullptr;
     QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;
 
