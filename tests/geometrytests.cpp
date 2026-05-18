@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <cmath>
-#include "geometry/geometry.h"
+#include "../src/geometry/geometry.h"
 
 static constexpr double EPS = 1e-9;
 

@@ -41,6 +41,10 @@ Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
 
 void CreateLineTool::setType(const LinearObjectType type) {
     m_type = type;
+    ToolType toolType = (type == LinearObjectType::Line)    ? ToolType::CreateLine :
+                        (type == LinearObjectType::Ray)     ? ToolType::CreateRay  :
+                                                              ToolType::CreateSegment;
+    m_ctx.drawingBoard->updateToolType(toolType);
     if (m_preview)
         m_preview->setLine(computePreviewLine(m_lastScenePos));
 }
@@ -141,14 +145,17 @@ void CreateLineTool::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
         case Qt::Key_L:
             setType(LinearObjectType::Line);
+            emit m_ctx.drawingBoard->toolChanged(ToolType::CreateLine);
             event->accept();
             return;
         case Qt::Key_R:
             setType(LinearObjectType::Ray);
+            emit m_ctx.drawingBoard->toolChanged(ToolType::CreateRay);
             event->accept();
             return;
         case Qt::Key_S:
             setType(LinearObjectType::Segment);
+            emit m_ctx.drawingBoard->toolChanged(ToolType::CreateSegment);
             event->accept();
             return;
         default:

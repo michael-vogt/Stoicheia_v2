@@ -38,41 +38,88 @@ add_custom_target(release_translations
 # -------------------------------------------------
 # CORE LIB (Geometry / Logic)
 # -------------------------------------------------
-add_library(StoicheiaLib STATIC
+add_library(StoicheiaCore STATIC
         src/geometry/GeoObject.cpp
         src/geometry/Point.cpp
         src/geometry/LinearObject.cpp
         src/geometry/geometryHelper.cpp
         src/geometry/UpdateGuard.cpp
         src/geometry/Scene.cpp
+        src/geometry/Circle.cpp
+        src/geometry/Triangle.cpp
+        src/geometry/Polygon.cpp
 
         src/constructions/Parallel.cpp
         src/constructions/Midpoint.cpp
         src/constructions/Perpendicular.cpp
         src/constructions/PerpendicularFoot.cpp
-
-        src/geometry/Circle.cpp
         src/constructions/IntersectionSet.cpp
         src/constructions/LineCircleIntersection.cpp
         src/constructions/LineLineIntersection.cpp
         src/constructions/CircleCircleIntersection.cpp
-
-        src/geometry/Triangle.cpp
-        src/geometry/Polygon.cpp
 )
 
-target_include_directories(StoicheiaLib PUBLIC
+target_include_directories(StoicheiaCore PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(StoicheiaLib PUBLIC
+target_link_libraries(StoicheiaCore PUBLIC
         Qt6::Core
 )
 
 # -------------------------------------------------
+# APP LIB (Commands, Tools, Serialization)
+# -------------------------------------------------
+add_library(StoicheiaApp STATIC
+        src/ui/commands/CommandStack.cpp
+        src/ui/commands/CreateCircleCommand.cpp
+        src/ui/commands/CreateIntersectionCommand.cpp
+        src/ui/commands/CreateLineCommand.cpp
+        src/ui/commands/CreateMidpointCommand.cpp
+        src/ui/commands/CreateParallelCommand.cpp
+        src/ui/commands/CreatePerpendicularCommand.cpp
+        src/ui/commands/CreatePerpendicularFootCommand.cpp
+        src/ui/commands/CreatePointCommand.cpp
+        src/ui/commands/DeleteObjectCommand.cpp
+        src/ui/commands/MacroCommand.cpp
+        src/ui/commands/MoveCenterCommand.cpp
+        src/ui/commands/MovePointCommand.cpp
+
+        src/ui/tools/ConstructionTool.cpp
+        src/ui/tools/CreateCircleTool.cpp
+        src/ui/tools/CreateIntersectionTool.cpp
+        src/ui/tools/CreateLineTool.cpp
+        src/ui/tools/CreateMidpointTool.cpp
+        src/ui/tools/CreateParallelTool.cpp
+        src/ui/tools/CreatePerpendicularFootTool.cpp
+        src/ui/tools/CreatePerpendicularTool.cpp
+        src/ui/tools/CreatePointTool.cpp
+        src/ui/tools/SelectTool.cpp
+
+        src/ui/io/FileManager.cpp
+        src/ui/io/FileManager.h
+        src/ui/io/Serializer.cpp
+
+        src/ui/SnapHelper.cpp
+        src/ui/Grid.cpp
+)
+
+target_include_directories(StoicheiaApp PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(StoicheiaApp PRIVATE
+        StoicheiaCore
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+)
+
+
+# -------------------------------------------------
 # GUI LIB (Qt Widgets / Items)
 # -------------------------------------------------
-add_library(StoicheiaGui STATIC
+add_library(StoicheiaQt STATIC
         src/ui/GeoGraphicsItem.cpp
         src/ui/GeoPointItem.cpp
         src/ui/GeoLinearObjectItem.cpp
@@ -80,16 +127,21 @@ add_library(StoicheiaGui STATIC
         src/ui/GeoIntersectionPointItem.cpp
         src/ui/SceneAdapter.cpp
         src/ui/HitTest.cpp
+        src/ui/DrawingBoard.cpp
+        src/ui/DrawingBoard.h
+        src/ui/MainWindow.cpp
+        src/ui/MainWindow.h
 )
 
-target_include_directories(StoicheiaGui PUBLIC
+target_include_directories(StoicheiaQt PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(StoicheiaGui PUBLIC
+target_link_libraries(StoicheiaQt PUBLIC
         Qt6::Core
         Qt6::Widgets
-        StoicheiaLib
+        StoicheiaCore
+        StoicheiaApp
 )
 
 # -------------------------------------------------
@@ -97,44 +149,12 @@ target_link_libraries(StoicheiaGui PUBLIC
 # -------------------------------------------------
 qt_add_executable(Stoicheia
         main.cpp
-
-        src/ui/MainWindow.cpp
-        src/ui/MainWindow.h
-        src/ui/DrawingBoard.cpp
-        src/ui/DrawingBoard.h
-
-        src/ui/commands/CommandStack.cpp
-        src/ui/commands/CreatePointCommand.cpp
-        src/ui/commands/MovePointCommand.cpp
-        src/ui/commands/DeleteObjectCommand.cpp
-        src/ui/commands/CreateLineCommand.cpp
-        src/ui/commands/CreateCircleCommand.cpp
-        src/ui/commands/MoveCenterCommand.cpp
-        src/ui/commands/MacroCommand.cpp
-
-        src/ui/tools/SelectTool.cpp
-        src/ui/tools/CreatePointTool.cpp
-        src/ui/tools/CreateLineTool.cpp
-        src/ui/tools/CreateCircleTool.cpp
-
-        src/ui/SnapHelper.cpp
-        src/ui/commands/CreateMidpointCommand.cpp
-        src/ui/commands/CreateIntersectionCommand.cpp
-        src/ui/commands/CreateParallelCommand.cpp
-        src/ui/commands/CreatePerpendicularCommand.cpp
-        src/ui/commands/CreatePerpendicularFootCommand.cpp
-        src/ui/tools/ConstructionTool.cpp
-        src/ui/tools/CreateIntersectionTool.cpp
-        src/ui/tools/CreateMidpointTool.cpp
-        src/ui/tools/CreateParallelTool.cpp
-        src/ui/tools/CreatePerpendicularTool.cpp
-        src/ui/tools/CreatePerpendicularFootTool.cpp
-        src/ui/Grid.cpp
 )
 
 target_link_libraries(Stoicheia PRIVATE
-        StoicheiaLib
-        StoicheiaGui
+        StoicheiaCore
+        StoicheiaApp
+        StoicheiaQt
         Qt6::Core
         Qt6::Widgets
 )
@@ -176,7 +196,7 @@ enable_testing()
 
 function(add_geo_test target source)
     add_executable(${target} ${source})
-    target_link_libraries(${target} PRIVATE StoicheiaLib gtest_main)
+    target_link_libraries(${target} PRIVATE StoicheiaCore gtest_main)
 
     set_target_properties(${target} PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
@@ -195,6 +215,6 @@ add_geo_test(LinearTest tests/lineartest.cpp)
 file(GLOB ALL_TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
 
 add_executable(AllTests ${ALL_TEST_SOURCES})
-target_link_libraries(AllTests PRIVATE StoicheiaLib gtest_main)
+target_link_libraries(AllTests PRIVATE StoicheiaCore gtest_main)
 
 gtest_discover_tests(AllTests)

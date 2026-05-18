@@ -12,6 +12,8 @@ protected:
     void onActivate() override;
     void onCancel() override;
 
+    bool hasIntermediateState() const override { return m_reference != nullptr; }
+
 public:
     explicit CreatePerpendicularTool(const ToolContext& ctx);
 

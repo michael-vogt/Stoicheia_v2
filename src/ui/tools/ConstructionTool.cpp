@@ -20,10 +20,16 @@ void ConstructionTool::deactivate() {
 
 void ConstructionTool::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Escape) {
-        removePreview();
-        onCancel();
-        onActivate(); // Status zurücksetzen
-        event->accept();
+        if (hasIntermediateState()) {
+            removePreview();
+            onCancel();
+            onActivate(); // Status zurücksetzen
+            event->accept();
+        } else {
+            // kein Zwischenstand -> ignorieren
+            // DrawingBoard wechselt zum SelectTool
+            event->ignore();
+        }
         return;
     }
     event->ignore();

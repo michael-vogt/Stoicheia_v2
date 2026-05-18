@@ -1,7 +1,7 @@
 #pragma once
 
-#include "geometry/LinearObject.h"
-#include "geometry/Point.h"
+#include "../geometry/LinearObject.h"
+#include "../geometry/Point.h"
 
 
 class PerpendicularFoot : public Point {
