@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IntersectionPoint.h"
-#include "geometry/GeoObject.h"
+#include "../geometry/GeoObject.h"
 
 
 class IntersectionSet : public GeoObject {

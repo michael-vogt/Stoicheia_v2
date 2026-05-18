@@ -1,9 +1,9 @@
 #pragma once
 
-#include "geometry/GeoObject.h"
-#include "geometry/Line.h"
-#include "geometry/LinearObject.h"
-#include "geometry/Point.h"
+#include "../geometry/GeoObject.h"
+#include "../geometry/Line.h"
+#include "../geometry/LinearObject.h"
+#include "../geometry/Point.h"
 
 
 class Parallel : public GeoObject {

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "geometry/geometry.h"
-#include "constructions/constructions.h"
+#include "../src/geometry/geometry.h"
+#include "../src/constructions/constructions.h"
 
 static constexpr double EPS = 1e-9;
 

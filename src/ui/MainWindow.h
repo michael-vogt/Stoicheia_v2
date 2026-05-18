@@ -5,7 +5,7 @@
 
 #include "DrawingBoard.h"
 #include "SceneAdapter.h"
-#include "import-export/FileManager.h"
+#include "io/FileManager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
