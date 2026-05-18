@@ -51,6 +51,12 @@ QJsonObject Serializer::serializeScene() const {
         saveable.insert(obj);
     }
 
+    // IntersectionSets explizit hinzufügen
+    for (IntersectionSet* iset : m_adapter->intersectionSets()) {
+        if (iset->isValid())
+            saveable.insert(iset);
+    }
+
     bool changed = true;
     while (changed) {
         changed = false;
@@ -72,10 +78,25 @@ QJsonObject Serializer::serializeScene() const {
     std::function<void(GeoObject*)> collect = [&](GeoObject* obj) {
         if (visited.contains(obj)) return;
         visited.insert(obj);
-        // Quellen zuerst – aber nur wenn sie auch saveable sind
+
+        // Normale Quellen
         for (GeoObject* src : obj->sources())
             if (saveable.contains(src))
                 collect(src);
+
+        // IntersectionPoint: IntersectionSet als implizite Quelle behandeln
+        if (auto* ip = dynamic_cast<IntersectionPoint*>(obj)) {
+            for (auto& [geoObj, _] : m_adapter->geoGraphicsItems()) {
+                if (auto* iset = dynamic_cast<IntersectionSet*>(geoObj)) {
+                    if (iset->first() == ip || iset->second() == ip) {
+                        if (saveable.contains(iset))
+                            collect(iset);
+                        break;
+                    }
+                }
+            }
+        }
+
         sorted.push_back(obj);
     };
 
@@ -126,19 +147,16 @@ QJsonObject Serializer::serializeObject(GeoObject* obj, int id, const std::unord
 
     if (auto* ip = dynamic_cast<IntersectionPoint*>(obj)) {
         o["type"] = "IntersectionPoint";
-        // IntersectionSet suchen dem dieser Punkt gehört
-        for (auto& [geoObj, _] : m_adapter->geoGraphicsItems()) {
-            if (auto* iset = dynamic_cast<IntersectionSet*>(geoObj)) {
-                if (iset->first() == ip) {
-                    o["intersectionSet"] = ref(iset);
-                    o["index"] = 0;
-                    break;
-                }
-                if (iset->second() == ip) {
-                    o["intersectionSet"] = ref(iset);
-                    o["index"] = 1;
-                    break;
-                }
+        for (IntersectionSet* iset : m_adapter->intersectionSets()) {
+            if (iset->first() == ip) {
+                o["intersectionSet"] = ref(iset);
+                o["index"] = 0;
+                break;
+            }
+            if (iset->second() == ip) {
+                o["intersectionSet"] = ref(iset);
+                o["index"] = 1;
+                break;
             }
         }
     } else if (auto* p = dynamic_cast<Point*>(obj)) {
@@ -231,18 +249,29 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
         int         id   = o["id"].toInt();
         QString     type = o["type"].toString();
 
-        qDebug() << "loading:" << id << type;
-
         auto ref = [&](const QString& key) -> GeoObject* {
             int refId = o[key].toInt(-1);
-            qDebug() << "  ref" << key << "=" << refId << "found:" << idMap.contains(refId);
             auto it = idMap.find(refId);
             return it != idMap.end() ? it->second : nullptr;
         };
 
         GeoObject* obj = nullptr;
 
-        if (type == "Point") {
+        if (type == "IntersectionPoint") {
+            int setId  = o["intersectionSet"].toInt(-1);
+            int index  = o["index"].toInt(0);
+            auto it = idMap.find(setId);
+            if (it == idMap.end()) {
+                m_lastError = "IntersectionSet nicht gefunden";
+                return false;
+            }
+            auto* iset = dynamic_cast<IntersectionSet*>(it->second);
+            if (!iset) { m_lastError = "Kein IntersectionSet"; return false; }
+            obj = (index == 0) ? iset->first() : iset->second();
+            // Kein addPoint nötig – Item wurde bereits von addIntersectionSet erzeugt
+            idMap[id] = obj;
+            continue; // kein erneutes addPoint
+        } else if (type == "Point") {
             auto* p = m_scene->create<Point>(o["x"].toDouble(),
                                               o["y"].toDouble());
             m_adapter->addPoint(p);
@@ -279,21 +308,6 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
             auto* c = m_scene->create<Circle>(center, radius);
             m_adapter->addCircle(c);
             obj = c;
-
-        } else if (type == "IntersectionPoint") {
-            int setId  = o["intersectionSet"].toInt(-1);
-            int index  = o["index"].toInt(0);
-            auto it = idMap.find(setId);
-            if (it == idMap.end()) {
-                m_lastError = "IntersectionSet nicht gefunden";
-                return false;
-            }
-            auto* iset = dynamic_cast<IntersectionSet*>(it->second);
-            if (!iset) { m_lastError = "Kein IntersectionSet"; return false; }
-            obj = (index == 0) ? iset->first() : iset->second();
-            // Kein addPoint nötig – Item wurde bereits von addIntersectionSet erzeugt
-            idMap[id] = obj;
-            continue; // kein erneutes addPoint
 
         } else if (type == "Midpoint") {
             auto* p1 = dynamic_cast<Point*>(ref("p1"));

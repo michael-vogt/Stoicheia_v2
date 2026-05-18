@@ -65,7 +65,7 @@ bool FileManager::saveAs() {
     return saveToFile(filename);
 }
 
-bool FileManager::exportSVG() {
+bool FileManager::exportSVG() const {
     QString filename = QFileDialog::getSaveFileName(
         m_parent, QObject::tr("SVG exportieren"), {}, FILTER_SVG);
     if (filename.isEmpty()) return false;
@@ -108,16 +108,13 @@ bool FileManager::loadFromFile(const QString& filename) {
     return true;
 }
 
-void FileManager::clearScene() {
-    // Alle Objekte aus SceneAdapter und Scene entfernen
-    const auto items = m_adapter->geoGraphicsItems();
-    for (auto& [obj, _] : items)
-        obj->detach();
-    // TODO: Scene leeren – braucht clear()-Methode
+void FileManager::clearScene() const {
+    m_adapter->clear();
+    m_scene->clear();
     m_commandStack->clear();
 }
 
-void FileManager::updateTitle() {
+void FileManager::updateTitle() const {
     if (auto* w = qobject_cast<QMainWindow*>(m_parent)) {
         QString name = m_currentFile.isEmpty()
             ? QObject::tr("Unbenannt")

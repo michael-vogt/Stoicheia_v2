@@ -29,6 +29,7 @@ std::pair<GeoPointItem *, GeoPointItem *> SceneAdapter::addIntersectionSet(Inter
         result.first = nullptr;
         result.second = nullptr;
     } else {
+        m_intersectionSets.insert(intersectionSet);
         result.first = addIntersectionPoint(intersectionSet->first());
         result.second = addIntersectionPoint(intersectionSet->second());
     }
@@ -49,7 +50,18 @@ GeoCircleItem* SceneAdapter::addCircle(Circle* circle) {
     return item;
 }
 
+void SceneAdapter::clear() {
+    for (const auto &item: m_map | std::views::values) {
+        m_qtScene->removeItem(item);
+        delete item;
+    }
+    m_map.clear();
+    m_intersectionSets.clear();
+}
+
 void SceneAdapter::remove(GeoObject* geoObject) {
+    if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject))
+        m_intersectionSets.erase(iset);
     auto it = m_map.find(geoObject);
     if (it != m_map.end()) {
         m_qtScene->removeItem(it->second);

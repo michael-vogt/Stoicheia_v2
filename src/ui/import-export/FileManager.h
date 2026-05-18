@@ -18,7 +18,7 @@ public:
     bool open();
     bool save();
     bool saveAs();
-    bool exportSVG();
+    bool exportSVG() const;
 
     bool hasUnsavedChanges() const { return m_unsavedChanges; }
 
@@ -31,8 +31,8 @@ public slots:
 private:
     bool saveToFile(const QString& filename);
     bool loadFromFile(const QString& filename);
-    void clearScene();
-    void updateTitle();
+    void clearScene() const;
+    void updateTitle() const;
 
     Scene*        m_scene;
     SceneAdapter* m_adapter;
