@@ -47,4 +47,5 @@ public:
     explicit MainWindow(const QString& title = "Stoicheia", QWidget* parent = nullptr);
 
     DrawingBoard* drawingBoard() const { return m_drawingBoard; }
+    FileManager* fileManager() const { return m_fileManager; }
 };

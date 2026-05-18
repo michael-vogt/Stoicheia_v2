@@ -52,6 +52,11 @@ bool FileManager::open() {
     return loadFromFile(filename);
 }
 
+bool FileManager::openFile(const QString& filename) {
+    return filename.isEmpty() ? open() : loadFromFile(filename);
+
+}
+
 bool FileManager::save() {
     if (m_currentFile.isEmpty()) return saveAs();
     return saveToFile(m_currentFile);

@@ -20,6 +20,11 @@ int main(int argc, char *argv[]) {
 
     DrawingBoard* board = window.drawingBoard();
 
+    if (argc > 1) {
+        QString filename(argv[1]);
+        window.fileManager()->openFile(filename);
+    }
+
     /*Point* P1 = board->geoScene()->create<Point>(-500,-500);
     Point* P2 = board->geoScene()->create<Point>(500,500);
     Point* P3 = board->geoScene()->create<Point>(-500,500);
