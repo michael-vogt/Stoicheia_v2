@@ -10,6 +10,7 @@
 #include <QActionGroup>
 #include <QLabel>
 
+#include "dialogs/SettingsDialog.h"
 #include "tools/CreateCircleTool.h"
 #include "tools/CreateIntersectionTool.h"
 #include "tools/CreateLineTool.h"
@@ -206,6 +207,14 @@ void MainWindow::setupMenu() {
     connect(gridAction, &QAction::toggled, [this](bool on) {
         m_drawingBoard->grid()->setVisible(on);
         m_drawingBoard->viewport()->update();
+    });
+
+    QMenu* extrasMenu = menuBar()->addMenu(tr("Extras"));
+    QAction* settingsAction = extrasMenu->addAction(tr("Einstellungen..."));
+    connect(settingsAction, &QAction::triggered, [this]() {
+        SettingsDialog dlg(AppSettings::instance(), this);
+        connect(&dlg, &SettingsDialog::settingsChanged, m_drawingBoard, &DrawingBoard::applySettings);
+        dlg.exec();
     });
 }
 

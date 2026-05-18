@@ -8,6 +8,7 @@
 #include <QShortcut>
 
 #include "MainWindow.h"
+#include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
 #include "tools/CreateLineTool.h"
@@ -19,10 +20,11 @@
 #include "tools/CreatePerpendicularFootTool.h"
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
+    AppSettings& s = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
     setRenderHint(QPainter::SmoothPixmapTransform);
-    setBackgroundBrush(QColor(245, 245, 245));
+    setBackgroundBrush(s.colors.background);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(-10000, -10000, 20000, 20000);
@@ -70,7 +72,7 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     font.setPointSize(72);
     font.setBold(true);
     painter->setFont(font);
-    painter->setPen(QColor(0,0,0,20));
+    painter->setPen(AppSettings::instance().colors.watermark);
 
     painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");
     painter->restore();
@@ -385,4 +387,17 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
 void DrawingBoard::updateToolType(ToolType type) {
     m_activeToolType = type;
     emit toolChanged(type);
+}
+
+void DrawingBoard::applySettings() {
+    const auto& s = AppSettings::instance();
+    setBackgroundBrush(s.colors.background);
+    m_grid.setVisible(s.grid.visible);
+    m_grid.setSpacing(s.grid.spacing);
+    m_grid.setSnapEnabled(s.grid.snapEnabled);
+    m_grid.setAxisColor(s.grid.axisColor);
+    m_grid.setGridColor(s.grid.gridColor);
+    m_grid.setLabelColor(s.grid.labelColor);
+    viewport()->update();
+    scene()->update();
 }

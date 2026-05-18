@@ -8,12 +8,12 @@ void Grid::drawBackground(QPainter* painter, const QRectF& rect) const {
     if (!m_visible) return;
 
     // Achsen
-    painter->setPen(QPen(QColor(160,160,160), 1.5));
+    painter->setPen(QPen(m_axisColor, 1.5));
     painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
     painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
 
     // Rasterlinien
-    painter->setPen(QPen(QColor(220,220,220), 0.5));
+    painter->setPen(QPen(m_gridColor, 0.5));
     double left = std::floor(rect.left() / m_spacing) * m_spacing;
     double top = std::floor(rect.top() / m_spacing) * m_spacing;
 
@@ -32,7 +32,7 @@ void Grid::drawLabels(QPainter* painter, std::function<QPointF(QPointF)> toViewp
     QFont font = painter->font();
     font.setPointSize(8);
     painter->setFont(font);
-    painter->setPen(QColor(120,120,120));
+    painter->setPen(m_labelColor);
 
     const int margin   = 4;
     const int tickSize = 4;
