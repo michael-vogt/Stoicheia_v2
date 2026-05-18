@@ -20,10 +20,11 @@
 #include "tools/CreatePerpendicularFootTool.h"
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
+    AppSettings& s = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
     setRenderHint(QPainter::SmoothPixmapTransform);
-    setBackgroundBrush(QColor(245, 245, 245));
+    setBackgroundBrush(s.colors.background);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(-10000, -10000, 20000, 20000);
@@ -71,7 +72,7 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     font.setPointSize(72);
     font.setBold(true);
     painter->setFont(font);
-    painter->setPen(QColor(0,0,0,20));
+    painter->setPen(AppSettings::instance().colors.watermark);
 
     painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");
     painter->restore();
