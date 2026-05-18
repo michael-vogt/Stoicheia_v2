@@ -6,6 +6,7 @@
 #include "geometry/geometry.h"
 #include "constructions/constructions.h"
 #include "ui/MainWindow.h"
+#include "ui/dialogs/AppSettings.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -17,8 +18,8 @@ int main(int argc, char *argv[]) {
     }
 
     MainWindow window("Στοιχεῖα");
-
-    DrawingBoard* board = window.drawingBoard();
+    AppSettings::instance().load();
+    window.drawingBoard()->applySettings();
 
     if (argc > 1) {
         QString filename(argv[1]);

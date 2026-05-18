@@ -10,6 +10,10 @@ class Grid {
     double m_spacing = 50.0;
     bool m_snapEnabled = false;
 
+    QColor m_axisColor = QColor(160, 160, 160);
+    QColor m_gridColor = QColor(220, 220, 220);
+    QColor m_labelColor = QColor(120, 120, 120);
+
 public:
     // Zeichnen
     void drawBackground(QPainter* painter, const QRectF& rect) const;
@@ -27,4 +31,8 @@ public:
     bool isVisible() const { return m_visible; }
     double spacing() const { return m_spacing; }
     bool isSnapEnabled() const { return m_snapEnabled; }
+
+    void setAxisColor(const QColor& c) { m_axisColor = c; }
+    void setGridColor(const QColor& c) { m_gridColor = c; }
+    void setLabelColor(const QColor& c) { m_labelColor = c; }
 };

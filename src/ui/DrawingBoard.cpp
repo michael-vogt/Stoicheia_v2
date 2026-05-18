@@ -8,6 +8,7 @@
 #include <QShortcut>
 
 #include "MainWindow.h"
+#include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
 #include "tools/CreateLineTool.h"
@@ -385,4 +386,17 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
 void DrawingBoard::updateToolType(ToolType type) {
     m_activeToolType = type;
     emit toolChanged(type);
+}
+
+void DrawingBoard::applySettings() {
+    const auto& s = AppSettings::instance();
+    setBackgroundBrush(s.colors.background);
+    m_grid.setVisible(s.grid.visible);
+    m_grid.setSpacing(s.grid.spacing);
+    m_grid.setSnapEnabled(s.grid.snapEnabled);
+    m_grid.setAxisColor(s.grid.axisColor);
+    m_grid.setGridColor(s.grid.gridColor);
+    m_grid.setLabelColor(s.grid.labelColor);
+    viewport()->update();
+    scene()->update();
 }

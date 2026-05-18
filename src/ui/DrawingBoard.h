@@ -113,5 +113,8 @@ public:
     void statusMessageChanged(const QString& text, int timeout = 0);
     void toolChanged(ToolType type);
     void shortcutModeChanged(ShortcutMode mode);
+
+    public slots:
+    void applySettings();
 };
 
