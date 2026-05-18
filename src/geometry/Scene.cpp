@@ -28,3 +28,9 @@ void Scene::removeCascade(GeoObject* target) {
         return std::ranges::contains(toDelete, ptr.get());
     });
 }
+
+void Scene::clear() {
+    for (auto& obj : m_objects)
+        obj->detach();
+    m_objects.clear();
+}

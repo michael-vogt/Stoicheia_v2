@@ -81,6 +81,8 @@ add_library(StoicheiaGui STATIC
         src/ui/GeoIntersectionPointItem.cpp
         src/ui/SceneAdapter.cpp
         src/ui/HitTest.cpp
+        src/ui/import-export/Serializer.cpp
+        src/ui/import-export/FileManager.cpp
 )
 
 target_include_directories(StoicheiaGui PUBLIC

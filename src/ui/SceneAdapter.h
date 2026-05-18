@@ -22,6 +22,7 @@ class SceneAdapter : public QObject {
 
     std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
     std::unordered_set<GeoObject*> m_selection;
+    std::unordered_set<IntersectionSet*> m_intersectionSets;
 
 public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
@@ -40,6 +41,8 @@ public:
     GeoGraphicsItem* itemFor(GeoObject* geoObject) const;
     std::unordered_map<GeoObject*, GeoGraphicsItem*>& geoGraphicsItems() { return m_map; }
 
+    const std::unordered_set<IntersectionSet*>& intersectionSets() const { return m_intersectionSets; }
+
     Point* radiusPointFor(const Point* centerPoint) const;
 
     Scene* geoScene() const { return m_geoScene; }
@@ -48,6 +51,8 @@ public:
     void deselect(GeoObject* geoObject);
     void clearSelection();
     const std::unordered_set<GeoObject*>& selection() const { return m_selection; }
+
+    void clear();
 
     void highlight(GeoObject* obj, bool on);
 

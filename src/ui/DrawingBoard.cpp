@@ -59,6 +59,21 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
     m_grid.drawBackground(painter, rect);
+    drawWatermark(painter);
+}
+
+void DrawingBoard::drawWatermark(QPainter *painter) const {
+    painter->save();
+    painter->setTransform(QTransform());
+
+    QFont font = painter->font();
+    font.setPointSize(72);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->setPen(QColor(0,0,0,20));
+
+    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");
+    painter->restore();
 }
 
 void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {

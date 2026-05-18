@@ -63,6 +63,7 @@ class DrawingBoard : public QGraphicsView {
     void setShortcutMode(ShortcutMode mode);
 
     void drawGrid(QPainter* painter, const QRectF& rect) const;
+    void drawWatermark(QPainter *painter) const;
     ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
 
 protected:

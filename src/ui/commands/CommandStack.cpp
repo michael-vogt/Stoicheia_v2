@@ -38,3 +38,9 @@ QString CommandStack::nextUndoDescription() const {
 QString CommandStack::nextRedoDescription() const {
     return canRedo() ? m_redoStack.back()->description() : QString();
 }
+
+void CommandStack::clear() {
+    m_undoStack.clear();
+    m_redoStack.clear();
+    emit changed();
+}

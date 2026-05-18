@@ -19,13 +19,14 @@
 #include "tools/CreatePerpendicularTool.h"
 #include "tools/CreatePointTool.h"
 #include "tools/SelectTool.h"
-#include <magic_enum/magic_enum.hpp>
 
 MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(title);
 
     m_drawingBoard = new DrawingBoard(this);
     setCentralWidget(m_drawingBoard);
+
+    m_fileManager = new FileManager(m_drawingBoard->geoScene(), m_drawingBoard->adapter(), m_drawingBoard->commandStack(), this);
 
     setupToolBar();
     setupMenu();
@@ -34,14 +35,12 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     connect(m_drawingBoard, &DrawingBoard::toolChanged, this, &MainWindow::onToolChanged);
     connect(m_drawingBoard, &DrawingBoard::shortcutModeChanged, this, &MainWindow::onShortcutModeChanged);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
+    connect(m_drawingBoard->commandStack(), &CommandStack::changed, m_fileManager, &FileManager::markChanged);
     connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
     connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
         m_selectAction->setChecked(true);
     });
-    /*connect(m_drawingBoard, &DrawingBoard::toolChanged, this, [this](ToolType type) {
-        checkTool(type);
-    });*/
 
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>(ToolType::Select);
@@ -106,77 +105,6 @@ void MainWindow::setupToolBar() {
     // beim Start: Geometrie-Toolbar aktiv, Konstruktions-Toolbar deaktiviert
     m_geoToolBar->setEnabled(true);
     m_conToolBar->setEnabled(false);
-
-    /*m_selectAction = m_toolbar->addAction(tr("Auswählen"));
-    m_selectAction->setCheckable(true);
-    m_selectAction->setChecked(true);
-    connect(m_drawingBoard, &DrawingBoard::escapePressed, m_selectAction, &QAction::trigger);
-    connect(m_selectAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<SelectTool>(ToolType::Select);
-        toggleTools(m_selectAction);
-    });
-
-    m_pointAction = m_toolbar->addAction(tr("Punkt"));
-    m_pointAction->setCheckable(true);
-    //m_pointAction->setShortcut(Qt::Key_P);
-    connect(m_pointAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreatePointTool>(ToolType::CreatePoint);
-        toggleTools(m_pointAction);
-    });
-
-
-    m_lineAction = m_toolbar->addAction(tr("Linie"));
-    m_lineAction->setCheckable(true);
-    //m_lineAction->setShortcut(Qt::Key_L);
-    connect(m_lineAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
-        toggleTools(m_lineAction);
-    });
-
-    m_circleAction = m_toolbar->addAction(tr("Kreis"));
-    m_circleAction->setCheckable(true);
-    //m_circleAction->setShortcut(Qt::Key_C);
-    connect(m_circleAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreateCircleTool>(ToolType::CreateCircle);
-        toggleTools(m_circleAction);
-    });
-
-    m_intersectionAction = m_toolbar->addAction(tr("Schnittpunkt"));
-    m_intersectionAction->setCheckable(true);
-    connect(m_intersectionAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
-        toggleTools(m_intersectionAction);
-    });
-
-    m_midpointAction = m_toolbar->addAction(tr("Mittelpunkt"));
-    m_midpointAction->setCheckable(true);
-    connect(m_midpointAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
-        toggleTools(m_midpointAction);
-    });
-
-    m_parallelAction = m_toolbar->addAction(tr("Parallele"));
-    m_parallelAction->setCheckable(true);
-    connect(m_parallelAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreateParallelTool>(ToolType::CreateParallel);
-        toggleTools(m_parallelAction);
-    });
-    
-
-    m_perpendicularAction = m_toolbar->addAction(tr("Senkrechte"));
-    m_perpendicularAction->setCheckable(true);
-    connect(m_perpendicularAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
-        toggleTools(m_perpendicularAction);
-    });
-    
-
-    m_perpendicularFootAction = m_toolbar->addAction(tr("Lotfußpunkt"));
-    m_perpendicularFootAction->setCheckable(true);
-    connect(m_perpendicularFootAction, &QAction::triggered, [this]() {
-        m_drawingBoard->setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
-        toggleTools(m_perpendicularFootAction);
-    });*/
 }
 
 void MainWindow::onShortcutModeChanged(ShortcutMode mode) {
@@ -215,6 +143,29 @@ void MainWindow::onToolChanged(ToolType type) {
 
 void MainWindow::setupMenu() {
     QMenu* fileMenu = menuBar()->addMenu(tr("Datei"));
+
+    QAction* newAction = fileMenu->addAction(tr("Neu"));
+    newAction->setShortcut(QKeySequence::New);
+    connect(newAction, &QAction::triggered, m_fileManager, &FileManager::newFile);
+
+    QAction* openAction = fileMenu->addAction(tr("Öffnen..."));
+    openAction->setShortcut(QKeySequence::Open);
+    connect(openAction, &QAction::triggered, m_fileManager, &FileManager::open);
+
+    QAction* saveAction = fileMenu->addAction(tr("Speichern"));
+    saveAction->setShortcut(QKeySequence::Save);
+    connect(saveAction, &QAction::triggered, m_fileManager, &FileManager::save);
+
+    QAction* saveAsAction = fileMenu->addAction(tr("Speichern unter..."));
+    saveAsAction->setShortcut(QKeySequence::SaveAs);
+    connect(saveAsAction, &QAction::triggered, m_fileManager, &FileManager::saveAs);
+
+    fileMenu->addSeparator();
+
+    QAction* svgAction = fileMenu->addAction(tr("Als SVG exportieren..."));
+    connect(svgAction, &QAction::triggered, m_fileManager, &FileManager::exportSVG);
+
+    fileMenu->addSeparator();
 
     QAction* quitAction = fileMenu->addAction(tr("Beenden"));
     quitAction->setShortcut(QKeySequence::Quit);
