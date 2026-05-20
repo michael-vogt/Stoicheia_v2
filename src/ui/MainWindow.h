@@ -2,14 +2,10 @@
 
 #include <QMainWindow>
 #include <QAction>
-#include <QLabel>
 
 #include "DrawingBoard.h"
+#include "SceneAdapter.h"
 #include "io/FileManager.h"
-#include "Enums.h"
-
-enum class ToolType;
-enum class ShortcutMode;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -17,6 +13,7 @@ class MainWindow : public QMainWindow {
     FileManager* m_fileManager = nullptr;
     QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;
+
     
     QToolBar* m_geoToolBar = nullptr;
     QAction* m_selectAction = nullptr;
@@ -33,18 +30,14 @@ class MainWindow : public QMainWindow {
     QAction* m_perpendicularAction = nullptr;
     QAction* m_perpFootAction = nullptr;
 
-    QMenu* m_recentMenu = nullptr;
-
-    QLabel* m_statusLeft = nullptr;
-    QLabel* m_statusRight = nullptr;
-
     //QToolBar* m_toolbar = nullptr;
 
     void setupToolBar();
     void setupMenu();
-    void setupStatusBar();
+    void setupStatusBar() const;
     void updateUndoRedo() const;
-    void updateRecentFilesMenu();
+    void toggleTools(const QAction* selectedAction) const;
+    //void checkTool(ToolType type);
 
 private slots:
     void onToolChanged(ToolType type);
@@ -54,10 +47,4 @@ public:
     explicit MainWindow(const QString& title = "Stoicheia", QWidget* parent = nullptr);
 
     DrawingBoard* drawingBoard() const { return m_drawingBoard; }
-    FileManager* fileManager() const { return m_fileManager; }
-
-    bool eventFilter(QObject* object, QEvent* event);
-
-public slots:
-    void setStatus(StatusBarPart sbp, const QString& text) const;
 };

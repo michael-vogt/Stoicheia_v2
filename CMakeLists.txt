@@ -102,12 +102,6 @@ add_library(StoicheiaApp STATIC
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
-        src/ui/dialogs/AppSettings.cpp
-        src/ui/dialogs/AppSettings.h
-        src/ui/dialogs/ColorButton.cpp
-        src/ui/dialogs/ColorButton.h
-        src/ui/dialogs/SettingsDialog.cpp
-        src/ui/dialogs/SettingsDialog.h
 )
 
 target_include_directories(StoicheiaApp PUBLIC
@@ -153,7 +147,7 @@ target_link_libraries(StoicheiaQt PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
 )
 

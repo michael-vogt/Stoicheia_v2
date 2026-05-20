@@ -16,7 +16,6 @@ public:
     // Gibt false zurück wenn der Nutzer abbricht
     bool newFile();
     bool open();
-    bool openFile(const QString& filename);
     bool save();
     bool saveAs();
     bool exportSVG() const;

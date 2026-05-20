@@ -36,7 +36,7 @@ void ConstructionTool::keyPressEvent(QKeyEvent* event) {
 }
 
 void ConstructionTool::showStatus(const QString& msg) {
-    m_ctx.drawingBoard->showStatusLeft(msg);
+    m_ctx.drawingBoard->showStatus(msg);
 }
 
 void ConstructionTool::setPreviewLine(const QLineF& line) {

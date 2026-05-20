@@ -1,5 +1,4 @@
 #include "GeoPointItem.h"
-#include "dialogs/AppSettings.h"
 #include <QPainter>
 
 GeoPointItem::GeoPointItem(Point* point, QGraphicsItem* parent)
@@ -20,11 +19,12 @@ void GeoPointItem::paint(QPainter* painter,
 {
     if (!m_point->isValid()) return;
     if (m_highlighted)
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, 2.5));
+        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
     else if (m_selected)
-        painter->setPen(QPen(AppSettings::instance().colors.selected, 2.5));
+        painter->setPen(QPen(Qt::blue, 2.5));
     else
         painter->setPen(m_pen);
+    //painter->setBrush(m_selected ? QBrush(Qt::cyan) : m_brush);
     painter->drawEllipse(QPointF(0, 0), m_radius, m_radius);
 }
 

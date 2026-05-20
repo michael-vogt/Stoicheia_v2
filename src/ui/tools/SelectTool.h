@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <QMouseEvent>
-#include <QRubberBand>
 
 #include "Tool.h"
 #include "geometry/Point.h"
@@ -13,17 +12,10 @@ class SelectTool : public Tool {
     Point* m_draggedPoint = nullptr;
     std::unique_ptr<MoveCommand> m_activeMove;
     QPointF m_dragOffset;
-    bool m_rubberBanding = false;
-    QPoint m_rubberStart;
-    QRubberBand* m_rubberBand = nullptr;
 
     Point* pointAt(const QPointF& scenePos) const;
     GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
     bool isDraggable(Point* p) const;
-
-    void startRubberBand(const QPoint& viewPos);
-    void updateRubberBand(const QPoint& viewPos);
-    void finishRubberBand(const QPoint& viewPos);
 
 public:
     explicit SelectTool(const ToolContext& ctx);

@@ -8,7 +8,6 @@
 #include <QShortcut>
 
 #include "MainWindow.h"
-#include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
 #include "tools/CreateLineTool.h"
@@ -20,11 +19,10 @@
 #include "tools/CreatePerpendicularFootTool.h"
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
-    AppSettings& s = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
     setRenderHint(QPainter::SmoothPixmapTransform);
-    setBackgroundBrush(s.colors.background);
+    setBackgroundBrush(QColor(245, 245, 245));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(-10000, -10000, 20000, 20000);
@@ -58,11 +56,6 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     });
 }
 
-void DrawingBoard::setSnapping(bool snapping) {
-    m_snapping = snapping;
-    showStatusRight(m_snapping ? tr("Snapping"): "");
-}
-
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
     m_grid.drawBackground(painter, rect);
@@ -77,7 +70,7 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     font.setPointSize(72);
     font.setBold(true);
     painter->setFont(font);
-    painter->setPen(AppSettings::instance().colors.watermark);
+    painter->setPen(QColor(0,0,0,20));
 
     painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");
     painter->restore();
@@ -137,7 +130,7 @@ void DrawingBoard::mousePressEvent(QMouseEvent *event) {
         m_panStart = event->pos();
         viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
-        showStatusRight(tr("Panning"));
+        emit statusMessageChanged(tr("Panning"));
         return;
     }
 
@@ -178,7 +171,7 @@ void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
         m_panning = false;
         viewport()->setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
         event->accept();
-        showStatusRight("");
+        emit statusMessageChanged("");
         return;
     }
 
@@ -206,8 +199,7 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
 
     if (event->key() == Qt::Key_Alt) {
-        setSnapping(true);
-        //showStatusRight(tr("Snapping"));
+        showStatus(tr("Snapping"));
     }
 
     // Undo/Redo
@@ -225,7 +217,7 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     
     // Pan-Modus
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        showStatusRight(tr("Panning"));
+        showStatus(tr("Panning"));
         m_spacePressed = true;
         viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
@@ -251,12 +243,11 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
 
 void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Alt) {
-        setSnapping(false);
+        emit statusMessageChanged("");
     }
 
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        //emit statusMessageChanged("");
-        showStatusRight("");
+        emit statusMessageChanged("");
         m_spacePressed = false;
         if (!m_panning)
             viewport()->setCursor(Qt::ArrowCursor);
@@ -306,14 +297,13 @@ void DrawingBoard::setShortcutMode(ShortcutMode mode) {
     emit shortcutModeChanged(mode);
     switch (mode) {
         case ShortcutMode::None:
-            //showStatus("");
-            showStatusLeft("");
+            showStatus("");
             break;
         case ShortcutMode::Geometry:
-            showStatusLeft(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
+            showStatus(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
             break;
         case ShortcutMode::Construction:
-            showStatusLeft(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
+            showStatus(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
             break;
     }
 }
@@ -395,17 +385,4 @@ void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
 void DrawingBoard::updateToolType(ToolType type) {
     m_activeToolType = type;
     emit toolChanged(type);
-}
-
-void DrawingBoard::applySettings() {
-    const auto& s = AppSettings::instance();
-    setBackgroundBrush(s.colors.background);
-    m_grid.setVisible(s.grid.visible);
-    m_grid.setSpacing(s.grid.spacing);
-    m_grid.setSnapEnabled(s.grid.snapEnabled);
-    m_grid.setAxisColor(s.grid.axisColor);
-    m_grid.setGridColor(s.grid.gridColor);
-    m_grid.setLabelColor(s.grid.labelColor);
-    viewport()->update();
-    scene()->update();
 }
