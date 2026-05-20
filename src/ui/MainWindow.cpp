@@ -38,15 +38,16 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     connect(m_drawingBoard, &DrawingBoard::shortcutModeChanged, this, &MainWindow::onShortcutModeChanged);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, m_fileManager, &FileManager::markChanged);
-    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
+    connect(m_drawingBoard, &DrawingBoard::statusBarTextChanged, this, &MainWindow::setStatus);
     connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
         m_selectAction->setChecked(true);
     });
 
+    qApp->installEventFilter(this);
+
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>(ToolType::Select);
-
 }
 
 void MainWindow::setupToolBar() {
@@ -213,29 +214,17 @@ void MainWindow::setupMenu() {
         m_drawingBoard->commandStack()->redo();
         updateUndoRedo();
     });
-
-
-    /*QMenu* viewMenu = menuBar()->addMenu(tr("Ansicht"));
-
-    QAction* snapAction = viewMenu->addAction(tr("Immer einrasten"));
-    snapAction->setCheckable(true);
-    snapAction->setChecked(false);
-    connect(snapAction, &QAction::toggled, [this](bool on) {
-        m_drawingBoard->grid()->setSnapEnabled(on);
-    });
-
-    QAction* gridAction = viewMenu->addAction(tr("Raster"));
-    gridAction->setCheckable(true);
-    gridAction->setChecked(true);
-    connect(gridAction, &QAction::toggled, [this](bool on) {
-        m_drawingBoard->grid()->setVisible(on);
-        m_drawingBoard->viewport()->update();
-    });*/
-
 }
 
-void MainWindow::setupStatusBar() const {
-    //statusBar()->showMessage(tr("Bereit"));
+void MainWindow::setupStatusBar() {
+    m_statusLeft = new QLabel("", this);
+    m_statusLeft->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+
+    m_statusRight = new QLabel("", this);
+    m_statusRight->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+
+    statusBar()->addPermanentWidget(m_statusLeft, 4);
+    statusBar()->addPermanentWidget(m_statusRight, 1);
 }
 
 void MainWindow::updateUndoRedo() const {
@@ -277,4 +266,30 @@ void MainWindow::updateRecentFilesMenu() {
         updateRecentFilesMenu();
     });
 
+}
+
+void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
+    if (sbp == StatusBarPart::Left && m_statusLeft) {
+        m_statusLeft->setText(text);
+    } else if (sbp == StatusBarPart::Right && m_statusRight) {
+        m_statusRight->setText(text);
+    }
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Alt) {
+            m_drawingBoard->setSnapping(true);
+        }
+    }
+
+    if (event->type() == QEvent::KeyRelease) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Alt) {
+            m_drawingBoard->setSnapping(false);
+        }
+    }
+
+    return QObject::eventFilter(object, event);
 }

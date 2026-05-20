@@ -2,10 +2,14 @@
 
 #include <QMainWindow>
 #include <QAction>
+#include <QLabel>
 
 #include "DrawingBoard.h"
-#include "SceneAdapter.h"
 #include "io/FileManager.h"
+#include "Enums.h"
+
+enum class ToolType;
+enum class ShortcutMode;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -31,11 +35,14 @@ class MainWindow : public QMainWindow {
 
     QMenu* m_recentMenu = nullptr;
 
+    QLabel* m_statusLeft = nullptr;
+    QLabel* m_statusRight = nullptr;
+
     //QToolBar* m_toolbar = nullptr;
 
     void setupToolBar();
     void setupMenu();
-    void setupStatusBar() const;
+    void setupStatusBar();
     void updateUndoRedo() const;
     void updateRecentFilesMenu();
 
@@ -48,4 +55,9 @@ public:
 
     DrawingBoard* drawingBoard() const { return m_drawingBoard; }
     FileManager* fileManager() const { return m_fileManager; }
+
+    bool eventFilter(QObject* object, QEvent* event);
+
+public slots:
+    void setStatus(StatusBarPart sbp, const QString& text) const;
 };

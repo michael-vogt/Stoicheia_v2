@@ -58,6 +58,11 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     });
 }
 
+void DrawingBoard::setSnapping(bool snapping) {
+    m_snapping = snapping;
+    showStatusRight(m_snapping ? tr("Snapping"): "");
+}
+
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
     m_grid.drawBackground(painter, rect);
@@ -132,7 +137,7 @@ void DrawingBoard::mousePressEvent(QMouseEvent *event) {
         m_panStart = event->pos();
         viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
-        emit statusMessageChanged(tr("Panning"));
+        showStatusRight(tr("Panning"));
         return;
     }
 
@@ -173,7 +178,7 @@ void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
         m_panning = false;
         viewport()->setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
         event->accept();
-        emit statusMessageChanged("");
+        showStatusRight("");
         return;
     }
 
@@ -201,7 +206,8 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     }
 
     if (event->key() == Qt::Key_Alt) {
-        showStatus(tr("Snapping"));
+        setSnapping(true);
+        //showStatusRight(tr("Snapping"));
     }
 
     // Undo/Redo
@@ -219,7 +225,7 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
     
     // Pan-Modus
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        showStatus(tr("Panning"));
+        showStatusRight(tr("Panning"));
         m_spacePressed = true;
         viewport()->setCursor(Qt::ClosedHandCursor);
         event->accept();
@@ -245,11 +251,12 @@ void DrawingBoard::keyPressEvent(QKeyEvent *event) {
 
 void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Alt) {
-        emit statusMessageChanged("");
+        setSnapping(false);
     }
 
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        emit statusMessageChanged("");
+        //emit statusMessageChanged("");
+        showStatusRight("");
         m_spacePressed = false;
         if (!m_panning)
             viewport()->setCursor(Qt::ArrowCursor);
@@ -299,13 +306,14 @@ void DrawingBoard::setShortcutMode(ShortcutMode mode) {
     emit shortcutModeChanged(mode);
     switch (mode) {
         case ShortcutMode::None:
-            showStatus("");
+            //showStatus("");
+            showStatusLeft("");
             break;
         case ShortcutMode::Geometry:
-            showStatus(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
+            showStatusLeft(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
             break;
         case ShortcutMode::Construction:
-            showStatus(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
+            showStatusLeft(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
             break;
     }
 }
