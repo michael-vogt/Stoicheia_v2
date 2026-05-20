@@ -10,7 +10,7 @@ SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void SelectTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
-    m_ctx.drawingBoard->showStatus(QObject::tr("Objekt auswählen und/oder verschieben"));
+    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Objekt auswählen und/oder verschieben"));
 }
 
 void SelectTool::deactivate() {
