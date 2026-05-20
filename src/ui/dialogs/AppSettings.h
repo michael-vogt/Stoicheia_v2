@@ -23,16 +23,23 @@ struct ColorScheme {
     QColor watermark    = QColor(0,   0,   0,  20);
 };
 
+struct RecentFiles {
+    QStringList files;
+    int maxCount = 10;
+};
+
 class AppSettings {
 public:
     static AppSettings& instance();
 
+    void addRecentFile(const QString& fileName);
     void load();
     void save();
     void resetToDefaults();
 
     GridSettings grid;
     ColorScheme  colors;
+    RecentFiles recent;
 
 private:
     AppSettings();

@@ -53,7 +53,15 @@ bool FileManager::open() {
 }
 
 bool FileManager::openFile(const QString& filename) {
-    return filename.isEmpty() ? open() : loadFromFile(filename);
+    if (m_unsavedChanges) {
+        auto btn = QMessageBox::question(m_parent,
+            tr("Ungespeicherte Änderungen"),
+            tr("Möchten Sie die aktuellen Änderungen speichern?"),
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        if (btn == QMessageBox::Cancel)  return false;
+        if (btn == QMessageBox::Save && !save()) return false;
+    }
+    return loadFromFile(filename);
 
 }
 
@@ -94,6 +102,7 @@ bool FileManager::saveToFile(const QString& filename) {
     }
     m_currentFile    = filename;
     m_unsavedChanges = false;
+    AppSettings::instance().addRecentFile(filename);
     updateTitle();
     return true;
 }
@@ -109,6 +118,7 @@ bool FileManager::loadFromFile(const QString& filename) {
     }
     m_currentFile    = filename;
     m_unsavedChanges = false;
+    AppSettings::instance().addRecentFile(filename);
     updateTitle();
     return true;
 }
