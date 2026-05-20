@@ -1,4 +1,5 @@
 #include "GeoLinearObjectItem.h"
+#include "dialogs/AppSettings.h"
 #include "../geometry/Line.h"
 #include "../geometry/Ray.h"
 #include "../geometry/Segment.h"
@@ -66,9 +67,9 @@ void GeoLinearObjectItem::paint(QPainter* painter,
 {
     if (!m_linearObject->isValid()) return;
     if (m_highlighted)
-        painter->setPen(QPen(QColor(255, 140, 0), 2.5));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, 2.5));
     else if (m_selected)
-        painter->setPen(QPen(Qt::blue, 2.5));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, 2.5));
     else
         painter->setPen(m_pen);
     painter->drawLine(m_line);

@@ -9,26 +9,9 @@
 #include "geometry/Scene.h"
 #include "tools/Tool.h"
 #include "Grid.h"
+#include "MainWindow.h"
+#include "Enums.h"
 
-enum class ToolType {
-    Select,
-    CreatePoint,
-    CreateLine,
-    CreateRay,
-    CreateSegment,
-    CreateCircle,
-    CreateIntersection,
-    CreateMidpoint,
-    CreateParallel,
-    CreatePerpendicular,
-    CreatePerpendicularFoot
-};
-
-enum class ShortcutMode {
-    None,
-    Geometry,
-    Construction
-};
 
 class DrawingBoard : public QGraphicsView {
     Q_OBJECT
@@ -43,6 +26,9 @@ class DrawingBoard : public QGraphicsView {
     bool m_panning = false;
     bool m_spacePressed = false;
     QPoint m_panStart;
+
+    // Snap
+    bool m_snapping = false;
 
     // Raster
     Grid m_grid;
@@ -62,7 +48,6 @@ class DrawingBoard : public QGraphicsView {
     void handleShortcutKey(QKeyEvent* event);
     void setShortcutMode(ShortcutMode mode);
 
-    void drawGrid(QPainter* painter, const QRectF& rect) const;
     void drawWatermark(QPainter *painter) const;
     ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
 
@@ -93,8 +78,11 @@ public:
 
     Tool* activeTool() const { return m_activeTool.get(); }
     ToolType activeToolType() const { return m_activeToolType; }
-    void showStatus(const QString& message) { emit statusMessageChanged(message); }
+    //void showStatus(const QString& message) { emit statusMessageChanged(message); }
+    void showStatusLeft(const QString& text) { emit statusBarTextChanged(StatusBarPart::Left, text); }
+    void showStatusRight(const QString& text) { emit statusBarTextChanged(StatusBarPart::Right, text); }
     void updateToolType(ToolType type);
+    void setSnapping(bool snapping);
 
     // Raster
     void setGridVisible(bool visible);
@@ -110,8 +98,12 @@ public:
 
     signals:
     void escapePressed();
-    void statusMessageChanged(const QString& text, int timeout = 0);
+    //void statusMessageChanged(const QString& text, int timeout = 0);
+    void statusBarTextChanged(StatusBarPart sbp, const QString& text);
     void toolChanged(ToolType type);
     void shortcutModeChanged(ShortcutMode mode);
+
+    public slots:
+    void applySettings();
 };
 

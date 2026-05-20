@@ -10,12 +10,18 @@ SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void SelectTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
-    m_ctx.drawingBoard->showStatus(QObject::tr("Objekt auswählen und/oder verschieben"));
+    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Objekt auswählen und/oder verschieben"));
 }
 
 void SelectTool::deactivate() {
-    m_ctx.adapter->clearSelection();
-    m_ctx.drawingBoard->showStatus("");
+    if (m_rubberBand) {
+        m_rubberBand->hide();
+        delete m_rubberBand;
+        m_rubberBand = nullptr;
+    }
+    m_rubberBanding = false;
+    //m_ctx.adapter->clearSelection();
+    //m_ctx.drawingBoard->showStatus("");
     m_draggedPoint = nullptr;
     m_activeMove = nullptr;
 }
@@ -80,13 +86,21 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
             hit->setGeoSelected(true);
             event->accept();
         } else {
-            m_ctx.adapter->clearSelection();
+            if (!(event->modifiers() & Qt::ControlModifier))
+                m_ctx.adapter->clearSelection();
+            startRubberBand(event->pos());
+            //m_ctx.adapter->clearSelection();
             event->accept();
         }
     }
 }
 
 void SelectTool::mouseMoveEvent(QMouseEvent *event) {
+    if (m_rubberBanding) {
+        updateRubberBand(event->pos());
+        event->accept();
+        return;
+    }
     if (!m_draggedPoint || !m_activeMove) {
         event->ignore();
         return;
@@ -101,6 +115,11 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
+    if (m_rubberBanding) {
+        finishRubberBand(event->pos());
+        event->accept();
+        return;
+    }
     if (!m_draggedPoint || !m_activeMove) {
         event->ignore();
         return;
@@ -139,4 +158,40 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
 
 bool SelectTool::isDraggable(Point* point) const {
     return typeid(*point) == typeid(Point);
+}
+
+void SelectTool::startRubberBand(const QPoint &viewPos) {
+    m_rubberBanding = true;
+    m_rubberStart = viewPos;
+    if (!m_rubberBand)
+        m_rubberBand = new QRubberBand(QRubberBand::Rectangle, m_ctx.drawingBoard->viewport());
+    m_rubberBand->setGeometry(QRect(viewPos, QSize()));
+    m_rubberBand->show();
+}
+
+void SelectTool::updateRubberBand(const QPoint& viewPos) {
+    if (!m_rubberBand) return;
+    m_rubberBand->setGeometry(
+        QRect(m_rubberStart, viewPos).normalized());
+}
+
+void SelectTool::finishRubberBand(const QPoint& viewPos) {
+    m_rubberBanding = false;
+    if (!m_rubberBand) return;
+    m_rubberBand->hide();
+
+    // Rechteck in Szenenkoordinaten
+    QRect  viewRect  = QRect(m_rubberStart, viewPos).normalized();
+    QRectF sceneRect = m_ctx.drawingBoard->mapToScene(viewRect).boundingRect();
+
+    // Alle Items im Rechteck selektieren
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        sceneRect, Qt::ContainsItemBoundingRect);
+
+    for (QGraphicsItem* item : items) {
+        if (auto* geoItem = dynamic_cast<GeoGraphicsItem*>(item)) {
+            if (geoItem->geoObject() && geoItem->geoObject()->isValid())
+                m_ctx.adapter->select(geoItem->geoObject());
+        }
+    }
 }
