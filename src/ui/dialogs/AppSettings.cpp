@@ -9,7 +9,21 @@ AppSettings& AppSettings::instance() {
     return s;
 }
 
+void AppSettings::addRecentFile(const QString &fileName) {
+    recent.files.removeAll(fileName);
+    recent.files.prepend(fileName);
+    while (recent.files.size() > recent.maxCount) {
+        recent.files.removeLast();
+    }
+    save();
+}
+
 void AppSettings::load() {
+    m_settings.beginGroup("Recent");
+    recent.files = m_settings.value("files", QStringList()).toStringList();
+    recent.maxCount = m_settings.value("maxCount",  10).toInt();
+    m_settings.endGroup();
+
     m_settings.beginGroup("Grid");
     grid.visible     = m_settings.value("visible",     grid.visible).toBool();
     grid.spacing     = m_settings.value("spacing",     grid.spacing).toDouble();
@@ -33,6 +47,11 @@ void AppSettings::load() {
 }
 
 void AppSettings::save() {
+    m_settings.beginGroup("Recent");
+    m_settings.setValue("files", recent.files);
+    m_settings.setValue("maxCount",  recent.maxCount);
+    m_settings.endGroup();
+
     m_settings.beginGroup("Grid");
     m_settings.setValue("visible",     grid.visible);
     m_settings.setValue("spacing",     grid.spacing);

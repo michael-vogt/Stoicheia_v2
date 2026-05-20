@@ -13,7 +13,6 @@ class MainWindow : public QMainWindow {
     FileManager* m_fileManager = nullptr;
     QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;
-
     
     QToolBar* m_geoToolBar = nullptr;
     QAction* m_selectAction = nullptr;
@@ -30,14 +29,15 @@ class MainWindow : public QMainWindow {
     QAction* m_perpendicularAction = nullptr;
     QAction* m_perpFootAction = nullptr;
 
+    QMenu* m_recentMenu = nullptr;
+
     //QToolBar* m_toolbar = nullptr;
 
     void setupToolBar();
     void setupMenu();
     void setupStatusBar() const;
     void updateUndoRedo() const;
-    void toggleTools(const QAction* selectedAction) const;
-    //void checkTool(ToolType type);
+    void updateRecentFilesMenu();
 
 private slots:
     void onToolChanged(ToolType type);
