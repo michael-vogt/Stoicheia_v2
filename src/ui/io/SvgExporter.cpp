@@ -6,12 +6,13 @@
 #include "ui/GeoGraphicsItem.h"
 
 bool SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
-    QRectF rect; // = scene->sceneRect();
-    for (QGraphicsItem *item : scene->items()) {
-        if (item->isVisible())
-            rect = rect.united(item->sceneBoundingRect());
-            //rect = rect.united(item->mapToScene(item->boundingRect()).boundingRect());
-    }
+    QRectF rect = scene->itemsBoundingRect();
+    /*for (QGraphicsItem *item : scene->items()) {
+        if (item->isVisible()) {
+            //rect = rect.united(item->sceneBoundingRect());
+            rect = rect.united(item->mapToScene(item->boundingRect()).boundingRect());
+        }
+    }*/
 
     if (rect.isEmpty()) {
         m_lastError = QObject::tr("Keine sichtbaren Objekte");
