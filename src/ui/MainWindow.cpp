@@ -262,7 +262,7 @@ void MainWindow::updateRecentFilesMenu() {
     }
 
     for (const QString& file : files) {
-        QString label = QFileInfo(file).fileName();
+        QString label = QFileInfo(file).absoluteFilePath();
         auto* action = m_recentMenu->addAction(label);
         action->setToolTip(file);
         connect(action, &QAction::triggered, [this, file]() {
