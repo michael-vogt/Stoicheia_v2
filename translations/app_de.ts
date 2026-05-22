@@ -12,23 +12,23 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="135"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="222"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="140"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="228"/>
         <source>Panning</source>
         <translation>Verschieben</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="204"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="63"/>
         <source>Snapping</source>
         <translation>Einrasten</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="305"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="313"/>
         <source>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</source>
         <translation>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="308"/>
+        <location filename="../src/ui/DrawingBoard.cpp" line="316"/>
         <source>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</source>
         <translation>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</translation>
     </message>
@@ -53,7 +53,7 @@
         <translation type="vanished">Werkzeuge</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="73"/>
+        <location filename="../src/ui/MainWindow.cpp" line="82"/>
         <source>Auswählen</source>
         <translation>Auswählen</translation>
     </message>
@@ -90,129 +90,133 @@
         <translation type="vanished">Lotfußpunkt</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="54"/>
+        <location filename="../src/ui/MainWindow.cpp" line="63"/>
         <source>Geometrie</source>
         <translation>Geometrie</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="57"/>
+        <location filename="../src/ui/MainWindow.cpp" line="66"/>
         <source>Geometrie [G] &gt;&gt;</source>
         <translation>Geometrie [G] &gt;&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="74"/>
+        <location filename="../src/ui/MainWindow.cpp" line="83"/>
         <source>Punkt [P]</source>
         <translation>Punkt [P]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="75"/>
+        <location filename="../src/ui/MainWindow.cpp" line="84"/>
         <source>Gerade [L]</source>
         <translation>Gerade [L]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="76"/>
+        <location filename="../src/ui/MainWindow.cpp" line="85"/>
         <source>Halbgerade [R]</source>
         <translation>Halbgerade [R]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="77"/>
+        <location filename="../src/ui/MainWindow.cpp" line="86"/>
         <source>Strecke [S]</source>
         <translation>Strecke [S]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="78"/>
+        <location filename="../src/ui/MainWindow.cpp" line="87"/>
         <source>Kreis [C]</source>
         <translation>Kreis [C]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="82"/>
+        <location filename="../src/ui/MainWindow.cpp" line="91"/>
         <source>Konstruktionen</source>
         <translation>Konstruktionen</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="85"/>
+        <location filename="../src/ui/MainWindow.cpp" line="94"/>
         <source>Konstruktionen [K] &gt;&gt;</source>
         <translation>Konstruktionen [K] &gt;&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="101"/>
+        <location filename="../src/ui/MainWindow.cpp" line="110"/>
         <source>Schnittpunkt [S]</source>
         <translation>Schnittpunkt [S]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="102"/>
+        <location filename="../src/ui/MainWindow.cpp" line="111"/>
         <source>Mittelpunkt [M]</source>
         <translation>Mittelpunkt [M]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="103"/>
+        <location filename="../src/ui/MainWindow.cpp" line="112"/>
         <source>Parallele [P]</source>
         <translation>Parallele [P]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="104"/>
+        <location filename="../src/ui/MainWindow.cpp" line="113"/>
         <source>Senkrechte [E]</source>
         <translation>Senkrechte [E]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="105"/>
+        <location filename="../src/ui/MainWindow.cpp" line="114"/>
         <source>Lotfußpunkt [L]</source>
         <translation>Lotfußpunkt [L]</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="147"/>
+        <location filename="../src/ui/MainWindow.cpp" line="156"/>
         <source>Datei</source>
         <translation>Datei</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="149"/>
+        <location filename="../src/ui/MainWindow.cpp" line="158"/>
         <source>Neu</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="153"/>
+        <location filename="../src/ui/MainWindow.cpp" line="162"/>
         <source>Öffnen...</source>
         <translation>Öffnen...</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="160"/>
+        <location filename="../src/ui/MainWindow.cpp" line="174"/>
         <source>Speichern</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="167"/>
+        <location filename="../src/ui/MainWindow.cpp" line="181"/>
         <source>Speichern unter...</source>
         <translation>Speichern unter...</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="179"/>
         <source>Als SVG exportieren...</source>
-        <translation>Als SVG exportieren...</translation>
+        <translation type="vanished">Als SVG exportieren...</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="174"/>
+        <location filename="../src/ui/MainWindow.cpp" line="169"/>
         <source>Zuletzt geöffnet</source>
         <translation>Zuletzt geöffnet</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="194"/>
+        <location filename="../src/ui/MainWindow.cpp" line="188"/>
+        <source>Exportieren...</source>
+        <translation>Exportieren...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/MainWindow.cpp" line="208"/>
         <source>Beenden</source>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="199"/>
+        <location filename="../src/ui/MainWindow.cpp" line="213"/>
         <source>Bearbeiten</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="201"/>
-        <location filename="../src/ui/MainWindow.cpp" line="248"/>
+        <location filename="../src/ui/MainWindow.cpp" line="215"/>
+        <location filename="../src/ui/MainWindow.cpp" line="250"/>
         <source>Rückgängig</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="209"/>
-        <location filename="../src/ui/MainWindow.cpp" line="249"/>
+        <location filename="../src/ui/MainWindow.cpp" line="223"/>
+        <location filename="../src/ui/MainWindow.cpp" line="251"/>
         <source>Wiederholen</source>
         <translation>Wiederholen</translation>
     </message>
@@ -233,27 +237,27 @@
         <translation type="vanished">Extras</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="184"/>
+        <location filename="../src/ui/MainWindow.cpp" line="198"/>
         <source>Einstellungen...</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="248"/>
+        <location filename="../src/ui/MainWindow.cpp" line="250"/>
         <source>Rückgängig: </source>
         <translation>Rückgängig: </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="249"/>
+        <location filename="../src/ui/MainWindow.cpp" line="251"/>
         <source>Wiederholen: </source>
         <translation>Wiederholen: </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="257"/>
+        <location filename="../src/ui/MainWindow.cpp" line="259"/>
         <source>(keine)</source>
         <translation>(keine)</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="273"/>
+        <location filename="../src/ui/MainWindow.cpp" line="275"/>
         <source>Liste leeren</source>
         <translation>Liste leeren</translation>
     </message>
@@ -409,6 +413,7 @@
     </message>
     <message>
         <location filename="../src/ui/io/FileManager.cpp" line="12"/>
+        <location filename="../src/ui/io/SvgExporter.h" line="11"/>
         <source>SVG-Dateien (*.svg)</source>
         <translation>SVG-Dateien (*.svg)</translation>
     </message>
@@ -458,6 +463,37 @@
         <location filename="../src/ui/io/FileManager.cpp" line="135"/>
         <source>Unbenannt</source>
         <translation>Unbenannt</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/ExportManager.cpp" line="23"/>
+        <source>Exportieren</source>
+        <translation>Exportieren</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/ExportManager.cpp" line="37"/>
+        <source>Fehler beim Export</source>
+        <translation>Fehler beim Export</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/PngExporter.cpp" line="8"/>
+        <location filename="../src/ui/io/SvgExporter.cpp" line="17"/>
+        <source>Keine sichtbaren Objekte</source>
+        <translation>Keine sichtbaren Objekte</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/PngExporter.cpp" line="31"/>
+        <source>Konnte Datei nicht schreiben</source>
+        <translation>Konnte Datei nicht schreiben</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/PdfExporter.h" line="11"/>
+        <source>PDF-Dateien (*.pdf)</source>
+        <translation>PDF-Dateien (*.pdf)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/io/PngExporter.h" line="13"/>
+        <source>PNG-Dateien (*.png)</source>
+        <translation>PNG-Dateien (*.png)</translation>
     </message>
 </context>
 <context>

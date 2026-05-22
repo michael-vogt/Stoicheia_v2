@@ -12,6 +12,9 @@
 #include <QLabel>
 
 #include "dialogs/SettingsDialog.h"
+#include "io/PdfExporter.h"
+#include "io/PngExporter.h"
+#include "io/SvgExporter.h"
 #include "tools/CreateCircleTool.h"
 #include "tools/CreateIntersectionTool.h"
 #include "tools/CreateLineTool.h"
@@ -48,6 +51,11 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
 
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>(ToolType::Select);
+
+    m_exportManager = new ExportManager(m_drawingBoard->scene(), this);
+    m_exportManager->registerExporter(std::make_unique<PdfExporter>());
+    m_exportManager->registerExporter(std::make_unique<PngExporter>());
+    m_exportManager->registerExporter(std::make_unique<SvgExporter>());
 }
 
 void MainWindow::setupToolBar() {
@@ -177,8 +185,13 @@ void MainWindow::setupMenu() {
             updateRecentFilesMenu();
     });
 
-    QAction* svgAction = fileMenu->addAction(tr("Als SVG exportieren..."));
-    connect(svgAction, &QAction::triggered, m_fileManager, &FileManager::exportSVG);
+    QAction* exportAction = fileMenu->addAction(tr("Exportieren..."));
+    connect(exportAction, &QAction::triggered, [this]() {
+       m_exportManager->exportWithDialog();
+    });
+
+    /*QAction* svgAction = fileMenu->addAction(tr("Als SVG exportieren..."));
+    connect(svgAction, &QAction::triggered, m_fileManager, &FileManager::exportSVG);*/
 
     fileMenu->addSeparator();
 
@@ -249,7 +262,7 @@ void MainWindow::updateRecentFilesMenu() {
     }
 
     for (const QString& file : files) {
-        QString label = QFileInfo(file).fileName();
+        QString label = QFileInfo(file).absoluteFilePath();
         auto* action = m_recentMenu->addAction(label);
         action->setToolTip(file);
         connect(action, &QAction::triggered, [this, file]() {

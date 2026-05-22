@@ -85,3 +85,5 @@ TestResults/
 # =========================
 *.sto
 *.svg
+*.pdf
+*.png

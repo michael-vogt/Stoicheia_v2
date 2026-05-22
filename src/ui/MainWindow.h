@@ -7,6 +7,7 @@
 #include "DrawingBoard.h"
 #include "io/FileManager.h"
 #include "Enums.h"
+#include "io/ExportManager.h"
 
 enum class ToolType;
 enum class ShortcutMode;
@@ -38,7 +39,7 @@ class MainWindow : public QMainWindow {
     QLabel* m_statusLeft = nullptr;
     QLabel* m_statusRight = nullptr;
 
-    //QToolBar* m_toolbar = nullptr;
+    ExportManager* m_exportManager = nullptr;
 
     void setupToolBar();
     void setupMenu();

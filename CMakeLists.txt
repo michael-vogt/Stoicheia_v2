@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -------------------------------------------------
 # Qt
 # -------------------------------------------------
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Svg PrintSupport)
 
 qt_standard_project_setup()
 
@@ -96,9 +96,13 @@ add_library(StoicheiaApp STATIC
         src/ui/tools/CreatePointTool.cpp
         src/ui/tools/SelectTool.cpp
 
+        src/ui/io/ExportManager.cpp
         src/ui/io/FileManager.cpp
         src/ui/io/FileManager.h
+        src/ui/io/PngExporter.cpp
+        src/ui/io/PdfExporter.cpp
         src/ui/io/Serializer.cpp
+        src/ui/io/SvgExporter.cpp
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
@@ -119,6 +123,8 @@ target_link_libraries(StoicheiaApp PRIVATE
         Qt6::Core
         Qt6::Gui
         Qt6::Widgets
+        Qt6::Svg
+        Qt6::PrintSupport
 )
 
 
