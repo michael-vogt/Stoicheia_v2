@@ -11,11 +11,11 @@ CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : 
 void CreateLineTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     m_ctx.drawingBoard->viewport()->setMouseTracking(true);
-    m_ctx.drawingBoard->showStatus(QObject::tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 }
 
 void CreateLineTool::deactivate() {
-    m_ctx.drawingBoard->showStatus("");
+    m_ctx.drawingBoard->showStatusLeft("");
     m_ctx.drawingBoard->viewport()->setMouseTracking(false);
     removePreview();
     if (m_firstPoint && m_firstIsNew)
@@ -77,7 +77,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
             m_firstScenePos = snapped;
         }
 
-        m_ctx.drawingBoard->showStatus(QObject::tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+        m_ctx.drawingBoard->showStatusLeft(QObject::tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 
         // Vorschaulinie starten
         m_preview = new QGraphicsLineItem(computePreviewLine(snapped));

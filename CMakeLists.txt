@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -------------------------------------------------
 # Qt
 # -------------------------------------------------
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Svg PrintSupport)
 
 qt_standard_project_setup()
 
@@ -96,12 +96,22 @@ add_library(StoicheiaApp STATIC
         src/ui/tools/CreatePointTool.cpp
         src/ui/tools/SelectTool.cpp
 
+        src/ui/io/ExportManager.cpp
         src/ui/io/FileManager.cpp
         src/ui/io/FileManager.h
+        src/ui/io/PngExporter.cpp
+        src/ui/io/PdfExporter.cpp
         src/ui/io/Serializer.cpp
+        src/ui/io/SvgExporter.cpp
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
+        src/ui/dialogs/AppSettings.cpp
+        src/ui/dialogs/AppSettings.h
+        src/ui/dialogs/ColorButton.cpp
+        src/ui/dialogs/ColorButton.h
+        src/ui/dialogs/SettingsDialog.cpp
+        src/ui/dialogs/SettingsDialog.h
 )
 
 target_include_directories(StoicheiaApp PUBLIC
@@ -113,6 +123,8 @@ target_link_libraries(StoicheiaApp PRIVATE
         Qt6::Core
         Qt6::Gui
         Qt6::Widgets
+        Qt6::Svg
+        Qt6::PrintSupport
 )
 
 
@@ -147,7 +159,7 @@ target_link_libraries(StoicheiaQt PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia
+qt_add_executable(Stoicheia WIN32
         main.cpp
 )
 

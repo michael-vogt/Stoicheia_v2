@@ -8,8 +8,13 @@
 #include <QMessageBox>
 #include <QMetaEnum>
 #include <QActionGroup>
+#include <qfileinfo.h>
 #include <QLabel>
 
+#include "dialogs/SettingsDialog.h"
+#include "io/PdfExporter.h"
+#include "io/PngExporter.h"
+#include "io/SvgExporter.h"
 #include "tools/CreateCircleTool.h"
 #include "tools/CreateIntersectionTool.h"
 #include "tools/CreateLineTool.h"
@@ -36,15 +41,21 @@ MainWindow::MainWindow(const QString& title, QWidget* parent) : QMainWindow(pare
     connect(m_drawingBoard, &DrawingBoard::shortcutModeChanged, this, &MainWindow::onShortcutModeChanged);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, m_fileManager, &FileManager::markChanged);
-    connect(m_drawingBoard, &DrawingBoard::statusMessageChanged, statusBar(), &QStatusBar::showMessage);
+    connect(m_drawingBoard, &DrawingBoard::statusBarTextChanged, this, &MainWindow::setStatus);
     connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
         m_selectAction->setChecked(true);
     });
 
+    qApp->installEventFilter(this);
+
     // Standard-Tool: Auswählen
     m_drawingBoard->setTool<SelectTool>(ToolType::Select);
 
+    m_exportManager = new ExportManager(m_drawingBoard->scene(), this);
+    m_exportManager->registerExporter(std::make_unique<PdfExporter>());
+    m_exportManager->registerExporter(std::make_unique<PngExporter>());
+    m_exportManager->registerExporter(std::make_unique<SvgExporter>());
 }
 
 void MainWindow::setupToolBar() {
@@ -150,22 +161,49 @@ void MainWindow::setupMenu() {
 
     QAction* openAction = fileMenu->addAction(tr("Öffnen..."));
     openAction->setShortcut(QKeySequence::Open);
-    connect(openAction, &QAction::triggered, m_fileManager, &FileManager::open);
+    connect(openAction, &QAction::triggered, [this]() {
+        if (m_fileManager->open())
+            updateRecentFilesMenu();
+    });
+
+    m_recentMenu = fileMenu->addMenu(tr("Zuletzt geöffnet"));
+    updateRecentFilesMenu();
+
+    fileMenu->addSeparator();
 
     QAction* saveAction = fileMenu->addAction(tr("Speichern"));
     saveAction->setShortcut(QKeySequence::Save);
-    connect(saveAction, &QAction::triggered, m_fileManager, &FileManager::save);
+    connect(saveAction, &QAction::triggered, [this]() {
+        if (m_fileManager->save())
+            updateRecentFilesMenu();
+    });
 
     QAction* saveAsAction = fileMenu->addAction(tr("Speichern unter..."));
     saveAsAction->setShortcut(QKeySequence::SaveAs);
-    connect(saveAsAction, &QAction::triggered, m_fileManager, &FileManager::saveAs);
+    connect(saveAsAction, &QAction::triggered, [this]() {
+        if (m_fileManager->saveAs())
+            updateRecentFilesMenu();
+    });
+
+    QAction* exportAction = fileMenu->addAction(tr("Exportieren..."));
+    connect(exportAction, &QAction::triggered, [this]() {
+       m_exportManager->exportWithDialog();
+    });
+
+    /*QAction* svgAction = fileMenu->addAction(tr("Als SVG exportieren..."));
+    connect(svgAction, &QAction::triggered, m_fileManager, &FileManager::exportSVG);*/
 
     fileMenu->addSeparator();
 
-    QAction* svgAction = fileMenu->addAction(tr("Als SVG exportieren..."));
-    connect(svgAction, &QAction::triggered, m_fileManager, &FileManager::exportSVG);
+    QAction* settingsAction = fileMenu->addAction(tr("Einstellungen..."));
+    connect(settingsAction, &QAction::triggered, [this]() {
+        SettingsDialog dlg(AppSettings::instance(), this);
+        connect(&dlg, &SettingsDialog::settingsChanged, m_drawingBoard, &DrawingBoard::applySettings);
+        dlg.exec();
+    });
 
     fileMenu->addSeparator();
+
 
     QAction* quitAction = fileMenu->addAction(tr("Beenden"));
     quitAction->setShortcut(QKeySequence::Quit);
@@ -189,28 +227,17 @@ void MainWindow::setupMenu() {
         m_drawingBoard->commandStack()->redo();
         updateUndoRedo();
     });
-
-
-    QMenu* viewMenu = menuBar()->addMenu(tr("Ansicht"));
-
-    QAction* snapAction = viewMenu->addAction(tr("Immer einrasten"));
-    snapAction->setCheckable(true);
-    snapAction->setChecked(false);
-    connect(snapAction, &QAction::toggled, [this](bool on) {
-        m_drawingBoard->grid()->setSnapEnabled(on);
-    });
-
-    QAction* gridAction = viewMenu->addAction(tr("Raster"));
-    gridAction->setCheckable(true);
-    gridAction->setChecked(true);
-    connect(gridAction, &QAction::toggled, [this](bool on) {
-        m_drawingBoard->grid()->setVisible(on);
-        m_drawingBoard->viewport()->update();
-    });
 }
 
-void MainWindow::setupStatusBar() const {
-    //statusBar()->showMessage(tr("Bereit"));
+void MainWindow::setupStatusBar() {
+    m_statusLeft = new QLabel("", this);
+    m_statusLeft->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+
+    m_statusRight = new QLabel("", this);
+    m_statusRight->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+
+    statusBar()->addPermanentWidget(m_statusLeft, 4);
+    statusBar()->addPermanentWidget(m_statusRight, 1);
 }
 
 void MainWindow::updateUndoRedo() const {
@@ -224,47 +251,58 @@ void MainWindow::updateUndoRedo() const {
     m_redoAction->setText(redoDesc.isEmpty() ? tr("Wiederholen") : tr("Wiederholen: ") + redoDesc);
 }
 
-void MainWindow::toggleTools(const QAction *selectedAction) const {
-    /*for (auto* action : m_toolbar->actions()) {
-        if (action == selectedAction) {
-            action->setChecked(true);
-        } else {
-            action->setChecked(false);
-        }
-    }*/
+void MainWindow::updateRecentFilesMenu() {
+    m_recentMenu->clear();
+    const auto& files = AppSettings::instance().recent.files;
+
+    if (files.isEmpty()) {
+        auto* empty = m_recentMenu->addAction(tr("(keine)"));
+        empty->setEnabled(false);
+        return;
+    }
+
+    for (const QString& file : files) {
+        QString label = QFileInfo(file).absoluteFilePath();
+        auto* action = m_recentMenu->addAction(label);
+        action->setToolTip(file);
+        connect(action, &QAction::triggered, [this, file]() {
+            if (m_fileManager->openFile(file))
+                updateRecentFilesMenu();
+        });
+    }
+
+    m_recentMenu->addSeparator();
+    auto* clearAction = m_recentMenu->addAction(tr("Liste leeren"));
+    connect(clearAction, &QAction::triggered, [this]() {
+        AppSettings::instance().recent.files.clear();
+        AppSettings::instance().save();
+        updateRecentFilesMenu();
+    });
+
 }
 
-/*void MainWindow::checkTool(ToolType type) {
-    for (auto* action : m_toolbar->actions())
-        action->setChecked(false);
-    
-        switch (type) {
-            case ToolType::Select:
-                m_selectAction->setChecked(true);
-                break;
-            case ToolType::CreatePoint:
-                m_pointAction->setChecked(true);
-                break;
-            case ToolType::CreateLine:
-                m_lineAction->setChecked(true);
-                break;
-            case ToolType::CreateCircle:
-                m_circleAction->setChecked(true);
-                break;
-            case ToolType::CreateIntersection:
-                m_intersectionAction->setChecked(true);
-                break;
-            case ToolType::CreateMidpoint:
-                m_midpointAction->setChecked(true);
-                break;
-            case ToolType::CreateParallel:
-                m_parallelAction->setChecked(true);
-                break;
-            case ToolType::CreatePerpendicular:
-                m_perpendicularAction->setChecked(true);
-                break;
-            case ToolType::CreatePerpendicularFoot:
-                m_perpendicularFootAction->setChecked(true);
-                break;
+void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
+    if (sbp == StatusBarPart::Left && m_statusLeft) {
+        m_statusLeft->setText(text);
+    } else if (sbp == StatusBarPart::Right && m_statusRight) {
+        m_statusRight->setText(text);
+    }
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Alt) {
+            m_drawingBoard->setSnapping(true);
         }
-}*/
+    }
+
+    if (event->type() == QEvent::KeyRelease) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Alt) {
+            m_drawingBoard->setSnapping(false);
+        }
+    }
+
+    return QObject::eventFilter(object, event);
+}
