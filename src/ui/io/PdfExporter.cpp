@@ -9,7 +9,12 @@ bool PdfExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
     printer.setOutputFileName(filename);
     printer.setPageSize(QPageSize(scene->sceneRect().size(), QPageSize::Point));
 
+    const QRectF pageRect = printer.pageRect(QPrinter::DevicePixel);
+    const qreal h = pageRect.height();
+
     QPainter painter(&printer);
+    painter.translate(0, h);
+    painter.scale(1.0, -1.0);
     scene->render(&painter);
     return true;
 

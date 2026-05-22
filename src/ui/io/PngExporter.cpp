@@ -1,32 +1,31 @@
 #include "PngExporter.h"
 
 #include <QPainter>
-#include <QGraphicsItem>
 
 bool PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
-    QRectF rect; // = scene->sceneRect();
-    for (QGraphicsItem* item : scene->items()) {
-        if (item->isVisible()) {
-            rect = rect.united(item->mapToScene(item->boundingRect()).boundingRect());
-        }
-    }
-
+    QRectF rect = scene->itemsBoundingRect();
     if (rect.isEmpty()) {
-        m_lastError = QObject::tr("Keine sichtbren Objekte");
+        m_lastError = QObject::tr("Keine sichtbaren Objekte");
         return false;
     }
 
-    double margin = 20.0;
+    constexpr double margin = 20.0;
     rect.adjust(-margin, -margin, margin, margin);
 
     double scale = m_dpi / 96.0;
-    QImage image((rect.size() * scale).toSize(), QImage::Format_ARGB32);
+    QImage image((rect.size() * scale).toSize(),
+                  QImage::Format_ARGB32);
     image.fill(Qt::white);
 
+    // Erst normal rendern
     QPainter painter(&image);
     painter.setRenderHint(QPainter::Antialiasing);
-    scene->render(&painter, QRectF(), rect);
+    scene->render(&painter, QRectF(QPointF(0,0), image.size()), rect);
     painter.end();
+
+    // Dann Y-Flip auf das fertige Image anwenden
+    //image = image.mirrored(false, true);
+    image = image.flipped(Qt::Vertical);
 
     if (!image.save(filename)) {
         m_lastError = QObject::tr("Konnte Datei nicht schreiben");
