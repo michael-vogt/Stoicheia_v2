@@ -7,9 +7,36 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
+#include <qdir.h>
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLabel>
+
+static QHash<QString, QString> buildLanguageMap(const QString& path) {
+    QHash<QString, QString> map;
+
+    QDir dir(path);
+    const QStringList files = dir.entryList({"app_*.qm"}, QDir::Files);
+
+    for (const QString& file : files) {
+        QString code = file;
+        code.remove("app_");
+        code.chop(3);
+
+        QLocale locale;
+
+        QString name = locale.nativeLanguageName();
+        if (code == "en")
+            name = "English";
+
+        if (name.isEmpty())
+            name = QLocale::languageToString(locale.language());
+
+        map.insert(code, name);
+    }
+
+    return map;
+}
 
 SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
     : QDialog(parent), m_settings(settings)
@@ -18,6 +45,7 @@ SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
     setMinimumWidth(400);
 
     auto* tabs = new QTabWidget(this);
+    tabs->addTab(buildUITab(),     tr("Appearance"));
     tabs->addTab(buildGridTab(),   tr("Raster"));
     tabs->addTab(buildColorsTab(), tr("Farben"));
 
@@ -37,6 +65,37 @@ SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
     layout->addWidget(buttons);
 
     readFromSettings();
+}
+
+QWidget *SettingsDialog::buildUITab() {
+    auto* widget = new QWidget;
+    auto* form = new QFormLayout(widget);
+    form->setRowWrapPolicy(QFormLayout::WrapLongRows);
+
+    m_uiRecentMaxCount = new QSpinBox(widget);
+    m_uiRecentMaxCount->setMinimum(1);
+    m_uiRecentMaxCount->setMaximum(10);
+    m_uiRecentMaxCount->setValue(5);
+    m_uiRecentMaxCount->setSuffix(tr(" (max)"));
+    form->addRow(tr("Zuletzt verwendete Dateien:"), m_uiRecentMaxCount);
+
+    m_uiLanguage = new QComboBox(widget);
+
+    auto languageMap = buildLanguageMap(":/i18n/");
+    QVector<QPair<QString, QString>> list;
+    for (auto it = languageMap.begin(); it != languageMap.end(); ++it) {
+        list.append({it.key(), it.value()});
+    }
+
+    std::ranges::sort(list, [](const auto& a, const auto& b) {return a.second < b.second;});
+
+    for (const auto& item : list) {
+        m_uiLanguage->addItem(item.second, item.first);
+    }
+
+    form->addRow(tr("Sprache:"), m_uiLanguage);
+
+    return widget;
 }
 
 QWidget* SettingsDialog::buildGridTab() {
@@ -97,6 +156,11 @@ QWidget* SettingsDialog::buildColorsTab() {
 }
 
 void SettingsDialog::readFromSettings() {
+    m_uiRecentMaxCount->setValue(m_settings.ui.recentFiles.maxCount);
+    int index = m_uiLanguage->findData(m_settings.ui.language);
+    if (index != -1)
+        m_uiLanguage->setCurrentIndex(index);
+
     m_gridVisible->setChecked(m_settings.grid.visible);
     m_gridSpacing->setValue(m_settings.grid.spacing);
     m_snapEnabled->setChecked(m_settings.grid.snapEnabled);
@@ -116,6 +180,9 @@ void SettingsDialog::readFromSettings() {
 }
 
 void SettingsDialog::writeToSettings() {
+    m_settings.ui.recentFiles.maxCount = m_uiRecentMaxCount->value();
+    m_settings.ui.language = m_uiLanguage->currentData().toString();
+
     m_settings.grid.visible     = m_gridVisible->isChecked();
     m_settings.grid.spacing     = m_gridSpacing->value();
     m_settings.grid.snapEnabled = m_snapEnabled->isChecked();

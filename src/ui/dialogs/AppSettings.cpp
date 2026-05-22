@@ -10,18 +10,21 @@ AppSettings& AppSettings::instance() {
 }
 
 void AppSettings::addRecentFile(const QString &fileName) {
-    recent.files.removeAll(fileName);
-    recent.files.prepend(fileName);
-    while (recent.files.size() > recent.maxCount) {
-        recent.files.removeLast();
+    ui.recentFiles.files.removeAll(fileName);
+    ui.recentFiles.files.prepend(fileName);
+    while (ui.recentFiles.files.size() > ui.recentFiles.maxCount) {
+        ui.recentFiles.files.removeLast();
     }
     save();
 }
 
 void AppSettings::load() {
-    m_settings.beginGroup("Recent");
-    recent.files = m_settings.value("files", QStringList()).toStringList();
-    recent.maxCount = m_settings.value("maxCount",  10).toInt();
+    m_settings.beginGroup("UI");
+    m_settings.beginGroup("recentFiles");
+    ui.recentFiles.files = m_settings.value("files", QStringList()).toStringList();
+    ui.recentFiles.maxCount = m_settings.value("maxCount",  5).toInt();
+    m_settings.endGroup();
+    ui.language = m_settings.value("language", ui.language).toString();
     m_settings.endGroup();
 
     m_settings.beginGroup("Grid");
@@ -47,9 +50,12 @@ void AppSettings::load() {
 }
 
 void AppSettings::save() {
-    m_settings.beginGroup("Recent");
-    m_settings.setValue("files", recent.files);
-    m_settings.setValue("maxCount",  recent.maxCount);
+    m_settings.beginGroup("UI");
+    m_settings.beginGroup("recentFiles");
+    m_settings.setValue("files", ui.recentFiles.files);
+    m_settings.setValue("maxCount",  ui.recentFiles.maxCount);
+    m_settings.endGroup();
+    m_settings.setValue("language",   ui.language);
     m_settings.endGroup();
 
     m_settings.beginGroup("Grid");
@@ -75,6 +81,7 @@ void AppSettings::save() {
 }
 
 void AppSettings::resetToDefaults() {
+    ui     = UI{};
     grid   = GridSettings{};
     colors = ColorScheme{};
 }

@@ -7,9 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -------------------------------------------------
 # Qt
 # -------------------------------------------------
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Svg PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui LinguistTools Svg PrintSupport)
 
 qt_standard_project_setup()
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 # -------------------------------------------------
 # Translation files
@@ -143,6 +146,7 @@ add_library(StoicheiaQt STATIC
         src/ui/DrawingBoard.h
         src/ui/MainWindow.cpp
         src/ui/MainWindow.h
+        src/ui/MainWindow.ui
 )
 
 target_include_directories(StoicheiaQt PUBLIC

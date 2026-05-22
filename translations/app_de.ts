@@ -239,7 +239,7 @@
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="198"/>
         <source>Einstellungen...</source>
-        <translation>Einstellungen</translation>
+        <translation>Einstellungen...</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.cpp" line="250"/>

@@ -10,15 +10,17 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    AppSettings::instance().load();
+    QString languageCode = AppSettings::instance().ui.language;
+
     QTranslator translator;
-    if (translator.load(":/i18n/app_en.qm")) {
+    if (translator.load(QString(":/i18n/app_%1.qm").arg(languageCode))) {
         app.installTranslator(&translator);
     } else {
         std::cerr << "Error loading translator" << std::endl;
     }
 
-    AppSettings::instance().load();
-    MainWindow window("Στοιχεῖα");
+    MainWindow window("Στοιχεῖα", &translator);
     window.drawingBoard()->applySettings();
 
     if (argc > 1) {

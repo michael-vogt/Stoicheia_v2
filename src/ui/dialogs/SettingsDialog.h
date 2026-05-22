@@ -1,11 +1,21 @@
 #pragma once
 #include <QDialog>
+#include <QLineEdit>
+#include <QComboBox>
+#include <qspinbox.h>
+
 #include "AppSettings.h"
 
 class QTabWidget;
 class QDoubleSpinBox;
 class QCheckBox;
 class ColorButton;
+
+/*static const QHash<QString, QString> languageMap = {
+    {"en", "English"},
+    {"de", "Deutsch" }
+};*/
+static QHash<QString, QString> buildLanguageMap(const QString& path);
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
@@ -20,6 +30,7 @@ private slots:
     void resetToDefaults();
 
 private:
+    QWidget* buildUITab();
     QWidget* buildGridTab();
     QWidget* buildColorsTab();
 
@@ -27,6 +38,10 @@ private:
     void writeToSettings();
 
     AppSettings& m_settings;
+
+    // UI-Tab
+    QSpinBox*  m_uiRecentMaxCount = nullptr;
+    QComboBox* m_uiLanguage       = nullptr;
 
     // Grid-Tab
     QCheckBox*      m_gridVisible  = nullptr;

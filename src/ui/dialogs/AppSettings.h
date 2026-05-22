@@ -23,9 +23,12 @@ struct ColorScheme {
     QColor watermark    = QColor(0,   0,   0,  20);
 };
 
-struct RecentFiles {
-    QStringList files;
-    int maxCount = 10;
+struct UI {
+    struct RecentFiles {
+        QStringList files;
+        int maxCount = 5;
+    } recentFiles;
+    QString language = "en";
 };
 
 class AppSettings {
@@ -39,7 +42,7 @@ public:
 
     GridSettings grid;
     ColorScheme  colors;
-    RecentFiles recent;
+    UI ui;
 
 private:
     AppSettings();
