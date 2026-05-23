@@ -11,6 +11,8 @@ class QDoubleSpinBox;
 class QCheckBox;
 class ColorButton;
 
+namespace Ui { class SettingsDialog; }
+
 /*static const QHash<QString, QString> languageMap = {
     {"en", "English"},
     {"de", "Deutsch" }
@@ -19,6 +21,9 @@ static QHash<QString, QString> buildLanguageMap(const QString& path);
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
+
+    Ui::SettingsDialog* ui;
+
 public:
     explicit SettingsDialog(AppSettings& settings, QWidget* parent = nullptr);
 
@@ -30,9 +35,9 @@ private slots:
     void resetToDefaults();
 
 private:
-    QWidget* buildUITab();
+    /*QWidget* buildUITab();
     QWidget* buildGridTab();
-    QWidget* buildColorsTab();
+    QWidget* buildColorsTab();*/
 
     void readFromSettings();
     void writeToSettings();
@@ -40,19 +45,19 @@ private:
     AppSettings& m_settings;
 
     // UI-Tab
-    QSpinBox*  m_uiRecentMaxCount = nullptr;
-    QComboBox* m_uiLanguage       = nullptr;
+    /*QSpinBox*  m_uiRecentMaxCount = nullptr;
+    QComboBox* m_uiLanguage       = nullptr;*/
 
     // Grid-Tab
-    QCheckBox*      m_gridVisible  = nullptr;
+    /*QCheckBox*      m_gridVisible  = nullptr;
     QDoubleSpinBox* m_gridSpacing  = nullptr;
     QCheckBox*      m_snapEnabled  = nullptr;
     ColorButton*    m_axisColor    = nullptr;
     ColorButton*    m_gridColor    = nullptr;
-    ColorButton*    m_labelColor   = nullptr;
+    ColorButton*    m_labelColor   = nullptr;*/
 
     // Farb-Tab
-    ColorButton* m_background   = nullptr;
+    /*ColorButton* m_background   = nullptr;
     ColorButton* m_point        = nullptr;
     ColorButton* m_pointFill    = nullptr;
     ColorButton* m_line         = nullptr;
@@ -60,5 +65,5 @@ private:
     ColorButton* m_selected     = nullptr;
     ColorButton* m_highlighted  = nullptr;
     ColorButton* m_construction = nullptr;
-    ColorButton* m_watermark    = nullptr;
+    ColorButton* m_watermark    = nullptr;*/
 };

@@ -1,4 +1,5 @@
 #include "SettingsDialog.h"
+#include "ui_settingsdialog.h"
 #include "ColorButton.h"
 #include <QTabWidget>
 #include <QDoubleSpinBox>
@@ -39,12 +40,22 @@ static QHash<QString, QString> buildLanguageMap(const QString& path) {
 }
 
 SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
-    : QDialog(parent), m_settings(settings)
+    : QDialog(parent), ui(new Ui::SettingsDialog), m_settings(settings)
 {
+    ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
     setMinimumWidth(400);
 
-    auto* tabs = new QTabWidget(this);
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() { apply(); accept(); });
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &SettingsDialog::apply);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetToDefaults);
+    //connect(ui->buttonBox, &QPushButton::clicked, this, [this]() { apply(); accept(); });
+    //connect(ui->buttonBox->Cancel, &QPushButton::clicked, this, &QDialog::reject);
+    //connect(ui->buttonBox->Apply, &QPushButton::clicked, &SettingsDialog::apply);
+    //connect(ui->buttonBox->Reset, &QPushButton::clicked, this, &SettingsDialog::resetToDefaults);
+
+    /*auto* tabs = new QTabWidget(this);
     tabs->addTab(buildUITab(),     tr("Appearance"));
     tabs->addTab(buildGridTab(),   tr("Raster"));
     tabs->addTab(buildColorsTab(), tr("Farben"));
@@ -62,12 +73,12 @@ SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
 
     auto* layout = new QVBoxLayout(this);
     layout->addWidget(tabs);
-    layout->addWidget(buttons);
+    layout->addWidget(buttons);*/
 
     readFromSettings();
 }
 
-QWidget *SettingsDialog::buildUITab() {
+/*QWidget *SettingsDialog::buildUITab() {
     auto* widget = new QWidget;
     auto* form = new QFormLayout(widget);
     form->setRowWrapPolicy(QFormLayout::WrapLongRows);
@@ -153,52 +164,52 @@ QWidget* SettingsDialog::buildColorsTab() {
     form->addRow(tr("Wasserzeichen:"),    m_watermark);
 
     return widget;
-}
+}*/
 
 void SettingsDialog::readFromSettings() {
-    m_uiRecentMaxCount->setValue(m_settings.ui.recentFiles.maxCount);
-    int index = m_uiLanguage->findData(m_settings.ui.language);
+    ui->m_uiRecentMaxCount->setValue(m_settings.ui.recentFiles.maxCount);
+    int index = ui->m_uiLanguage->findData(m_settings.ui.language);
     if (index != -1)
-        m_uiLanguage->setCurrentIndex(index);
+        ui->m_uiLanguage->setCurrentIndex(index);
 
-    m_gridVisible->setChecked(m_settings.grid.visible);
-    m_gridSpacing->setValue(m_settings.grid.spacing);
-    m_snapEnabled->setChecked(m_settings.grid.snapEnabled);
-    m_axisColor->setColor(m_settings.grid.axisColor);
-    m_gridColor->setColor(m_settings.grid.gridColor);
-    m_labelColor->setColor(m_settings.grid.labelColor);
+    ui->m_gridVisible->setChecked(m_settings.grid.visible);
+    ui->m_gridSpacing->setValue(m_settings.grid.spacing);
+    ui->m_snapEnabled->setChecked(m_settings.grid.snapEnabled);
+    ui->m_axisColor->setColor(m_settings.grid.axisColor);
+    ui->m_gridColor->setColor(m_settings.grid.gridColor);
+    ui->m_labelColor->setColor(m_settings.grid.labelColor);
 
-    m_background->setColor(m_settings.colors.background);
-    m_point->setColor(m_settings.colors.point);
-    m_pointFill->setColor(m_settings.colors.pointFill);
-    m_line->setColor(m_settings.colors.line);
-    m_circle->setColor(m_settings.colors.circle);
-    m_selected->setColor(m_settings.colors.selected);
-    m_highlighted->setColor(m_settings.colors.highlighted);
-    m_construction->setColor(m_settings.colors.construction);
-    m_watermark->setColor(m_settings.colors.watermark);
+    ui->m_background->setColor(m_settings.colors.background);
+    ui->m_point->setColor(m_settings.colors.point);
+    ui->m_pointFill->setColor(m_settings.colors.pointFill);
+    ui->m_line->setColor(m_settings.colors.line);
+    ui->m_circle->setColor(m_settings.colors.circle);
+    ui->m_selected->setColor(m_settings.colors.selected);
+    ui->m_highlighted->setColor(m_settings.colors.highlighted);
+    ui->m_construction->setColor(m_settings.colors.construction);
+    ui->m_watermark->setColor(m_settings.colors.watermark);
 }
 
 void SettingsDialog::writeToSettings() {
-    m_settings.ui.recentFiles.maxCount = m_uiRecentMaxCount->value();
-    m_settings.ui.language = m_uiLanguage->currentData().toString();
+    m_settings.ui.recentFiles.maxCount = ui->m_uiRecentMaxCount->value();
+    m_settings.ui.language = ui->m_uiLanguage->currentData().toString();
 
-    m_settings.grid.visible     = m_gridVisible->isChecked();
-    m_settings.grid.spacing     = m_gridSpacing->value();
-    m_settings.grid.snapEnabled = m_snapEnabled->isChecked();
-    m_settings.grid.axisColor   = m_axisColor->color();
-    m_settings.grid.gridColor   = m_gridColor->color();
-    m_settings.grid.labelColor  = m_labelColor->color();
+    m_settings.grid.visible     = ui->m_gridVisible->isChecked();
+    m_settings.grid.spacing     = ui->m_gridSpacing->value();
+    m_settings.grid.snapEnabled = ui->m_snapEnabled->isChecked();
+    m_settings.grid.axisColor   = ui->m_axisColor->color();
+    m_settings.grid.gridColor   = ui->m_gridColor->color();
+    m_settings.grid.labelColor  = ui->m_labelColor->color();
 
-    m_settings.colors.background   = m_background->color();
-    m_settings.colors.point        = m_point->color();
-    m_settings.colors.pointFill    = m_pointFill->color();
-    m_settings.colors.line         = m_line->color();
-    m_settings.colors.circle       = m_circle->color();
-    m_settings.colors.selected     = m_selected->color();
-    m_settings.colors.highlighted  = m_highlighted->color();
-    m_settings.colors.construction = m_construction->color();
-    m_settings.colors.watermark    = m_watermark->color();
+    m_settings.colors.background   = ui->m_background->color();
+    m_settings.colors.point        = ui->m_point->color();
+    m_settings.colors.pointFill    = ui->m_pointFill->color();
+    m_settings.colors.line         = ui->m_line->color();
+    m_settings.colors.circle       = ui->m_circle->color();
+    m_settings.colors.selected     = ui->m_selected->color();
+    m_settings.colors.highlighted  = ui->m_highlighted->color();
+    m_settings.colors.construction = ui->m_construction->color();
+    m_settings.colors.watermark    = ui->m_watermark->color();
 }
 
 void SettingsDialog::apply() {

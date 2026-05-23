@@ -109,12 +109,6 @@ add_library(StoicheiaApp STATIC
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
-        src/ui/dialogs/AppSettings.cpp
-        src/ui/dialogs/AppSettings.h
-        src/ui/dialogs/ColorButton.cpp
-        src/ui/dialogs/ColorButton.h
-        src/ui/dialogs/SettingsDialog.cpp
-        src/ui/dialogs/SettingsDialog.h
 )
 
 target_include_directories(StoicheiaApp PUBLIC
@@ -135,6 +129,13 @@ target_link_libraries(StoicheiaApp PRIVATE
 # GUI LIB (Qt Widgets / Items)
 # -------------------------------------------------
 add_library(StoicheiaQt STATIC
+src/ui/dialogs/AppSettings.cpp
+        src/ui/dialogs/AppSettings.h
+        src/ui/dialogs/ColorButton.cpp
+        src/ui/dialogs/ColorButton.h
+        src/ui/dialogs/SettingsDialog.cpp
+        src/ui/dialogs/SettingsDialog.h
+        src/ui/dialogs/SettingsDialog.ui
         src/ui/GeoGraphicsItem.cpp
         src/ui/GeoPointItem.cpp
         src/ui/GeoLinearObjectItem.cpp
@@ -151,6 +152,10 @@ add_library(StoicheiaQt STATIC
 
 target_include_directories(StoicheiaQt PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_include_directories(StoicheiaQt PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/dialogs
 )
 
 target_link_libraries(StoicheiaQt PUBLIC
