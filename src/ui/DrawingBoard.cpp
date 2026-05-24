@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QShortcut>
 
-#include "MainWindow.h"
+//#include "MainWindow.h"
 #include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"

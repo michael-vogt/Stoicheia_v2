@@ -12,11 +12,17 @@
 enum class ToolType;
 enum class ShortcutMode;
 
+namespace Ui { class MainWindow; }
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
+
+    Ui::MainWindow* ui;
+
     DrawingBoard* m_drawingBoard = nullptr;
     FileManager* m_fileManager = nullptr;
-    QAction* m_undoAction = nullptr;
+
+    /*QAction* m_undoAction = nullptr;
     QAction* m_redoAction = nullptr;
     
     QToolBar* m_geoToolBar = nullptr;
@@ -34,25 +40,35 @@ class MainWindow : public QMainWindow {
     QAction* m_perpendicularAction = nullptr;
     QAction* m_perpFootAction = nullptr;
 
-    QMenu* m_recentMenu = nullptr;
+    QMenu* m_recentMenu = nullptr;*/
 
     QLabel* m_statusLeft = nullptr;
     QLabel* m_statusRight = nullptr;
 
     ExportManager* m_exportManager = nullptr;
 
-    void setupToolBar();
-    void setupMenu();
-    void setupStatusBar();
+    QTranslator* m_translator = nullptr;
+
+    //void setupToolBar();
+    //void setupMenu();
+    //void setupStatusBar();
+    void setupConnections();
     void updateUndoRedo() const;
     void updateRecentFilesMenu();
 
+    template <typename ToolT>
+    auto makeToolAction(ToolType type) {
+        return [this, type]() {
+            m_drawingBoard->setTool<ToolT>(type);
+        };
+    }
+
 private slots:
-    void onToolChanged(ToolType type);
+    void onToolChanged(ToolType type) const;
     void onShortcutModeChanged(ShortcutMode mode);
 
 public:
-    explicit MainWindow(const QString& title = "Stoicheia", QWidget* parent = nullptr);
+    explicit MainWindow(const QString& title = "Stoicheia", QTranslator* translator = nullptr, QWidget* parent = nullptr);
 
     DrawingBoard* drawingBoard() const { return m_drawingBoard; }
     FileManager* fileManager() const { return m_fileManager; }
@@ -61,4 +77,5 @@ public:
 
 public slots:
     void setStatus(StatusBarPart sbp, const QString& text) const;
+    void switchLanguage();
 };

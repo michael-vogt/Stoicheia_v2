@@ -9,7 +9,7 @@
 #include "geometry/Scene.h"
 #include "tools/Tool.h"
 #include "Grid.h"
-#include "MainWindow.h"
+//#include "MainWindow.h"
 #include "Enums.h"
 
 

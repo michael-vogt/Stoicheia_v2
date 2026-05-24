@@ -6,6 +6,7 @@
 class ColorButton : public QPushButton {
     Q_OBJECT
 public:
+    explicit ColorButton(QWidget* parent = nullptr);
     explicit ColorButton(const QColor& color, QWidget* parent = nullptr);
 
     QColor color() const { return m_color; }

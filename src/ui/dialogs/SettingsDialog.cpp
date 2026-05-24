@@ -1,4 +1,5 @@
 #include "SettingsDialog.h"
+#include "ui_settingsdialog.h"
 #include "ColorButton.h"
 #include <QTabWidget>
 #include <QDoubleSpinBox>
@@ -7,131 +8,126 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
+#include <qdir.h>
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLabel>
+#include <QTimer>
+
+static QHash<QString, QString> buildLanguageMap(const QString& path) {
+    QHash<QString, QString> map;
+
+    QDir dir(path);
+    if (!dir.exists())
+        return map;
+
+    const QStringList files = dir.entryList({"app_*.qm"}, QDir::Files);
+
+    for (const QString& file : files) {
+        QString code = file;
+        code.remove("app_");
+        code.chop(3);
+
+        QLocale locale(code);
+
+        QString name = locale.nativeLanguageName();
+        if (code == "en")
+            name = "English";
+
+        if (name.isEmpty())
+            name = QLocale::languageToString(locale.language());
+
+        map.insert(code, name);
+    }
+
+    return map;
+}
 
 SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
-    : QDialog(parent), m_settings(settings)
+    : QDialog(parent), ui(new Ui::SettingsDialog), 
+    m_settings(settings),
+    m_snapshotGrid(settings.grid),
+    m_snapshotColors(settings.colors),
+    m_snapshotGeneral(settings.general)
 {
+    ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
     setMinimumWidth(400);
 
-    auto* tabs = new QTabWidget(this);
-    tabs->addTab(buildGridTab(),   tr("Raster"));
-    tabs->addTab(buildColorsTab(), tr("Farben"));
+    fillLanguages();
 
-    auto* buttons = new QDialogButtonBox(this);
-    auto* okBtn     = buttons->addButton(QDialogButtonBox::Ok);
-    auto* cancelBtn = buttons->addButton(QDialogButtonBox::Cancel);
-    auto* applyBtn  = buttons->addButton(QDialogButtonBox::Apply);
-    auto* resetBtn  = buttons->addButton(tr("Standard"), QDialogButtonBox::ResetRole);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Abbrechen"));
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
+    ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Standard"));
 
-    connect(okBtn,     &QPushButton::clicked, this, [this]() { apply(); accept(); });
-    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
-    connect(applyBtn,  &QPushButton::clicked, this, &SettingsDialog::apply);
-    connect(resetBtn,  &QPushButton::clicked, this, &SettingsDialog::resetToDefaults);
-
-    auto* layout = new QVBoxLayout(this);
-    layout->addWidget(tabs);
-    layout->addWidget(buttons);
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() { apply(); accept(); });
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &SettingsDialog::apply);
+    connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetToDefaults);
 
     readFromSettings();
 }
 
-QWidget* SettingsDialog::buildGridTab() {
-    auto* widget = new QWidget;
-    auto* form   = new QFormLayout(widget);
-    form->setRowWrapPolicy(QFormLayout::WrapLongRows);
+void SettingsDialog::fillLanguages() {
+    auto languageMap = buildLanguageMap(":/i18n/");
 
-    m_gridVisible = new QCheckBox(tr("Raster anzeigen"), widget);
-    form->addRow(m_gridVisible);
+    QVector<QPair<QString, QString>> list;
+    for (auto it = languageMap.begin(); it != languageMap.end(); ++it) {
+        list.append({it.key(), it.value()});
+    }
 
-    m_gridSpacing = new QDoubleSpinBox(widget);
-    m_gridSpacing->setRange(5.0, 500.0);
-    m_gridSpacing->setSingleStep(5.0);
-    m_gridSpacing->setSuffix(" px");
-    form->addRow(tr("Rasterabstand:"), m_gridSpacing);
+    std::ranges::sort(list, [](const auto& a, const auto& b) {return a.second < b.second;});
 
-    m_snapEnabled = new QCheckBox(tr("Immer einrasten"), widget);
-    form->addRow(m_snapEnabled);
-
-    form->addRow(new QLabel(tr("<b>Farben</b>")));
-
-    m_axisColor  = new ColorButton(m_settings.grid.axisColor,  widget);
-    m_gridColor  = new ColorButton(m_settings.grid.gridColor,  widget);
-    m_labelColor = new ColorButton(m_settings.grid.labelColor, widget);
-
-    form->addRow(tr("Achsenfarbe:"),     m_axisColor);
-    form->addRow(tr("Rasterfarbe:"),     m_gridColor);
-    form->addRow(tr("Beschriftungsfarbe:"), m_labelColor);
-
-    return widget;
-}
-
-QWidget* SettingsDialog::buildColorsTab() {
-    auto* widget = new QWidget;
-    auto* form   = new QFormLayout(widget);
-
-    m_background   = new ColorButton(m_settings.colors.background,   widget);
-    m_point        = new ColorButton(m_settings.colors.point,        widget);
-    m_pointFill    = new ColorButton(m_settings.colors.pointFill,    widget);
-    m_line         = new ColorButton(m_settings.colors.line,         widget);
-    m_circle       = new ColorButton(m_settings.colors.circle,       widget);
-    m_selected     = new ColorButton(m_settings.colors.selected,     widget);
-    m_highlighted  = new ColorButton(m_settings.colors.highlighted,  widget);
-    m_construction = new ColorButton(m_settings.colors.construction, widget);
-    m_watermark    = new ColorButton(m_settings.colors.watermark,    widget);
-
-    form->addRow(tr("Hintergrund:"),      m_background);
-    form->addRow(tr("Punkt:"),            m_point);
-    form->addRow(tr("Punktfüllung:"),     m_pointFill);
-    form->addRow(tr("Linie:"),            m_line);
-    form->addRow(tr("Kreis:"),            m_circle);
-    form->addRow(tr("Selektiert:"),       m_selected);
-    form->addRow(tr("Hervorgehoben:"),    m_highlighted);
-    form->addRow(tr("Konstruktion:"),     m_construction);
-    form->addRow(tr("Wasserzeichen:"),    m_watermark);
-
-    return widget;
+    for (const auto& item : list) {
+        ui->m_uiLanguage->addItem(item.second, item.first);
+    }
 }
 
 void SettingsDialog::readFromSettings() {
-    m_gridVisible->setChecked(m_settings.grid.visible);
-    m_gridSpacing->setValue(m_settings.grid.spacing);
-    m_snapEnabled->setChecked(m_settings.grid.snapEnabled);
-    m_axisColor->setColor(m_settings.grid.axisColor);
-    m_gridColor->setColor(m_settings.grid.gridColor);
-    m_labelColor->setColor(m_settings.grid.labelColor);
+    ui->m_uiRecentMaxCount->setValue(m_settings.general.recentFiles.maxCount);
+    int index = ui->m_uiLanguage->findData(m_settings.general.language);
+    if (index != -1)
+        ui->m_uiLanguage->setCurrentIndex(index);
 
-    m_background->setColor(m_settings.colors.background);
-    m_point->setColor(m_settings.colors.point);
-    m_pointFill->setColor(m_settings.colors.pointFill);
-    m_line->setColor(m_settings.colors.line);
-    m_circle->setColor(m_settings.colors.circle);
-    m_selected->setColor(m_settings.colors.selected);
-    m_highlighted->setColor(m_settings.colors.highlighted);
-    m_construction->setColor(m_settings.colors.construction);
-    m_watermark->setColor(m_settings.colors.watermark);
+    ui->m_gridVisible->setChecked(m_settings.grid.visible);
+    ui->m_gridSpacing->setValue(m_settings.grid.spacing);
+    ui->m_snapEnabled->setChecked(m_settings.grid.snapEnabled);
+    ui->m_axisColor->setColor(m_settings.grid.axisColor);
+    ui->m_gridColor->setColor(m_settings.grid.gridColor);
+    ui->m_labelColor->setColor(m_settings.grid.labelColor);
+
+    ui->m_background->setColor(m_settings.colors.background);
+    ui->m_point->setColor(m_settings.colors.point);
+    ui->m_pointFill->setColor(m_settings.colors.pointFill);
+    ui->m_line->setColor(m_settings.colors.line);
+    ui->m_circle->setColor(m_settings.colors.circle);
+    ui->m_selected->setColor(m_settings.colors.selected);
+    ui->m_highlighted->setColor(m_settings.colors.highlighted);
+    ui->m_construction->setColor(m_settings.colors.construction);
+    ui->m_watermark->setColor(m_settings.colors.watermark);
 }
 
 void SettingsDialog::writeToSettings() {
-    m_settings.grid.visible     = m_gridVisible->isChecked();
-    m_settings.grid.spacing     = m_gridSpacing->value();
-    m_settings.grid.snapEnabled = m_snapEnabled->isChecked();
-    m_settings.grid.axisColor   = m_axisColor->color();
-    m_settings.grid.gridColor   = m_gridColor->color();
-    m_settings.grid.labelColor  = m_labelColor->color();
+    m_settings.general.recentFiles.maxCount = ui->m_uiRecentMaxCount->value();
+    m_settings.general.language = ui->m_uiLanguage->currentData().toString();
 
-    m_settings.colors.background   = m_background->color();
-    m_settings.colors.point        = m_point->color();
-    m_settings.colors.pointFill    = m_pointFill->color();
-    m_settings.colors.line         = m_line->color();
-    m_settings.colors.circle       = m_circle->color();
-    m_settings.colors.selected     = m_selected->color();
-    m_settings.colors.highlighted  = m_highlighted->color();
-    m_settings.colors.construction = m_construction->color();
-    m_settings.colors.watermark    = m_watermark->color();
+    m_settings.grid.visible     = ui->m_gridVisible->isChecked();
+    m_settings.grid.spacing     = ui->m_gridSpacing->value();
+    m_settings.grid.snapEnabled = ui->m_snapEnabled->isChecked();
+    m_settings.grid.axisColor   = ui->m_axisColor->color();
+    m_settings.grid.gridColor   = ui->m_gridColor->color();
+    m_settings.grid.labelColor  = ui->m_labelColor->color();
+
+    m_settings.colors.background   = ui->m_background->color();
+    m_settings.colors.point        = ui->m_point->color();
+    m_settings.colors.pointFill    = ui->m_pointFill->color();
+    m_settings.colors.line         = ui->m_line->color();
+    m_settings.colors.circle       = ui->m_circle->color();
+    m_settings.colors.selected     = ui->m_selected->color();
+    m_settings.colors.highlighted  = ui->m_highlighted->color();
+    m_settings.colors.construction = ui->m_construction->color();
+    m_settings.colors.watermark    = ui->m_watermark->color();
 }
 
 void SettingsDialog::apply() {
@@ -143,4 +139,26 @@ void SettingsDialog::apply() {
 void SettingsDialog::resetToDefaults() {
     m_settings.resetToDefaults();
     readFromSettings();
+}
+
+void SettingsDialog::changeEvent(QEvent* event) {
+    QDialog::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        QTimer::singleShot(0, this, [this]() {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
+            ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Abbrechen"));
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
+            ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Standard"));
+        });
+    }
+}
+
+void SettingsDialog::reject() {
+    m_settings.grid = m_snapshotGrid;
+    m_settings.colors = m_snapshotColors;
+    m_settings.general = m_snapshotGeneral;
+    m_settings.save();
+    emit settingsChanged();
+    QDialog::reject();
 }
