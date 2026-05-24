@@ -11,7 +11,7 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     AppSettings::instance().load();
-    QString languageCode = AppSettings::instance().ui.language;
+    QString languageCode = AppSettings::instance().general.language;
 
     QTranslator translator;
     if (translator.load(QString(":/i18n/app_%1.qm").arg(languageCode))) {
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading translator" << std::endl;
     }
 
-    MainWindow window("Στοιχεῖα", &translator);
+    MainWindow window("Stoicheia (Στοιχεῖα)", &translator);
     window.drawingBoard()->applySettings();
 
     if (argc > 1) {

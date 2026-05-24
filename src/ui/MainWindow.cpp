@@ -188,7 +188,7 @@ void MainWindow::updateUndoRedo() const {
 
 void MainWindow::updateRecentFilesMenu() {
     ui->menuRecent->clear();
-    const auto& files = AppSettings::instance().ui.recentFiles.files;
+    const auto& files = AppSettings::instance().general.recentFiles.files;
 
     if (files.isEmpty()) {
         auto* empty = ui->menuRecent->addAction(tr("(keine)"));
@@ -209,7 +209,7 @@ void MainWindow::updateRecentFilesMenu() {
     ui->menuRecent->addSeparator();
     const auto* clearAction = ui->menuRecent->addAction(tr("Liste leeren"));
     connect(clearAction, &QAction::triggered, [this]() {
-        AppSettings::instance().ui.recentFiles.files.clear();
+        AppSettings::instance().general.recentFiles.files.clear();
         AppSettings::instance().save();
         updateRecentFilesMenu();
     });
@@ -245,7 +245,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
 void MainWindow::switchLanguage() {
     if (!m_translator)
         return;
-    QString languageCode = AppSettings::instance().ui.language;
+    QString languageCode = AppSettings::instance().general.language;
     qApp->removeTranslator(m_translator);
     if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode)))
         qApp->installTranslator(m_translator);

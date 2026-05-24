@@ -20,6 +20,7 @@ set(CMAKE_AUTORCC ON)
 set(TS_FILES
         translations/app_de.ts
         translations/app_en.ts
+        translations/app_fr.ts
 )
 
 # -------------------------------------------------

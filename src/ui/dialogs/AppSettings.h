@@ -23,7 +23,7 @@ struct ColorScheme {
     QColor watermark    = QColor(0,   0,   0,  20);
 };
 
-struct UI {
+struct General {
     struct RecentFiles {
         QStringList files;
         int maxCount = 5;
@@ -42,7 +42,7 @@ public:
 
     GridSettings grid;
     ColorScheme  colors;
-    UI ui;
+    General general;
 
 private:
     AppSettings();

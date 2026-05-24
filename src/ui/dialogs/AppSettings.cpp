@@ -10,21 +10,21 @@ AppSettings& AppSettings::instance() {
 }
 
 void AppSettings::addRecentFile(const QString &fileName) {
-    ui.recentFiles.files.removeAll(fileName);
-    ui.recentFiles.files.prepend(fileName);
-    while (ui.recentFiles.files.size() > ui.recentFiles.maxCount) {
-        ui.recentFiles.files.removeLast();
+    general.recentFiles.files.removeAll(fileName);
+    general.recentFiles.files.prepend(fileName);
+    while (general.recentFiles.files.size() > general.recentFiles.maxCount) {
+        general.recentFiles.files.removeLast();
     }
     save();
 }
 
 void AppSettings::load() {
-    m_settings.beginGroup("UI");
+    m_settings.beginGroup("General");
     m_settings.beginGroup("recentFiles");
-    ui.recentFiles.files = m_settings.value("files", QStringList()).toStringList();
-    ui.recentFiles.maxCount = m_settings.value("maxCount",  5).toInt();
+    general.recentFiles.files = m_settings.value("files", QStringList()).toStringList();
+    general.recentFiles.maxCount = m_settings.value("maxCount",  5).toInt();
     m_settings.endGroup();
-    ui.language = m_settings.value("language", ui.language).toString();
+    general.language = m_settings.value("language", general.language).toString();
     m_settings.endGroup();
 
     m_settings.beginGroup("Grid");
@@ -50,12 +50,12 @@ void AppSettings::load() {
 }
 
 void AppSettings::save() {
-    m_settings.beginGroup("UI");
+    m_settings.beginGroup("General");
     m_settings.beginGroup("recentFiles");
-    m_settings.setValue("files", ui.recentFiles.files);
-    m_settings.setValue("maxCount",  ui.recentFiles.maxCount);
+    m_settings.setValue("files", general.recentFiles.files);
+    m_settings.setValue("maxCount",  general.recentFiles.maxCount);
     m_settings.endGroup();
-    m_settings.setValue("language",   ui.language);
+    m_settings.setValue("language",   general.language);
     m_settings.endGroup();
 
     m_settings.beginGroup("Grid");
@@ -81,7 +81,7 @@ void AppSettings::save() {
 }
 
 void AppSettings::resetToDefaults() {
-    ui     = UI{};
-    grid   = GridSettings{};
-    colors = ColorScheme{};
+    general = General{};
+    grid    = GridSettings{};
+    colors  = ColorScheme{};
 }
