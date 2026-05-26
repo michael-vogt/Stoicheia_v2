@@ -116,6 +116,10 @@ target_include_directories(StoicheiaApp PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_include_directories(StoicheiaApp PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/dialogs
+)
+
 target_link_libraries(StoicheiaApp PRIVATE
         StoicheiaCore
         Qt6::Core
