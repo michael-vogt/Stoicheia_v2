@@ -31,3 +31,8 @@ void LineLineIntersection::onSourceRemoved(GeoObject *src) {
     if (src == static_cast<GeoObject*>(m_line2)) m_line2 = nullptr;
     IntersectionSet::onSourceRemoved(src);
 }
+
+void LineLineIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_line1 == oldSource) m_line1 = static_cast<LinearObject*>(newSource);
+    if (m_line2 == oldSource) m_line2 = static_cast<LinearObject*>(newSource);
+}

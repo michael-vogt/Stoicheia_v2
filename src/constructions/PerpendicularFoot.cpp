@@ -43,3 +43,8 @@ void PerpendicularFoot::recompute() {
 std::string PerpendicularFoot::toString() {
     return Point::toString();
 }
+
+void PerpendicularFoot::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_point == oldSource) m_point = static_cast<Point*>(newSource);
+    if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
+}

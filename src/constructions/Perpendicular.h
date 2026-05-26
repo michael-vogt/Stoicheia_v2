@@ -28,4 +28,6 @@ public:
     LinearObject* line() { return &m_line; };
 
     std::string toString() override;
+
+    void replaceSource(GeoObject* oldSource, GeoObject* newSource);
 };

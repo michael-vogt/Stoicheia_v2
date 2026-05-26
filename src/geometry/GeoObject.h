@@ -29,5 +29,7 @@ public:
     std::unordered_set<GeoObject*> dependents() { return m_dependents; };
     std::unordered_set<GeoObject*>& sources() { return m_sources; }
 
+    virtual void replaceSource(GeoObject* oldSource, GeoObject* newSource) {};
+
     virtual std::string toString() { return ""; };
 };

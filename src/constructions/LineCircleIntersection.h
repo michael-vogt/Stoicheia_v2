@@ -15,4 +15,6 @@ public:
     Circle* circle() const { return m_circle; }
     LinearObject* line() const { return m_line; }
     void onSourceRemoved(GeoObject *src) override;
+
+    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 };

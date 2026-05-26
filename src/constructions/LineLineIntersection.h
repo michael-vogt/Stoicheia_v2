@@ -15,4 +15,6 @@ public:
     LinearObject* L2() const { return m_line2; }
     void onSourceRemoved(GeoObject *src) override;
 
+    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+
 };

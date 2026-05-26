@@ -44,3 +44,8 @@ void Parallel::recompute() {
 std::string Parallel::toString() {
     return m_line.toString();
 }
+
+void Parallel::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_origin == oldSource) m_origin = static_cast<Point*>(newSource);
+    if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
+}

@@ -24,6 +24,8 @@ public:
 
     void onSourceRemoved(GeoObject* src) override;
 
+    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+
 protected:
     void compute() override;
 };

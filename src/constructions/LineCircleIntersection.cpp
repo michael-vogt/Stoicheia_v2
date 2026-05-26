@@ -55,3 +55,8 @@ void LineCircleIntersection::onSourceRemoved(GeoObject *src) {
     if (src == static_cast<GeoObject*>(m_circle)) m_circle = nullptr;
     IntersectionSet::onSourceRemoved(src);
 }
+
+void LineCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
+    if (m_circle == oldSource) m_circle = static_cast<Circle*>(newSource);
+}

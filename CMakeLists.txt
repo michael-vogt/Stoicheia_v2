@@ -110,6 +110,8 @@ add_library(StoicheiaApp STATIC
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
+        src/ui/commands/CopyCommand.cpp
+        src/ui/commands/MergePointsCommand.cpp
 )
 
 target_include_directories(StoicheiaApp PUBLIC
