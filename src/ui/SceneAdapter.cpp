@@ -122,3 +122,24 @@ void SceneAdapter::highlight(GeoObject *obj, bool on) {
     }
     it->second->setHighlighted(on);
 }
+
+void SceneAdapter::hide(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(false);
+}
+
+void SceneAdapter::show(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(true);
+}
+
+void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end()) {
+        m_qtScene->removeItem(it->second);
+        delete it->second;
+        m_map.erase(it);
+    }
+}

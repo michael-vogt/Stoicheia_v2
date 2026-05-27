@@ -14,26 +14,25 @@ void MergePointsCommand::execute() {
     for (GeoObject* dep : deps) {
         m_absorbed->removeDependent(dep);
         m_survivor->addDependent(dep);
-
         dep->replaceSource(m_absorbed, m_survivor);
         dep->recompute();
-
         m_rewired.push_back(dep);
     }
 
-    m_adapter->remove(m_absorbed);
+    m_adapter->removeGraphicsOnly(m_absorbed);
 }
 
 void MergePointsCommand::undo() {
-    m_adapter->addPoint(m_absorbed);
-    m_absorbed->moveTo(m_absorbedX, m_absorbedY);
-
     for (GeoObject* dep : m_rewired) {
+        if (!m_survivor->dependents().contains(dep)) continue;
         m_survivor->removeDependent(dep);
         m_absorbed->addDependent(dep);
         dep->replaceSource(m_survivor, m_absorbed);
         dep->recompute();
     }
+
+    m_absorbed->moveTo(m_absorbedX, m_absorbedY);
+    m_adapter->addPoint(m_absorbed);
 }
 
 QString MergePointsCommand::description() const {

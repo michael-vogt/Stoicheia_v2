@@ -56,6 +56,9 @@ public:
     void clear();
 
     void highlight(GeoObject* obj, bool on);
+    void hide(GeoObject* obj);
+    void show(GeoObject* obj);
+    void removeGraphicsOnly(GeoObject* obj);
 
     signals:
     void selectionChanged();
