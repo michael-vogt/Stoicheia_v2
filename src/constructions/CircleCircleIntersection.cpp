@@ -52,3 +52,14 @@ void CircleCircleIntersection::onSourceRemoved(GeoObject *src)  {
     if (src == static_cast<GeoObject*>(m_c2)) m_c2 = nullptr;
     IntersectionSet::onSourceRemoved(src);
 }
+
+void CircleCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_c1 == oldSource) m_c1 = static_cast<Circle*>(newSource);
+    if (m_c2 == oldSource) m_c2 = static_cast<Circle*>(newSource);
+}
+
+bool CircleCircleIntersection::equals(const GeoObject &other) const {
+    auto cci = dynamic_cast<const CircleCircleIntersection*>(&other);
+    if (!cci) return false;
+    return cci->c1()->equals(*c1()) && cci->c2()->equals(*c2());
+}

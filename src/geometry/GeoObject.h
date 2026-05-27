@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <typeinfo>
 
 class UpdateGuard;
 
@@ -29,5 +30,13 @@ public:
     std::unordered_set<GeoObject*> dependents() { return m_dependents; };
     std::unordered_set<GeoObject*>& sources() { return m_sources; }
 
+    virtual void replaceSource(GeoObject* oldSource, GeoObject* newSource) {};
+
     virtual std::string toString() { return ""; };
+
+    virtual bool equals(const GeoObject& other) const = 0;
 };
+
+inline bool operator==(const GeoObject& obj1, const GeoObject& obj2) {
+    return obj1.equals(obj2);
+}

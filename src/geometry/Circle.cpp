@@ -50,3 +50,14 @@ std::string Circle::toString() {
     std::string str = std::format("C[center {}, radius {}]", m_center->toString(), m_radius);
     return str;
 }
+
+void Circle::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_center == oldSource) m_center = static_cast<Point*>(newSource);
+    if (m_radiusPoint == oldSource) m_radiusPoint = static_cast<Point*>(newSource);
+}
+
+bool Circle::equals(const GeoObject &other) const {
+    auto c = dynamic_cast<const Circle*>(&other);
+    if (!c) return false;
+    return (c->center()->equals(*center()) && c->radiusPoint()->equals(*radiusPoint()));
+}

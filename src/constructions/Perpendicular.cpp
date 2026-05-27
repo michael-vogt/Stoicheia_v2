@@ -41,3 +41,14 @@ double Perpendicular::py() const {
 std::string Perpendicular::toString() {
     return m_line.toString();
 }
+
+void Perpendicular::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_origin == oldSource) m_origin = static_cast<Point*>(newSource);
+    if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
+}
+
+bool Perpendicular::equals(const GeoObject &other) const {
+    auto perp = dynamic_cast<const Perpendicular*>(&other);
+    if (!perp) return false;
+    return perp->origin()->equals(*origin()) && perp->reference()->equals(*reference());
+}

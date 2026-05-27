@@ -26,6 +26,8 @@ public:
     void setHighlighted(bool highlighted);
     bool isHighlighted() const { return m_highlighted; }
 
+    bool equals(const GeoObject &other) const override { return false; }
+
 protected:
     bool m_selected = false;
     bool m_highlighted = false;

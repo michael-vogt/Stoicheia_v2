@@ -13,4 +13,12 @@ std::string Point::toString() {
     return str;
 }
 
+bool Point::equals(const GeoObject &other) const {
+    auto p = dynamic_cast<const Point*>(&other);
+    if (!p)
+        return false;
+
+    return m_x == p->m_x && m_y == p->m_y;
+}
+
 
