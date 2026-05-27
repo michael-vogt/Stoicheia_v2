@@ -79,9 +79,9 @@ void MainWindow::setupConnections() {
     // Toolbar Geometry
     connect(ui->actionSelect, &QAction::triggered, makeToolAction<SelectTool>(ToolType::Select));
     connect(ui->actionPoint, &QAction::triggered, makeToolAction<CreatePointTool>(ToolType::CreatePoint));
-    connect(ui->actionLine, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateLine));
-    connect(ui->actionRay, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateRay));
-    connect(ui->actionSegment, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateSegment));
+    connect(ui->actionLine, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line));
+    connect(ui->actionRay, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateRay, LinearObjectType::Ray));
+    connect(ui->actionSegment, &QAction::triggered, makeToolAction<CreateLineTool>(ToolType::CreateSegment, LinearObjectType::Segment));
     connect(ui->actionCircle, &QAction::triggered, makeToolAction<CreateCircleTool>(ToolType::CreateCircle));
 
     // Toolbar Constructions
