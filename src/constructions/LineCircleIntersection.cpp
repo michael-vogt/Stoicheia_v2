@@ -60,3 +60,9 @@ void LineCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newS
     if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
     if (m_circle == oldSource) m_circle = static_cast<Circle*>(newSource);
 }
+
+bool LineCircleIntersection::equals(const GeoObject &other) const {
+    auto lci = dynamic_cast<const LineCircleIntersection*>(&other);
+    if (!lci) return false;
+    return lci->line()->equals(*line()) && lci->circle()->equals(*circle());
+}

@@ -26,4 +26,6 @@ public:
 
     void replaceSource(GeoObject *oldSource, GeoObject *newSource);
 
+    bool equals(const GeoObject &other) const override;
+
 };

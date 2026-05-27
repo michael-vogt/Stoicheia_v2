@@ -17,4 +17,6 @@ public:
     void onSourceRemoved(GeoObject *src) override;
 
     void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+
+    bool equals(const GeoObject &other) const override;
 };

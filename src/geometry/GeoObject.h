@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <typeinfo>
 
 class UpdateGuard;
 
@@ -32,4 +33,10 @@ public:
     virtual void replaceSource(GeoObject* oldSource, GeoObject* newSource) {};
 
     virtual std::string toString() { return ""; };
+
+    virtual bool equals(const GeoObject& other) const = 0;
 };
+
+inline bool operator==(const GeoObject& obj1, const GeoObject& obj2) {
+    return obj1.equals(obj2);
+}

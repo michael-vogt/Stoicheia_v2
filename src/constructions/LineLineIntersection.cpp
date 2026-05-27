@@ -36,3 +36,9 @@ void LineLineIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSou
     if (m_line1 == oldSource) m_line1 = static_cast<LinearObject*>(newSource);
     if (m_line2 == oldSource) m_line2 = static_cast<LinearObject*>(newSource);
 }
+
+bool LineLineIntersection::equals(const GeoObject &other) const {
+    const auto lli = dynamic_cast<const LineLineIntersection*>(&other);
+    if (!lli) return false;
+    return lli->L1()->equals(*L1()) && lli->L2()->equals(*L2());
+}
