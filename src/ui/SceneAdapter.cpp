@@ -60,6 +60,7 @@ void SceneAdapter::clear() {
 }
 
 void SceneAdapter::remove(GeoObject* geoObject) {
+    if (!geoObject) return;
     if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject))
         m_intersectionSets.erase(iset);
     auto it = m_map.find(geoObject);
@@ -69,7 +70,9 @@ void SceneAdapter::remove(GeoObject* geoObject) {
         m_map.erase(it);
     }
     // Geometrie-Objekt aus der Scene entfernen
-    m_geoScene->remove(geoObject);
+    if (m_geoScene->contains(geoObject)) {
+        m_geoScene->remove(geoObject);
+    }
 }
 
 GeoGraphicsItem* SceneAdapter::itemFor(GeoObject* geoObject) const {

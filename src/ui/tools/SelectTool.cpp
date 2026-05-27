@@ -179,19 +179,46 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
         const auto selection = m_ctx.adapter->selection();
         if (!selection.empty()) {
             std::vector<GeoObject*> toDelete;
+            std::vector<GeoObject*> toDeleteUpward;
             std::function<void(GeoObject*)> collect = [&](GeoObject* obj) {
                 if (std::ranges::contains(toDelete, obj)) return;
-                toDelete.push_back(obj);
+                if (dynamic_cast<QGraphicsItem*>(obj)) return;
                 for (GeoObject* dep : obj->dependents())
                     collect(dep);
+                toDelete.push_back(obj);
             };
 
-            for (GeoObject* obj : selection)
+            std::function<void(GeoObject*)> collectUpward = [&](GeoObject* obj) {
+                if (std::ranges::contains(toDeleteUpward, obj)) return;
+                if (dynamic_cast<QGraphicsItem*>(obj)) return;
+
+                std::vector<GeoObject*> geoObjectDeps;
+                for (GeoObject* dep : obj->dependents()) {
+                    if (dynamic_cast<QGraphicsItem*>(dep)) continue;
+                    geoObjectDeps.push_back(dep);
+                }
+
+                if (!geoObjectDeps.empty()) {
+                    for (GeoObject* dep : geoObjectDeps) {
+                        collectUpward(dep);
+                        toDeleteUpward.push_back(obj);
+                    }
+                } else {
+                    if (!dynamic_cast<QGraphicsItem*>(obj))
+                        toDeleteUpward.push_back(obj);
+                }
+            };
+
+            for (GeoObject* obj : selection) {
                 collect(obj);
+                collectUpward(obj);
+            }
 
             auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte löschen"));
-            for (auto it = toDelete.rbegin(); it != toDelete.rend(); ++it)
-                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, *it));
+            /*for (auto it = toDeleteUpward.begin(); it != toDeleteUpward.end(); ++it)
+                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, *it));*/
+            for (GeoObject* obj : toDeleteUpward)
+                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, obj));
 
             m_ctx.adapter->clearSelection();
             m_ctx.commandStack->execute(std::move(macro));

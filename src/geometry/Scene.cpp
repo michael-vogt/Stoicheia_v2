@@ -34,3 +34,7 @@ void Scene::clear() {
         obj->detach();
     m_objects.clear();
 }
+
+bool Scene::contains(GeoObject *obj) const {
+    return std::ranges::any_of(m_objects, [obj](const auto& ptr) { return ptr.get() == obj; });
+}

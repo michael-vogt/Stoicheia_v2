@@ -17,7 +17,15 @@ public:
 
     template<typename T, typename... Args>
     T* create(Args&&... args) {
-        auto obj = std::make_unique<T>(std::forward<Args>(args)...);
+        T temp(std::forward<Args>(args)...);
+        for (auto& object : m_objects) {
+            if (auto casted = dynamic_cast<T*>(object.get())) {
+                if (*casted == temp)
+                    return casted;
+            }
+        }
+
+        auto obj = std::make_unique<T>(std::move(temp)); //(std::forward<Args>(args)...);
         T* ptr = obj.get();
         m_objects.push_back(std::move(obj));
         return ptr;
@@ -27,6 +35,7 @@ public:
     
     void remove(GeoObject* target);
     void removeCascade(GeoObject* target);
+    bool contains(GeoObject* obj) const;
 
     void clear();
 
