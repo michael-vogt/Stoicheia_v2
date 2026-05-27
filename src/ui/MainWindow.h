@@ -63,6 +63,13 @@ class MainWindow : public QMainWindow {
         };
     }
 
+    template <typename ToolT>
+    auto makeToolAction(ToolType type, LinearObjectType loType) {
+        return [this, type, loType]() {
+            m_drawingBoard->setTool<ToolT>(type, loType);
+        };
+    }
+
 private slots:
     void onToolChanged(ToolType type) const;
     void onShortcutModeChanged(ShortcutMode mode);
