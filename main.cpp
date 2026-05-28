@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading translator" << std::endl;
     }
 
-    MainWindow window("Stoicheia (Στοιχεῖα)", &translator);
+    MainWindow window(QObject::tr("Stoicheia (Στοιχεῖα)"), &translator);
     window.drawingBoard()->applySettings();
 
     if (argc > 1) {

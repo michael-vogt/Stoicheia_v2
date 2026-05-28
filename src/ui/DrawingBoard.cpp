@@ -8,6 +8,7 @@
 #include <QShortcut>
 
 //#include "MainWindow.h"
+#include "commands/CopyCommand.h"
 #include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
@@ -408,4 +409,19 @@ void DrawingBoard::applySettings() {
     m_grid.setLabelColor(s.grid.labelColor);
     viewport()->update();
     scene()->update();
+}
+
+void DrawingBoard::copySelection() {
+    m_adapter.copySelection();
+}
+
+void DrawingBoard::pasteSelection() {
+    const auto& clipboard = m_adapter.clipboard();
+    if (!clipboard.empty()) {
+        m_commandStack.execute(
+                std::make_unique<CopyCommand>(
+                    &m_adapter,
+                    clipboard,
+                    QPointF(50, -50)));
+    }
 }

@@ -144,3 +144,7 @@ void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
         m_map.erase(it);
     }
 }
+
+void SceneAdapter::copySelection() {
+    m_clipboard = selection();
+}

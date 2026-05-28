@@ -18,7 +18,8 @@ CopyCommand::CopyCommand(SceneAdapter *adapter, const std::unordered_set<GeoObje
         for (GeoObject* src : obj->sources())
             if (selection.contains(src))
                 collect(src);
-        m_originals.push_back(obj);
+        if (!std::ranges::contains(m_originals, obj))
+            m_originals.push_back(obj);
     };
 
     for (GeoObject* obj : selection)

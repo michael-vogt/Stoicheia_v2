@@ -6,6 +6,7 @@
 #include <ui/commands/MacroCommand.h>
 #include <ui/commands/DeleteObjectCommand.h>
 
+#include "ui/commands/CopyCommand.h"
 #include "ui/commands/MergePointsCommand.h"
 
 SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
@@ -175,6 +176,26 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void SelectTool::keyPressEvent(QKeyEvent *event) {
+    if (event->matches(QKeySequence::Copy)) {
+        const auto& sel = m_ctx.adapter->selection();
+        m_ctx.adapter->copySelection();
+        event->accept();
+        return;
+    }
+
+    if (event->matches(QKeySequence::Paste)) {
+        const auto& clipboard = m_ctx.adapter->clipboard();
+        if (!clipboard.empty()) {
+            m_ctx.commandStack->execute(
+                std::make_unique<CopyCommand>(
+                    m_ctx.adapter,
+                    clipboard,
+                    QPointF(50, -50)));
+        }
+        event->accept();
+        return;
+    }
+
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
         const auto selection = m_ctx.adapter->selection();
         if (!selection.empty()) {

@@ -13,15 +13,7 @@ class Scene {
 public:
     template<typename T, typename... Args>
     T* create(Args&&... args) {
-        T temp(std::forward<Args>(args)...);
-        for (auto& object : m_objects) {
-            if (auto casted = dynamic_cast<T*>(object.get())) {
-                if (*casted == temp)
-                    return casted;
-            }
-        }
-
-        auto obj = std::make_unique<T>(std::move(temp));
+        auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         T* ptr = obj.get();
         m_objects.push_back(std::move(obj));
         return ptr;

@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>1151</width>
-     <height>33</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDatei">
@@ -53,6 +53,8 @@
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
@@ -317,6 +319,16 @@
   <action name="actionDummy">
    <property name="text">
     <string>Dummy</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Kopieren</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Einfügen</string>
    </property>
   </action>
  </widget>

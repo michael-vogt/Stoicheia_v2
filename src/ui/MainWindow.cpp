@@ -127,6 +127,7 @@ void MainWindow::setupConnections() {
     ui->actionQuit->setShortcut(QKeySequence::Close);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
 
+    // Menu Edit
     ui->actionUndo->setShortcut(QKeySequence::Undo);
     ui->actionUndo->setEnabled(false);
     connect(ui->actionUndo, &QAction::triggered, [this]() {
@@ -140,6 +141,9 @@ void MainWindow::setupConnections() {
         m_drawingBoard->commandStack()->redo();
         updateUndoRedo();
     });
+
+    connect(ui->actionCopy, &QAction::triggered, [this]() { m_drawingBoard->copySelection(); });
+    connect(ui->actionPaste, &QAction::triggered, [this]() { m_drawingBoard->pasteSelection(); });
 }
 
 void MainWindow::onShortcutModeChanged(ShortcutMode mode) {

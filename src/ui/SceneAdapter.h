@@ -24,6 +24,7 @@ class SceneAdapter : public QObject {
     std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
     std::unordered_set<GeoObject*> m_selection;
     std::unordered_set<IntersectionSet*> m_intersectionSets;
+    std::unordered_set<GeoObject*> m_clipboard;
 
 public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
@@ -59,6 +60,9 @@ public:
     void hide(GeoObject* obj);
     void show(GeoObject* obj);
     void removeGraphicsOnly(GeoObject* obj);
+
+    void copySelection();
+    std::unordered_set<GeoObject*> clipboard() const { return m_clipboard; };
 
     signals:
     void selectionChanged();
