@@ -8,6 +8,8 @@
 #include <QShortcut>
 
 //#include "MainWindow.h"
+#include <qdir.h>
+
 #include "dialogs/AppSettings.h"
 #include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
@@ -73,13 +75,18 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     painter->save();
     painter->setTransform(QTransform());
 
-    QFont font = painter->font();
+    /*QFont font = painter->font();
     font.setPointSize(72);
     font.setBold(true);
     painter->setFont(font);
     painter->setPen(AppSettings::instance().colors.watermark);
 
-    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");
+    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");*/
+    const QImage image(":/resources/logo.png");
+    painter->setOpacity(0.1);
+    QPoint vc = viewport()->rect().center();
+    QSize size = image.size();
+    painter->drawImage(vc.x() - size.width() / 2, vc.y() - size.height() / 2, image);
     painter->restore();
 }
 

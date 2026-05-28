@@ -173,8 +173,9 @@ target_link_libraries(StoicheiaQt PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
+        resources.qrc
 )
 
 target_link_libraries(Stoicheia PRIVATE
@@ -184,6 +185,8 @@ target_link_libraries(Stoicheia PRIVATE
         Qt6::Core
         Qt6::Widgets
 )
+
+target_sources(Stoicheia PRIVATE resources/app.rc)
 
 # -------------------------------------------------
 # Qt Translations (RICHTIG + MODERN)

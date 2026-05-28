@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading translator" << std::endl;
     }
 
+    app.setWindowIcon(QIcon(":/resources/icon.ico"));
     MainWindow window("Stoicheia (Στοιχεῖα)", &translator);
     window.drawingBoard()->applySettings();
 
