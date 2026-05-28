@@ -70,9 +70,7 @@ void SceneAdapter::remove(GeoObject* geoObject) {
         m_map.erase(it);
     }
     // Geometrie-Objekt aus der Scene entfernen
-    if (m_geoScene->contains(geoObject)) {
-        m_geoScene->remove(geoObject);
-    }
+    m_geoScene->softRemove(geoObject);
 }
 
 GeoGraphicsItem* SceneAdapter::itemFor(GeoObject* geoObject) const {

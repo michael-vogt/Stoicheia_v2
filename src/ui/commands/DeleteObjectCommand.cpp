@@ -145,8 +145,8 @@ std::function<void()> DeleteObjectCommand::buildUndoFactory() {
 
 void DeleteObjectCommand::execute() {
     m_undoFactory = buildUndoFactory();
-    m_adapter->remove(m_object);
-    m_object = nullptr;
+    m_object->detach();
+    m_adapter->removeGraphicsOnly(m_object);
 }
 
 void DeleteObjectCommand::undo() {

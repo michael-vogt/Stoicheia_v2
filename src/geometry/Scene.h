@@ -8,13 +8,9 @@
 
 class Scene {
     std::vector<std::unique_ptr<GeoObject>> m_objects;
-    //Scene() = default;
-public:
-    /*static Scene& getInstance() {
-        static Scene instance;
-        return instance;
-    }*/
+    std::vector<std::unique_ptr<GeoObject>> m_graveyard;
 
+public:
     template<typename T, typename... Args>
     T* create(Args&&... args) {
         T temp(std::forward<Args>(args)...);
@@ -25,11 +21,14 @@ public:
             }
         }
 
-        auto obj = std::make_unique<T>(std::move(temp)); //(std::forward<Args>(args)...);
+        auto obj = std::make_unique<T>(std::move(temp));
         T* ptr = obj.get();
         m_objects.push_back(std::move(obj));
         return ptr;
     }
+
+    void softRemove(GeoObject* target);
+    void clearGraveyard() { m_graveyard.clear(); }
 
     [[nodiscard]] const std::vector<std::unique_ptr<GeoObject>>& objects() const { return m_objects; }
     

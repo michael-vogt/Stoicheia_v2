@@ -38,3 +38,12 @@ void Scene::clear() {
 bool Scene::contains(GeoObject *obj) const {
     return std::ranges::any_of(m_objects, [obj](const auto& ptr) { return ptr.get() == obj; });
 }
+
+void Scene::softRemove(GeoObject *target) {
+    auto it = std::find_if(m_objects.begin(), m_objects.end(), [target](const auto& p) { return p.get() == target; });
+    if (it != m_objects.end()) {
+        (*it)->detach();
+        m_graveyard.push_back(std::move(*it));
+        m_objects.erase(it);
+    }
+}

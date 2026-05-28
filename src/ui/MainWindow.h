@@ -74,6 +74,9 @@ private slots:
     void onToolChanged(ToolType type) const;
     void onShortcutModeChanged(ShortcutMode mode);
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 public:
     explicit MainWindow(const QString& title = "Stoicheia", QTranslator* translator = nullptr, QWidget* parent = nullptr);
 

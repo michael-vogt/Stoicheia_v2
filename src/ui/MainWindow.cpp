@@ -251,3 +251,9 @@ void MainWindow::switchLanguage() {
         qApp->installTranslator(m_translator);
     ui->retranslateUi(this);
 }
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (m_drawingBoard && m_drawingBoard->geoScene())
+        m_drawingBoard->geoScene()->clearGraveyard();
+    event->accept();
+}
