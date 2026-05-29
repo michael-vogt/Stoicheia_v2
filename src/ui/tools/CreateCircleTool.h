@@ -3,6 +3,7 @@
 
 
 class CreateCircleTool : public Tool {
+    Q_OBJECT
     Point* m_centerPoint = nullptr;
     bool m_centerIsNew = false;
     QPointF m_centerScenePos;

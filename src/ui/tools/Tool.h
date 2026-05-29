@@ -5,7 +5,7 @@
 
 #include "ui/ToolContext.h"
 
-class Tool {
+class Tool : public QObject {
 protected:
     ToolContext m_ctx;
 

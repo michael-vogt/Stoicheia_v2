@@ -5,6 +5,7 @@
 // 1. Klick: erster Punkt
 // 2. Klick: zweiter Punkt → Mittelpunkt wird erzeugt
 class CreateMidpointTool : public ConstructionTool {
+    Q_OBJECT
     Point* m_firstPoint = nullptr;
 
 protected:

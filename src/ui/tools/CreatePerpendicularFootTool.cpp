@@ -7,7 +7,7 @@ CreatePerpendicularFootTool::CreatePerpendicularFootTool(const ToolContext& ctx)
 {}
 
 void CreatePerpendicularFootTool::onActivate() {
-    showStatus(QObject::tr("Punkt klicken"));
+    showStatus(tr("Punkt klicken"));
 }
 
 void CreatePerpendicularFootTool::onCancel() {
@@ -23,7 +23,7 @@ void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
         m_point = m_ctx.hitTest->pointAt(scenePos);
         if (m_point) {
             highlightObject(m_point, true);
-            showStatus(QObject::tr("Gerade klicken"));
+            showStatus(tr("Gerade klicken"));
         }
     } else {
         LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
@@ -33,7 +33,7 @@ void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
                     m_ctx.adapter, m_point, line));
             removePreview();
             m_point = nullptr;
-            showStatus(QObject::tr("Punkt klicken"));
+            showStatus(tr("Punkt klicken"));
         }
     }
     event->accept();

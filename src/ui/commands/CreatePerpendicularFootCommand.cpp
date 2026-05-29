@@ -19,5 +19,5 @@ void CreatePerpendicularFootCommand::undo() {
 }
 
 QString CreatePerpendicularFootCommand::description() const {
-    return QObject::tr("Lotfußpunkt erstellen");
+    return tr("Lotfußpunkt erstellen");
 }

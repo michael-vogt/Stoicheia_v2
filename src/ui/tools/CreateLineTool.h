@@ -6,6 +6,7 @@
 #include "ui/commands/CreatePointCommand.h"
 
 class CreateLineTool : public Tool {
+    Q_OBJECT
     LinearObjectType m_type;
     Point* m_firstPoint = nullptr;
     QPointF m_firstScenePos;

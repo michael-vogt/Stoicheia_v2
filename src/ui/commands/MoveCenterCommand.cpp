@@ -24,5 +24,5 @@ void MoveCenterCommand::setTarget(const double x, const double y) {
 }
 
 QString MoveCenterCommand::description() const {
-    return QObject::tr("Mittelpunkt verschieben");
+    return tr("Mittelpunkt verschieben");
 }

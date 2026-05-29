@@ -19,5 +19,5 @@ void CreatePerpendicularCommand::undo() {
 }
 
 QString CreatePerpendicularCommand::description() const {
-    return QObject::tr("Senkrechte erstellen");
+    return tr("Senkrechte erstellen");
 }

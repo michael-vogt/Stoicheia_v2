@@ -7,6 +7,7 @@ class IntersectionSet;
 // Erzeugt den Schnittpunkt zweier Objekte.
 // Unterstützt: Line∩Line, Line∩Circle, Circle∩Circle
 class CreateIntersectionCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     GeoObject* m_obj1;
     GeoObject* m_obj2;

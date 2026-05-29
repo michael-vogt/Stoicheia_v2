@@ -3,6 +3,7 @@
 #include "ui/SceneAdapter.h"
 
 class CreateMidpointCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     Point* m_p1;
     Point* m_p2;

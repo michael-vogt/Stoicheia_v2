@@ -3,6 +3,7 @@
 #include "ui/SceneAdapter.h"
 
 class CreatePerpendicularFootCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     Point* m_point;
     LinearObject* m_line;

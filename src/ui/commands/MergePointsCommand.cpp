@@ -36,5 +36,5 @@ void MergePointsCommand::undo() {
 }
 
 QString MergePointsCommand::description() const {
-    return QObject::tr("Punkte zusammenführen");
+    return tr("Punkte zusammenführen");
 }

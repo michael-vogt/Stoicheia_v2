@@ -8,8 +8,8 @@
 #include <QMessageBox>
 #include <QMainWindow>
 
-static const QString FILTER_JSON = QObject::tr("Stoicheia-Dateien (*.sto)");
-static const QString FILTER_SVG  = QObject::tr("SVG-Dateien (*.svg)");
+static const QString FILTER_JSON = FileManager::tr("Stoicheia-Dateien (*.sto)");
+static const QString FILTER_SVG  = FileManager::tr("SVG-Dateien (*.svg)");
 
 FileManager::FileManager(Scene* scene, SceneAdapter* adapter,
                           CommandStack* commandStack, QWidget* parent)
@@ -20,8 +20,8 @@ FileManager::FileManager(Scene* scene, SceneAdapter* adapter,
 bool FileManager::newFile() {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,
-            QObject::tr("Ungespeicherte Änderungen"),
-            QObject::tr("Möchten Sie die aktuellen Änderungen speichern?"),
+            tr("Ungespeicherte Änderungen"),
+            tr("Möchten Sie die aktuellen Änderungen speichern?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
         if (btn == QMessageBox::Cancel)  return false;
@@ -37,8 +37,8 @@ bool FileManager::newFile() {
 bool FileManager::open() {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,
-            QObject::tr("Ungespeicherte Änderungen"),
-            QObject::tr("Möchten Sie die aktuellen Änderungen speichern?"),
+            tr("Ungespeicherte Änderungen"),
+            tr("Möchten Sie die aktuellen Änderungen speichern?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
         if (btn == QMessageBox::Cancel)  return false;
@@ -46,7 +46,7 @@ bool FileManager::open() {
     }
 
     QString filename = QFileDialog::getOpenFileName(
-        m_parent, QObject::tr("Datei öffnen"), {}, FILTER_JSON);
+        m_parent, tr("Datei öffnen"), {}, FILTER_JSON);
     if (filename.isEmpty()) return false;
 
     return loadFromFile(filename);
@@ -72,7 +72,7 @@ bool FileManager::save() {
 
 bool FileManager::saveAs() {
     QString filename = QFileDialog::getSaveFileName(
-        m_parent, QObject::tr("Datei speichern"), {}, FILTER_JSON);
+        m_parent, tr("Datei speichern"), {}, FILTER_JSON);
     if (filename.isEmpty()) return false;
     if (!filename.endsWith(".sto")) filename += ".sto";
     return saveToFile(filename);
@@ -80,14 +80,14 @@ bool FileManager::saveAs() {
 
 bool FileManager::exportSVG() const {
     QString filename = QFileDialog::getSaveFileName(
-        m_parent, QObject::tr("SVG exportieren"), {}, FILTER_SVG);
+        m_parent, tr("SVG exportieren"), {}, FILTER_SVG);
     if (filename.isEmpty()) return false;
     if (!filename.endsWith(".svg")) filename += ".svg";
 
     Serializer s(m_scene, m_adapter);
     if (!s.exportSVG(filename)) {
         QMessageBox::critical(m_parent,
-            QObject::tr("Fehler"), s.lastError());
+            tr("Fehler"), s.lastError());
         return false;
     }
     return true;
@@ -97,7 +97,7 @@ bool FileManager::saveToFile(const QString& filename) {
     Serializer s(m_scene, m_adapter);
     if (!s.save(filename)) {
         QMessageBox::critical(m_parent,
-            QObject::tr("Fehler beim Speichern"), s.lastError());
+            tr("Fehler beim Speichern"), s.lastError());
         return false;
     }
     m_currentFile    = filename;
@@ -113,7 +113,7 @@ bool FileManager::loadFromFile(const QString& filename) {
     Serializer s(m_scene, m_adapter);
     if (!s.load(filename)) {
         QMessageBox::critical(m_parent,
-            QObject::tr("Fehler beim Laden"), s.lastError());
+            tr("Fehler beim Laden"), s.lastError());
         return false;
     }
     m_currentFile    = filename;
@@ -133,10 +133,10 @@ void FileManager::clearScene() const {
 void FileManager::updateTitle() const {
     if (auto* w = qobject_cast<QMainWindow*>(m_parent)) {
         QString name = m_currentFile.isEmpty()
-            ? QObject::tr("Unbenannt")
+            ? tr("Unbenannt")
             : QFileInfo(m_currentFile).baseName();
         w->setWindowTitle(
-            QString("Στοιχεῖα – %1%2")
+            QString(tr("Stoicheia (Στοιχεῖα) – %1%2"))
                 .arg(name)
                 .arg(m_unsavedChanges ? " *" : ""));
     }

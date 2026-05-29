@@ -156,5 +156,5 @@ void DeleteObjectCommand::undo() {
 }
 
 QString DeleteObjectCommand::description() const {
-    return QObject::tr("Objekt löschen");
+    return tr("Objekt löschen");
 }

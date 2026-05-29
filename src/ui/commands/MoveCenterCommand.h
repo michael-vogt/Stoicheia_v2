@@ -4,6 +4,7 @@
 #include "geometry/Point.h"
 
 class MoveCenterCommand : public MoveCommand {
+    Q_OBJECT
     Point* m_centerPoint;
     Point* m_radiusPoint;
 

@@ -3,6 +3,7 @@
 #include "ui/SceneAdapter.h"
 
 class DeleteObjectCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     GeoObject* m_object;
     std::function<void()> m_undoFactory;

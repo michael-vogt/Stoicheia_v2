@@ -11,7 +11,7 @@ CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : 
 void CreateLineTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     m_ctx.drawingBoard->viewport()->setMouseTracking(true);
-    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 }
 
 void CreateLineTool::deactivate() {
@@ -77,7 +77,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
             m_firstScenePos = snapped;
         }
 
-        m_ctx.drawingBoard->showStatusLeft(QObject::tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+        m_ctx.drawingBoard->showStatusLeft(tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 
         // Vorschaulinie starten
         m_preview = new QGraphicsLineItem(computePreviewLine(snapped));
@@ -88,7 +88,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         if (m_firstIsNew)
             m_ctx.adapter->remove(m_firstPoint);
 
-        auto macro = std::make_unique<MacroCommand>(QObject::tr(
+        auto macro = std::make_unique<MacroCommand>(tr(
             m_type == LinearObjectType::Line ? "Gerade erstellen" :
             m_type == LinearObjectType::Ray ?  "Halbgerade erstellen" :
                                                "Strecke erstellen"));

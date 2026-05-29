@@ -6,6 +6,7 @@
 // 1. Klick: Referenzgerade
 // 2. Klick: Punkt durch den die Parallele läuft
 class CreateParallelTool : public ConstructionTool {
+    Q_OBJECT
     LinearObject* m_reference = nullptr;
 
 protected:
