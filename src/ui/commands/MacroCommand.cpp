@@ -12,7 +12,7 @@ void MacroCommand::execute() {
 }
 
 void MacroCommand::undo() {
-    for (auto it = m_commands.rbegin(); it != m_commands.rend(); ++it)
+    for (auto it = m_commands.begin(); it != m_commands.end(); ++it)
         (*it)->undo();
 }
 

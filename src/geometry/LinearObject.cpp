@@ -101,3 +101,8 @@ std::string LinearObject::toString() {
     std::string str = std::format("[{}; P1{}--P2{}]", equation, m_p1->toString(), m_p2->toString()); //"Line " + m_p1->toString() + " -- " + m_p2->toString();
     return str;
 }
+
+void LinearObject::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_p1 == oldSource) m_p1 = static_cast<Point*>(newSource);
+    if (m_p2 == oldSource) m_p2 = static_cast<Point*>(newSource);
+}

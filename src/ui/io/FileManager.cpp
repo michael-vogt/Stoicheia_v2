@@ -126,6 +126,7 @@ bool FileManager::loadFromFile(const QString& filename) {
 void FileManager::clearScene() const {
     m_adapter->clear();
     m_scene->clear();
+    m_scene->clearGraveyard();
     m_commandStack->clear();
 }
 

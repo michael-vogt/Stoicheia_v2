@@ -17,4 +17,6 @@ public:
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
     std::string toString() override;
+
+    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 };

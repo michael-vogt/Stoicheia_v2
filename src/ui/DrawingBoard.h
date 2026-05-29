@@ -96,6 +96,10 @@ public:
     SceneAdapter* adapter() { return &m_adapter; }
     CommandStack* commandStack() { return &m_commandStack; }
 
+    // Copy and paste
+    void copySelection();
+    void pasteSelection();
+
     signals:
     void escapePressed();
     //void statusMessageChanged(const QString& text, int timeout = 0);

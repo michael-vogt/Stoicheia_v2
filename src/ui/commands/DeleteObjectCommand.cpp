@@ -44,8 +44,16 @@ std::function<void()> DeleteObjectCommand::buildUndoFactory() {
     if (auto* s = dynamic_cast<Segment*>(m_object)) {
         Point* p1 = s->p1();
         Point* p2 = s->p2();
-        return [this, p1, p2]() {
-            auto* segment = m_adapter->geoScene()->create<Segment>(p1, p2);
+
+        Point* p1Copy = nullptr;
+        Point* p2Copy = nullptr;
+        if (p1)
+            p1Copy = new Point(p1->x(), p1->y());
+        if (p2)
+            p2Copy = new Point(p2->x(), p2->y());
+
+        return [this, p1Copy, p2Copy]() {
+            auto* segment = m_adapter->geoScene()->create<Segment>(p1Copy, p2Copy);
             m_adapter->addLinearObject(segment);
             m_object = segment;
         };
@@ -137,8 +145,8 @@ std::function<void()> DeleteObjectCommand::buildUndoFactory() {
 
 void DeleteObjectCommand::execute() {
     m_undoFactory = buildUndoFactory();
-    m_adapter->remove(m_object);
-    m_object = nullptr;
+    m_object->detach();
+    m_adapter->removeGraphicsOnly(m_object);
 }
 
 void DeleteObjectCommand::undo() {

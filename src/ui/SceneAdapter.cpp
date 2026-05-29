@@ -60,6 +60,7 @@ void SceneAdapter::clear() {
 }
 
 void SceneAdapter::remove(GeoObject* geoObject) {
+    if (!geoObject) return;
     if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject))
         m_intersectionSets.erase(iset);
     auto it = m_map.find(geoObject);
@@ -69,7 +70,7 @@ void SceneAdapter::remove(GeoObject* geoObject) {
         m_map.erase(it);
     }
     // Geometrie-Objekt aus der Scene entfernen
-    m_geoScene->remove(geoObject);
+    m_geoScene->softRemove(geoObject);
 }
 
 GeoGraphicsItem* SceneAdapter::itemFor(GeoObject* geoObject) const {
@@ -121,4 +122,29 @@ void SceneAdapter::highlight(GeoObject *obj, bool on) {
         return;
     }
     it->second->setHighlighted(on);
+}
+
+void SceneAdapter::hide(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(false);
+}
+
+void SceneAdapter::show(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(true);
+}
+
+void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end()) {
+        m_qtScene->removeItem(it->second);
+        delete it->second;
+        m_map.erase(it);
+    }
+}
+
+void SceneAdapter::copySelection() {
+    m_clipboard = selection();
 }

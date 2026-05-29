@@ -16,14 +16,18 @@ class SelectTool : public Tool {
     bool m_rubberBanding = false;
     QPoint m_rubberStart;
     QRubberBand* m_rubberBand = nullptr;
+    Point* m_mergeCandidate = nullptr;
 
     Point* pointAt(const QPointF& scenePos) const;
+    Point* nearbyPoint(const QPointF& scenePos, Point* exclude) const;
     GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
     bool isDraggable(Point* p) const;
 
     void startRubberBand(const QPoint& viewPos);
     void updateRubberBand(const QPoint& viewPos);
     void finishRubberBand(const QPoint& viewPos);
+
+    void setMergeCandidate(Point* candidate);
 
 public:
     explicit SelectTool(const ToolContext& ctx);
