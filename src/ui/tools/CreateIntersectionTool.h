@@ -5,6 +5,7 @@
 // 1. Klick: erstes Objekt (Line oder Circle)
 // 2. Klick: zweites Objekt (Line oder Circle)
 class CreateIntersectionTool : public ConstructionTool {
+    Q_OBJECT
     GeoObject* m_firstObject = nullptr;
 
 protected:

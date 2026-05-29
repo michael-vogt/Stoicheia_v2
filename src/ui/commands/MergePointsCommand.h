@@ -5,6 +5,7 @@
 
 
 class MergePointsCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     Point* m_survivor;
     Point* m_absorbed;

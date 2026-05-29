@@ -10,6 +10,7 @@
 #include "ui/commands/MovePointCommand.h"
 
 class SelectTool : public Tool {
+    Q_OBJECT
     std::vector<std::unique_ptr<MoveCommand>> m_activeMoves;
     std::vector<Point*> m_draggedPoints;
     /*Point* m_draggedPoint = nullptr;

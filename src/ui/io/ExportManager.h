@@ -5,7 +5,8 @@
 #include <memory>
 #include <QWidget>
 
-class ExportManager {
+class ExportManager : QObject {
+    Q_OBJECT
     QGraphicsScene* m_scene;
     QWidget* m_parent;
     std::vector<std::unique_ptr<Exporter>> m_exporters;

@@ -40,5 +40,5 @@ void CreateIntersectionCommand::undo() {
 }
 
 QString CreateIntersectionCommand::description() const {
-    return QObject::tr("Schnittpunkt erstellen");
+    return tr("Schnittpunkt erstellen");
 }

@@ -7,7 +7,7 @@ CreateParallelTool::CreateParallelTool(const ToolContext& ctx)
 {}
 
 void CreateParallelTool::onActivate() {
-    showStatus(QObject::tr("Referenzgerade klicken"));
+    showStatus(tr("Referenzgerade klicken"));
 }
 
 void CreateParallelTool::onCancel() {
@@ -23,7 +23,7 @@ void CreateParallelTool::mousePressEvent(QMouseEvent* event) {
         m_reference = m_ctx.hitTest->linearObjectAt(scenePos);
         if (m_reference) {
             highlightObject(m_reference, true);
-            showStatus(QObject::tr("Punkt klicken durch den die Parallele läuft"));
+            showStatus(tr("Punkt klicken durch den die Parallele läuft"));
         }
     } else {
         Point* origin = m_ctx.hitTest->pointAt(scenePos);
@@ -33,7 +33,7 @@ void CreateParallelTool::mousePressEvent(QMouseEvent* event) {
                     m_ctx.adapter, origin, m_reference));
             removePreview();
             m_reference = nullptr;
-            showStatus(QObject::tr("Referenzgerade klicken"));
+            showStatus(tr("Referenzgerade klicken"));
         }
     }
     event->accept();

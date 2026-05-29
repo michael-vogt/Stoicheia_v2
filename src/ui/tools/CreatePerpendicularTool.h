@@ -6,6 +6,7 @@
 // 1. Klick: Referenzgerade
 // 2. Klick: Punkt durch den die Senkrechte läuft
 class CreatePerpendicularTool : public ConstructionTool {
+    Q_OBJECT
     LinearObject* m_reference = nullptr;
 
 protected:

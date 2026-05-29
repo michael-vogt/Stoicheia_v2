@@ -5,6 +5,7 @@
 #include "ui/SceneAdapter.h"
 
 class CreateCircleCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     CreatePointCommand* m_p1Cmd = nullptr;
     CreatePointCommand* m_p2Cmd = nullptr;

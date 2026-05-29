@@ -13,7 +13,7 @@ SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void SelectTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
-    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Objekt auswählen und/oder verschieben"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Objekt auswählen und/oder verschieben"));
 }
 
 void SelectTool::deactivate() {
@@ -203,7 +203,7 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
 
     if (mergeTarget && m_draggedPoints.size() == 1) {
         // Merge nur bei Einzelpunkt-Drag
-        auto macro = std::make_unique<MacroCommand>(QObject::tr("Punkte zusammenführen"));
+        auto macro = std::make_unique<MacroCommand>(tr("Punkte zusammenführen"));
         for (auto& move : m_activeMoves)
             macro->add(std::move(move));
         macro->add(std::make_unique<MergePointsCommand>(m_ctx.adapter, mergeTarget, m_draggedPoints[0]));
@@ -212,7 +212,7 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
         m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMoves[0]));
     } else {
         // Mehrere Punkte -> Macro
-        auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte verschieben"));
+        auto macro = std::make_unique<MacroCommand>(tr("Objekte verschieben"));
         for (auto& move : m_activeMoves)
             macro->add(std::move(move));
         m_ctx.commandStack->pushWithoutExecute(std::move(macro));
@@ -284,7 +284,7 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
                 collectUpward(obj);
             }
 
-            auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte löschen"));
+            auto macro = std::make_unique<MacroCommand>(tr("Objekte löschen"));
             for (GeoObject* obj : toDeleteUpward)
                 macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, obj));
 

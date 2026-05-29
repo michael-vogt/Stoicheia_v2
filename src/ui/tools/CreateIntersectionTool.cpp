@@ -7,7 +7,7 @@ CreateIntersectionTool::CreateIntersectionTool(const ToolContext& ctx)
 {}
 
 void CreateIntersectionTool::onActivate() {
-    showStatus(QObject::tr("Erstes Objekt klicken (Gerade oder Kreis)"));
+    showStatus(tr("Erstes Objekt klicken (Gerade oder Kreis)"));
 }
 
 void CreateIntersectionTool::onCancel() {
@@ -29,7 +29,7 @@ void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
     if (!m_firstObject) {
         m_firstObject = hit;
         highlightObject(m_firstObject, true);
-        showStatus(QObject::tr("Zweites Objekt klicken (Gerade oder Kreis)"));
+        showStatus(tr("Zweites Objekt klicken (Gerade oder Kreis)"));
     } else {
         if (hit != m_firstObject) {
             m_ctx.commandStack->execute(
@@ -38,7 +38,7 @@ void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
         }
         removePreview();
         m_firstObject = nullptr;
-        showStatus(QObject::tr("Erstes Objekt klicken (Gerade oder Kreis)"));
+        showStatus(tr("Erstes Objekt klicken (Gerade oder Kreis)"));
     }
     event->accept();
 }

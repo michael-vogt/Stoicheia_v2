@@ -4,6 +4,7 @@
 #include <QPointF>
 
 class CreatePointTool : public Tool {
+    Q_OBJECT
     QGraphicsEllipseItem* m_preview = nullptr;
     static constexpr double RADIUS = 4.0;
 

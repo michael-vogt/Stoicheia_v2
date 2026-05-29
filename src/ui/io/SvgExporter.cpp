@@ -14,7 +14,7 @@ bool SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
     }*/
 
     if (rect.isEmpty()) {
-        m_lastError = QObject::tr("Keine sichtbaren Objekte");
+        m_lastError = tr("Keine sichtbaren Objekte");
         return false;
     }
 

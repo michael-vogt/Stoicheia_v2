@@ -39,7 +39,7 @@ void CopyCommand::undo() {
 }
 
 QString CopyCommand::description() const {
-    return QObject::tr("Kopieren");
+    return tr("Kopieren");
 }
 
 Point* CopyCommand::resolvePoint(Point *p) const {

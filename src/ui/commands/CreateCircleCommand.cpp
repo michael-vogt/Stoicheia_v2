@@ -28,5 +28,5 @@ void CreateCircleCommand::undo() {
 }
 
 QString CreateCircleCommand::description() const {
-    return QObject::tr("Kreis erstellen");
+    return tr("Kreis erstellen");
 }

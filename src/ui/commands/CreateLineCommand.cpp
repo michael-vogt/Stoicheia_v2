@@ -40,9 +40,9 @@ void CreateLineCommand::undo() {
 
 QString CreateLineCommand::description() const {
     switch (m_type) {
-        case LinearObjectType::Line: return QObject::tr("Gerade erstellen");
-        case LinearObjectType::Ray: return QObject::tr("Halbgerade erstellen");
-        case LinearObjectType::Segment: return QObject::tr("Strecke erstellen");
+        case LinearObjectType::Line: return tr("Gerade erstellen");
+        case LinearObjectType::Ray: return tr("Halbgerade erstellen");
+        case LinearObjectType::Segment: return tr("Strecke erstellen");
     }
     return "";
 }

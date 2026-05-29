@@ -5,6 +5,7 @@
 
 
 class CopyCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter = nullptr;
     std::vector<GeoObject*> m_originals;
     std::vector<GeoObject*> m_copies;

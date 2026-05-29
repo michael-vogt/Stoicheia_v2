@@ -5,6 +5,7 @@
 // 1. Klick: Punkt
 // 2. Klick: Gerade
 class CreatePerpendicularFootTool : public ConstructionTool {
+    Q_OBJECT
     Point* m_point = nullptr;
 
 protected:

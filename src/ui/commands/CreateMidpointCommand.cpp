@@ -16,5 +16,5 @@ void CreateMidpointCommand::undo() {
 }
 
 QString CreateMidpointCommand::description() const {
-    return QObject::tr("Mittelpunkt erstellen");
+    return tr("Mittelpunkt erstellen");
 }

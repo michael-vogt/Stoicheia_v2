@@ -4,6 +4,7 @@
 #include "ui/SceneAdapter.h"
 
 class CreateParallelCommand : public Command {
+    Q_OBJECT
     SceneAdapter* m_adapter;
     Point* m_origin;
     LinearObject* m_reference;

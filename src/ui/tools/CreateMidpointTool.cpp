@@ -8,7 +8,7 @@ CreateMidpointTool::CreateMidpointTool(const ToolContext& ctx)
 {}
 
 void CreateMidpointTool::onActivate() {
-    showStatus(QObject::tr("Ersten Punkt klicken"));
+    showStatus(tr("Ersten Punkt klicken"));
 }
 
 void CreateMidpointTool::onCancel() {
@@ -26,7 +26,7 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
     if (!m_firstPoint) {
         m_firstPoint = hit;
         highlightObject(m_firstPoint, true);
-        showStatus(QObject::tr("Zweiten Punkt klicken"));
+        showStatus(tr("Zweiten Punkt klicken"));
     } else {
         if (hit != m_firstPoint) {
             m_ctx.commandStack->execute(
@@ -35,7 +35,7 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
         }
         removePreview();
         m_firstPoint = nullptr;
-        showStatus(QObject::tr("Ersten Punkt klicken"));
+        showStatus(tr("Ersten Punkt klicken"));
     }
     event->accept();
 }

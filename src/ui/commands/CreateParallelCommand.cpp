@@ -19,5 +19,5 @@ void CreateParallelCommand::undo() {
 }
 
 QString CreateParallelCommand::description() const {
-    return QObject::tr("Parallele erstellen");
+    return tr("Parallele erstellen");
 }
