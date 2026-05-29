@@ -10,8 +10,10 @@
 #include "ui/commands/MovePointCommand.h"
 
 class SelectTool : public Tool {
-    Point* m_draggedPoint = nullptr;
-    std::unique_ptr<MoveCommand> m_activeMove;
+    std::vector<std::unique_ptr<MoveCommand>> m_activeMoves;
+    std::vector<Point*> m_draggedPoints;
+    /*Point* m_draggedPoint = nullptr;
+    std::unique_ptr<MoveCommand> m_activeMove;*/
     QPointF m_dragOffset;
     bool m_rubberBanding = false;
     QPoint m_rubberStart;
@@ -22,6 +24,7 @@ class SelectTool : public Tool {
     Point* nearbyPoint(const QPointF& scenePos, Point* exclude) const;
     GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
     bool isDraggable(Point* p) const;
+    void startMultiDrag(const QPointF& scenePos);
 
     void startRubberBand(const QPoint& viewPos);
     void updateRubberBand(const QPoint& viewPos);

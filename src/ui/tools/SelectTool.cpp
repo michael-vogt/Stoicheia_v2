@@ -24,12 +24,10 @@ void SelectTool::deactivate() {
         m_rubberBand = nullptr;
     }
     m_rubberBanding = false;
-    m_draggedPoint = nullptr;
-    m_activeMove = nullptr;
 }
 
 QCursor SelectTool::cursor() const {
-    return m_draggedPoint ? Qt::ClosedHandCursor : Qt::ArrowCursor;
+    return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor;
 }
 
 Point *SelectTool::pointAt(const QPointF &scenePos) const {
@@ -83,40 +81,74 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
     }
 
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    m_draggedPoint = pointAt(scenePos);
+    Point* hit = pointAt(scenePos);
 
-    if (m_draggedPoint && isDraggable(m_draggedPoint)) {
+    bool doMultiDrag = (hit) ? m_ctx.adapter->selection().contains(hit) : event->modifiers() & Qt::ShiftModifier;
+    if (doMultiDrag) {
+        // Punkt ist in der Selektion -> alle selektierten Punkte mitbewegen
+        startMultiDrag(scenePos);
+        event->accept();
+        return;
+    }
+
+    if (hit) {
+        // Punkt außerhalb Selektion -> nur diesen selektieren und bewegen
         if (!(event->modifiers() & Qt::ControlModifier))
             m_ctx.adapter->clearSelection();
-        m_ctx.adapter->select(m_draggedPoint);
-
-        if (Point* radiusPoint = m_ctx.adapter->radiusPointFor(m_draggedPoint)) {
-            m_activeMove = std::make_unique<MoveCenterCommand>(m_draggedPoint, radiusPoint, m_draggedPoint->x(), m_draggedPoint->y());
-        } else {
-            m_activeMove = std::make_unique<MovePointCommand>(m_draggedPoint, m_draggedPoint->x(), m_draggedPoint->y());
-        }
-        m_dragOffset = scenePos - QPointF(m_draggedPoint->x(), m_draggedPoint->y());
-        m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
+        m_ctx.adapter->select(hit);
+        startMultiDrag(scenePos);
         event->accept();
-    } else {
-        GeoGraphicsItem* hit = itemAt(scenePos, typeid(GeoLinearObjectItem));
-        if (!hit)
-            hit = itemAt(scenePos, typeid(GeoCircleItem));
+        return;
+    }
 
-        if (hit) {
-            if (!(event->modifiers() & Qt::ControlModifier))
-                m_ctx.adapter->clearSelection();
-            m_ctx.adapter->select(hit->geoObject());
-            hit->setGeoSelected(true);
-            event->accept();
-        } else {
-            if (!(event->modifiers() & Qt::ControlModifier))
-                m_ctx.adapter->clearSelection();
-            startRubberBand(event->pos());
-            //m_ctx.adapter->clearSelection();
-            event->accept();
+    // Kein Punkt - anderes Objekt oder Rubberband
+    GeoObject* obj = m_ctx.hitTest->anyObjectAt(scenePos);
+    if (obj) {
+        if (!(event->modifiers() & Qt::ControlModifier))
+            m_ctx.adapter->clearSelection();
+        m_ctx.adapter->select(obj);
+    } else {
+        if (!(event->modifiers() & Qt::ControlModifier))
+            m_ctx.adapter->clearSelection();
+        startRubberBand(event->pos());
+    }
+    event->accept();
+}
+
+void SelectTool::startMultiDrag(const QPointF &scenePos) {
+    m_draggedPoints.clear();
+    m_activeMoves.clear();
+
+    const auto& sel = m_ctx.adapter->selection();
+
+    // Alle draggbaren Punkte aus der Selektion sammeln
+    for (GeoObject* obj : sel) {
+        auto* p = dynamic_cast<Point*>(obj);
+        if (!p) continue;
+
+        GeoGraphicsItem* item = m_ctx.adapter->itemFor(p);
+        auto* pi = dynamic_cast<GeoPointItem*>(item);
+        if (!pi || !isDraggable(pi->point())) continue;
+
+        m_draggedPoints.push_back(p);
+
+        Point* radiusPoint = m_ctx.adapter->radiusPointFor(p);
+        if (radiusPoint && !sel.contains(radiusPoint)) {
+            // Kreismittelpunkt mitbewegen
+            m_activeMoves.push_back(std::make_unique<MoveCenterCommand>(p, radiusPoint, p->x(), p->y()));
+        } else if (!radiusPoint) {
+            m_activeMoves.push_back(std::make_unique<MovePointCommand>(p, p->x(), p->y()));
         }
     }
+
+    // Drag-Offset: relativ zum ersten Punkt
+    if (!m_draggedPoints.empty()) {
+        Point* first = m_draggedPoints.front();
+        m_dragOffset = scenePos - QPointF(first->x(), first->y());
+    }
+
+    if (!m_draggedPoints.empty())
+        m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
 }
 
 void SelectTool::mouseMoveEvent(QMouseEvent *event) {
@@ -125,20 +157,31 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
         event->accept();
         return;
     }
-    if (!m_draggedPoint || !m_activeMove) {
+
+    if (m_activeMoves.empty()) {
         event->ignore();
         return;
     }
 
-    const bool snapActive = event->modifiers() & Qt::AltModifier;
+    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF delta = scenePos - m_dragOffset - QPointF(m_draggedPoints.front()->x(), m_draggedPoints.front()->y());
 
-    const QPointF newPos = m_ctx.snapHelper->snap(m_ctx.drawingBoard->mapToScene(event->pos()) - m_dragOffset, snapActive);
-    m_activeMove->setTarget(newPos.x(), newPos.y());
-    m_activeMove->execute();
+    // Alle Punkte um denselben Delta verschieben
+    {
+        UpdateGuard guard;
+        for (size_t i = 0; i < m_draggedPoints.size(); ++i) {
+            double newX = m_draggedPoints[i]->x() + delta.x();
+            double newY = m_draggedPoints[i]->y() + delta.y();
+            m_activeMoves[i]->setTarget(newX, newY);
+            m_activeMoves[i]->execute();
+        }
+    }
 
-    // Merge-Kandidt aktualisieren
-    Point* nearby = nearbyPoint(QPointF(m_draggedPoint->x(), m_draggedPoint->y()), m_draggedPoint);
-    setMergeCandidate(nearby);
+    // Merge-Kandidat nur bei Einzelpunkt-Drag
+    if (m_draggedPoints.size() == 1) {
+        Point* nearby = nearbyPoint(QPointF(m_draggedPoints[0]->x(), m_draggedPoints[0]->y()), m_draggedPoints[0]);
+        setMergeCandidate(nearby);
+    }
 
     event->accept();
 }
@@ -149,28 +192,34 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
         event->accept();
         return;
     }
-    if (!m_draggedPoint || !m_activeMove) {
+
+    if (m_activeMoves.empty()) {
         event->ignore();
         return;
     }
 
-    // Merge-Kandidat zurücksetzen
     Point* mergeTarget = m_mergeCandidate;
     setMergeCandidate(nullptr);
 
-    if (mergeTarget) {
-        // Merge: gezogener Punkt wird in mergeTarget absorbiert
+    if (mergeTarget && m_draggedPoints.size() == 1) {
+        // Merge nur bei Einzelpunkt-Drag
         auto macro = std::make_unique<MacroCommand>(QObject::tr("Punkte zusammenführen"));
-        macro->add(std::move(m_activeMove));
-        macro->add(std::make_unique<MergePointsCommand>(
-            m_ctx.adapter, mergeTarget, m_draggedPoint));
+        for (auto& move : m_activeMoves)
+            macro->add(std::move(move));
+        macro->add(std::make_unique<MergePointsCommand>(m_ctx.adapter, mergeTarget, m_draggedPoints[0]));
         m_ctx.commandStack->execute(std::move(macro));
+    } else if (m_activeMoves.size() == 1) {
+        m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMoves[0]));
     } else {
-        // Normaler Drag: Nur aufden Stack legen
-        m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMove));
+        // Mehrere Punkte -> Macro
+        auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte verschieben"));
+        for (auto& move : m_activeMoves)
+            macro->add(std::move(move));
+        m_ctx.commandStack->pushWithoutExecute(std::move(macro));
     }
 
-    m_draggedPoint = nullptr;
+    m_activeMoves.clear();
+    m_draggedPoints.clear();
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     event->accept();
 }
@@ -236,28 +285,21 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
             }
 
             auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte löschen"));
-            /*for (auto it = toDeleteUpward.begin(); it != toDeleteUpward.end(); ++it)
-                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, *it));*/
             for (GeoObject* obj : toDeleteUpward)
                 macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, obj));
 
             m_ctx.adapter->clearSelection();
             m_ctx.commandStack->execute(std::move(macro));
-            /*auto macro = std::make_unique<MacroCommand>(QObject::tr("Objekte löschen"));
-            for (GeoObject* obj : selection) {
-                macro->add(std::make_unique<DeleteObjectCommand>(m_ctx.adapter, obj));
-            }
-            m_ctx.adapter->clearSelection();
-            m_ctx.commandStack->execute(std::move(macro));*/
         }
         event->accept();
         return;
     }
-    if (event->key() == Qt::Key_Escape && m_activeMove) {
+    if (event->key() == Qt::Key_Escape && !m_activeMoves.empty()) {
         setMergeCandidate(nullptr);
-        m_activeMove->undo();
-        m_activeMove = nullptr;
-        m_draggedPoint = nullptr;
+        for (auto& move : m_activeMoves)
+            move->undo();
+        m_activeMoves.clear();
+        m_draggedPoints.clear();
         m_ctx.drawingBoard->viewport()->setCursor(cursor());
         event->accept();
         return;
