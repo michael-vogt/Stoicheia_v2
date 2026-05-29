@@ -1,5 +1,6 @@
 #include "Polygon.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "geometryHelper.h"
@@ -22,4 +23,18 @@ void Polygon::recompute() {
     }
 
     notify();
+}
+
+bool Polygon::equals(const GeoObject &other) const {
+    auto p = dynamic_cast<const Polygon *>(&other);
+    if (!p) return false;
+
+    auto otherPoints = p->m_points;
+    if (otherPoints.size() != m_points.size()) return false;
+
+    for (auto obj : otherPoints) {
+        if (!std::ranges::contains(m_points, obj)) return false;
+    }
+
+    return true;
 }

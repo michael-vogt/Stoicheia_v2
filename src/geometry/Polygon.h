@@ -14,4 +14,6 @@ public:
 
     void recompute() override;
     std::string toString() override { return ""; }
+
+    bool equals(const GeoObject &other) const override;
 };
