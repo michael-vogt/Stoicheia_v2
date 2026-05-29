@@ -20,7 +20,8 @@ int main(int argc, char *argv[]) {
         std::cerr << "Error loading translator" << std::endl;
     }
 
-    MainWindow window(QObject::tr("Stoicheia (Στοιχεῖα)"), &translator);
+    app.setWindowIcon(QIcon(":/resources/icon.ico"));
+    MainWindow window("Stoicheia (Στοιχεῖα)", &translator);
     window.drawingBoard()->applySettings();
 
     if (argc > 1) {
