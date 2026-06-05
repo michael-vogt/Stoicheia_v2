@@ -19,9 +19,6 @@ public:
     void recompute() override;
     void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 
-    bool equals(const GeoObject &other) const override;
-    std::string toString() override;
-
 private:
     Point* m_center = nullptr;
     Point* m_radiusPoint = nullptr;

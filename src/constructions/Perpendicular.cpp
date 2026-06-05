@@ -34,16 +34,6 @@ void Perpendicular::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
     if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
 }
 
-bool Perpendicular::equals(const GeoObject &other) const {
-    auto perp = dynamic_cast<const Perpendicular*>(&other);
-    if (!perp) return false;
-    return perp->origin()->equals(*origin()) && perp->reference()->equals(*reference());
-}
-
-std::string Perpendicular::toString() {
-    return m_line.toString();
-}
-
 double Perpendicular::px() const {
     return -(m_reference->p2()->y() - m_reference->p1()->y());
 }

@@ -39,7 +39,3 @@ void Midpoint::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
     if (m_a == oldSource) m_a = static_cast<Point*>(newSource);
     if (m_b == oldSource) m_b = static_cast<Point*>(newSource);
 }
-
-std::string Midpoint::toString() {
-    return Point::toString();
-}

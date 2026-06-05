@@ -31,8 +31,6 @@ public:
     void recompute() override;
     void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 
-    std::string toString() override;
-
 protected:
     virtual bool containsT(double t) const = 0;
 

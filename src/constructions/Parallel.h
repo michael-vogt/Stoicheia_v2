@@ -20,9 +20,6 @@ public:
     void recompute() override;
     void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 
-    bool equals(const GeoObject &other) const override;
-    std::string toString() override;
-
 private:
     // Steigung der Referenzlinie
     double dx() const;

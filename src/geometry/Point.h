@@ -15,9 +15,6 @@ public:
     void moveTo(double nx, double ny);
     void recompute() override {}
 
-    bool equals(const GeoObject &other) const override;
-    std::string toString() override;
-
 private:
     double m_x;
     double m_y;

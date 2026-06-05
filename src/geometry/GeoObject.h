@@ -24,9 +24,6 @@ public:
     void removeDependent(GeoObject* dep);
     virtual void replaceSource(GeoObject* oldSource, GeoObject* newSource) {};
 
-    virtual bool equals(const GeoObject& other) const = 0;
-    virtual std::string toString() { return ""; };
-
 protected:
     // notify and helpers are implemented in UpdateGuard.cpp
     void enqueueTransitive() const;
@@ -40,7 +37,3 @@ protected:
 private:
     friend class UpdateGuard;
 };
-
-inline bool operator==(const GeoObject& obj1, const GeoObject& obj2) {
-    return obj1.equals(obj2);
-}

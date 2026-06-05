@@ -62,9 +62,3 @@ void LineCircleIntersection::compute() {
         setResults(2, x1 + t1*dx, y1 + t1*dy,x1 + t2*dx, y1 + t2*dy);
     }
 }
-
-bool LineCircleIntersection::equals(const GeoObject &other) const {
-    auto lci = dynamic_cast<const LineCircleIntersection*>(&other);
-    if (!lci) return false;
-    return lci->line()->equals(*line()) && lci->circle()->equals(*circle());
-}

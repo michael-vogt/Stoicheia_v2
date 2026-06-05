@@ -11,10 +11,6 @@ void IntersectionSet::recompute() {
     notify();
 }
 
-std::string IntersectionSet::toString() {
-    return "";
-}
-
 void IntersectionSet::setResults(const int count, double x1, double y1, double x2, double y2) {
     if (count == 2) {
         if (x1 > x2 || (x1 == x2 && y1 > y2)) {

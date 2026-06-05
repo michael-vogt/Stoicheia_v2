@@ -18,9 +18,6 @@ public:
     void recompute() override;
     void replaceSource(GeoObject* oldSource, GeoObject* newSource) override;
 
-    bool equals(const GeoObject &other) const override;
-    std::string toString() override;
-
 private:
     // Komponenten des Normalenvektors der Referenzlinie
     double px() const;

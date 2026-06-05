@@ -11,7 +11,6 @@ public:
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
-    std::string toString() override;
 
 protected:
     void setResults(int count, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0);

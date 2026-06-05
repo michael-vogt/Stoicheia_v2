@@ -15,8 +15,6 @@ public:
     void recompute() override;
     void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
 
-    std::string toString() override;
-
 private:
     Point* m_point;
     LinearObject* m_line;

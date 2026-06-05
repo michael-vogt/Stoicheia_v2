@@ -38,9 +38,3 @@ void LineLineIntersection::compute() {
 
     setResults(1, (b1 * c2 - c1 * b2) / det, (c1 * a2 - a1 * c2) / det);
 }
-
-bool LineLineIntersection::equals(const GeoObject &other) const {
-    const auto lli = dynamic_cast<const LineLineIntersection*>(&other);
-    if (!lli) return false;
-    return lli->L1()->equals(*L1()) && lli->L2()->equals(*L2());
-}

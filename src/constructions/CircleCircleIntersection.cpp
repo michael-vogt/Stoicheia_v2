@@ -59,9 +59,3 @@ void CircleCircleIntersection::compute()  {
             px - h*nx, py - h*ny);
     }
 }
-
-bool CircleCircleIntersection::equals(const GeoObject &other) const {
-    auto cci = dynamic_cast<const CircleCircleIntersection*>(&other);
-    if (!cci) return false;
-    return cci->c1()->equals(*c1()) && cci->c2()->equals(*c2());
-}

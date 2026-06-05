@@ -36,16 +36,6 @@ void Parallel::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
     if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
 }
 
-bool Parallel::equals(const GeoObject &other) const {
-    auto p = dynamic_cast<const Parallel*>(&other);
-    if (!p) return false;
-    return p->origin()->equals(*origin()) && p->reference()->equals(*reference());
-}
-
-std::string Parallel::toString() {
-    return m_line.toString();
-}
-
 double Parallel::dx() const {
     auto [p1, p2] = m_reference->points();
     return p2->x() - p1->x();
