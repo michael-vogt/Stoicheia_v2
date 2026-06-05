@@ -5,10 +5,11 @@
 class IntersectionSet;
 
 class IntersectionPoint : public Point {
+public:
+    IntersectionPoint() : Point(0,0) {}
+    void recompute() override {}
+
+private:
     friend class IntersectionSet;
     using Point::moveTo;
-
-public:
-    IntersectionPoint() : Point(0,0) {};
-    void recompute() override {};
 };

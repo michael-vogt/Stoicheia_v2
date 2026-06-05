@@ -5,20 +5,22 @@
 
 
 class Midpoint : public Point {
-    Point* m_a;
-    Point* m_b;
-
 public:
     Midpoint(Point *a, Point *b);
+    explicit Midpoint(const LinearObject* line);
 
-    explicit Midpoint(const LinearObject* line) : Midpoint(line->p1(), line->p2()) {}
-
+    // Getter
     Point* p1() const { return m_a; }
     Point* p2() const { return m_b; }
 
+    // Objekt aktualisieren
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
+    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+
     std::string toString() override;
 
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+private:
+    Point* m_a;
+    Point* m_b;
 };

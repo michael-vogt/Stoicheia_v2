@@ -3,23 +3,13 @@
 #include <stdexcept>
 
 Parallel::Parallel(Point *origin, LinearObject *reference)
-: m_origin(origin), m_reference(reference), m_phantom(origin->x(), origin->y()), m_line(&m_phantom, origin)
+: m_origin(origin), m_phantom(origin->x(), origin->y()), m_reference(reference), m_line(&m_phantom, origin)
 {
     if (m_origin == nullptr || m_reference == nullptr)
         throw std::invalid_argument("null argument");
     m_origin->addDependent(this);
     m_reference->addDependent(this);
     Parallel::recompute();
-}
-
-double Parallel::dx() const {
-    auto [p1, p2] = m_reference->points();
-    return p2->x() - p1->x();
-}
-
-double Parallel::dy() const {
-    auto [p1, p2] = m_reference->points();
-    return p2->y() - p1->y();
 }
 
 void Parallel::onSourceRemoved(GeoObject *src) {
@@ -41,10 +31,6 @@ void Parallel::recompute() {
     notify();
 }
 
-std::string Parallel::toString() {
-    return m_line.toString();
-}
-
 void Parallel::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
     if (m_origin == oldSource) m_origin = static_cast<Point*>(newSource);
     if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
@@ -54,4 +40,18 @@ bool Parallel::equals(const GeoObject &other) const {
     auto p = dynamic_cast<const Parallel*>(&other);
     if (!p) return false;
     return p->origin()->equals(*origin()) && p->reference()->equals(*reference());
+}
+
+std::string Parallel::toString() {
+    return m_line.toString();
+}
+
+double Parallel::dx() const {
+    auto [p1, p2] = m_reference->points();
+    return p2->x() - p1->x();
+}
+
+double Parallel::dy() const {
+    auto [p1, p2] = m_reference->points();
+    return p2->y() - p1->y();
 }
