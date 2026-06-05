@@ -15,8 +15,8 @@ public:
 
     Circle* circle() const { return m_circle; }
 
-    void setPen(const QPen& pen);
-    void setBrush(const QBrush& brush);
+    void setPen(const QPen& pen) { m_pen = pen; update(); }
+    void setBrush(const QBrush& brush) { m_brush = brush; update(); }
 
     bool contains(const QPointF &point) override;
 

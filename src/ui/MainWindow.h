@@ -17,75 +17,49 @@ namespace Ui { class MainWindow; }
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-    Ui::MainWindow* ui;
+public:
+    explicit MainWindow(const QString& title = "Stoicheia", QTranslator* translator = nullptr, QWidget* parent = nullptr);
 
-    DrawingBoard* m_drawingBoard = nullptr;
-    FileManager* m_fileManager = nullptr;
+    [[nodiscard]] DrawingBoard* drawingBoard() const { return m_drawingBoard; }
+    [[nodiscard]] FileManager* fileManager() const { return m_fileManager; }
 
-    /*QAction* m_undoAction = nullptr;
-    QAction* m_redoAction = nullptr;
-    
-    QToolBar* m_geoToolBar = nullptr;
-    QAction* m_selectAction = nullptr;
-    QAction* m_pointAction = nullptr;
-    QAction* m_lineAction = nullptr;
-    QAction* m_rayAction = nullptr;
-    QAction* m_segmentAction = nullptr;
-    QAction* m_circleAction = nullptr;
+    bool eventFilter(QObject* object, QEvent* event) override;
 
-    QToolBar* m_conToolBar = nullptr;
-    QAction* m_intersectionAction = nullptr;
-    QAction* m_midpointAction = nullptr;
-    QAction* m_parallelAction = nullptr;
-    QAction* m_perpendicularAction = nullptr;
-    QAction* m_perpFootAction = nullptr;
+public slots:
+    void setStatus(StatusBarPart sbp, const QString& text) const;
+    void switchLanguage();
 
-    QMenu* m_recentMenu = nullptr;*/
+protected:
+    void closeEvent(QCloseEvent* event) override;
 
-    QLabel* m_statusLeft = nullptr;
-    QLabel* m_statusRight = nullptr;
-
-    ExportManager* m_exportManager = nullptr;
-
-    QTranslator* m_translator = nullptr;
-
-    //void setupToolBar();
-    //void setupMenu();
-    //void setupStatusBar();
+private:
     void setupConnections();
     void updateUndoRedo() const;
     void updateRecentFilesMenu();
 
     template <typename ToolT>
-    auto makeToolAction(ToolType type) {
+    auto makeToolAction(ToolType type) const {
         return [this, type]() {
             m_drawingBoard->setTool<ToolT>(type);
         };
     }
 
     template <typename ToolT>
-    auto makeToolAction(ToolType type, LinearObjectType loType) {
+    auto makeToolAction(ToolType type, LinearObjectType loType) const {
         return [this, type, loType]() {
             m_drawingBoard->setTool<ToolT>(type, loType);
         };
     }
 
+    Ui::MainWindow* ui;
+    DrawingBoard* m_drawingBoard = nullptr;
+    FileManager* m_fileManager = nullptr;
+    QLabel* m_statusLeft = nullptr;
+    QLabel* m_statusRight = nullptr;
+    ExportManager* m_exportManager = nullptr;
+    QTranslator* m_translator = nullptr;
+
 private slots:
+    void onShortcutModeChanged(ShortcutMode mode) const;
     void onToolChanged(ToolType type) const;
-    void onShortcutModeChanged(ShortcutMode mode);
-
-protected:
-    void closeEvent(QCloseEvent* event) override;
-
-public:
-    explicit MainWindow(const QString& title = "Stoicheia", QTranslator* translator = nullptr, QWidget* parent = nullptr);
-
-    DrawingBoard* drawingBoard() const { return m_drawingBoard; }
-    FileManager* fileManager() const { return m_fileManager; }
-
-    bool eventFilter(QObject* object, QEvent* event);
-
-public slots:
-    void setStatus(StatusBarPart sbp, const QString& text) const;
-    void switchLanguage();
 };

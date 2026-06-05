@@ -1,16 +1,11 @@
 #include "DrawingBoard.h"
 
 #include <iostream>
-#include <QMouseEvent>
 #include <QScrollBar>
-#include <QStatusBar>
 #include <QTimer>
-#include <QShortcut>
 
-//#include "MainWindow.h"
 #include "commands/CopyCommand.h"
 #include "dialogs/AppSettings.h"
-#include "geometry/Point.h"
 #include "tools/CreatePointTool.h"
 #include "tools/CreateLineTool.h"
 #include "tools/CreateCircleTool.h"
@@ -21,7 +16,9 @@
 #include "tools/CreatePerpendicularFootTool.h"
 #include "tools/SelectTool.h"
 
-DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
+DrawingBoard::DrawingBoard(QWidget *parent)
+: QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene)
+{
     AppSettings& s = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
@@ -53,51 +50,9 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     });
 }
 
-void DrawingBoard::wheelEvent(QWheelEvent *event) { m_inputManager->handleWheel(event); }
-void DrawingBoard::mousePressEvent(QMouseEvent *event) { m_inputManager->handleMousePress(event); }
-void DrawingBoard::mouseMoveEvent(QMouseEvent *event) { m_inputManager->handleMouseMove(event); }
-void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) { m_inputManager->handleMouseRelease(event); }
-void DrawingBoard::keyPressEvent(QKeyEvent *event) { m_inputManager->handleKeyPress(event); }
-void DrawingBoard::keyReleaseEvent(QKeyEvent *event) { m_inputManager->handleKeyRelease(event); }
-
-void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
-    QGraphicsView::drawBackground(painter, rect);
-    m_grid.drawBackground(painter, rect);
-    drawWatermark(painter);
-}
-
-void DrawingBoard::drawWatermark(QPainter *painter) const {
-    painter->save();
-    painter->setTransform(QTransform());
-
-    /*QFont font = painter->font();
-    font.setPointSize(72);
-    font.setBold(true);
-    painter->setFont(font);
-    painter->setPen(AppSettings::instance().colors.watermark);
-
-    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");*/
-    const QImage image(":/resources/logo.png");
-    painter->setOpacity(0.1);
-    QPoint vc = viewport()->rect().center();
-    QSize size = image.size();
-    painter->drawImage(vc.x() - size.width() / 2, vc.y() - size.height() / 2, image);
-    painter->restore();
-}
-
-void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
-    QGraphicsView::drawForeground(painter, rect);
-    if (!m_grid.isVisible()) return;
-
-    painter->save();
-    painter->setTransform(QTransform());
-
-    auto toViewport = [this](QPointF p) -> QPointF {
-        return viewport()->mapFrom(this, mapFromScene(p));
-    };
-
-    m_grid.drawLabels(painter, toViewport, viewport()->width(), viewport()->height());
-    painter->restore();
+void DrawingBoard::updateToolType(ToolType type) {
+    m_activeToolType = type;
+    emit toolChanged(type);
 }
 
 void DrawingBoard::setGridVisible(const bool visible) {
@@ -110,30 +65,6 @@ void DrawingBoard::setGridSpacing(const double spacing) {
     viewport()->update();
 }
 
-
-
-/*
-   ─────────────────────────────────────────────────────────────────────────────
-   ── Zentrierung ───────────────────────────────────────────────────────────────
-   ─────────────────────────────────────────────────────────────────────────────
-*/
-
-void DrawingBoard::resizeEvent(QResizeEvent *event) {
-    QGraphicsView::resizeEvent(event);
-    if (m_resizeCount < 2) {
-        ++m_resizeCount;
-        QPointF origin = mapFromScene(QPointF(0, 0));
-        QPointF center = viewport()->rect().center();
-        QPointF delta  = origin - center;
-
-        horizontalScrollBar()->setValue(
-            horizontalScrollBar()->value() + static_cast<int>(delta.x()));
-        verticalScrollBar()->setValue(
-            verticalScrollBar()->value() + static_cast<int>(delta.y()));
-    }
-    viewport()->update();
-}
-
 void DrawingBoard::resetView() {
     setTransformationAnchor(QGraphicsView::NoAnchor);
     QTransform t = transform();
@@ -142,26 +73,6 @@ void DrawingBoard::resetView() {
     centerOn(0, 0);
     scale(1.0 / scaleX, -1.0 / scaleY);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-}
-
-void DrawingBoard::updateToolType(ToolType type) {
-    m_activeToolType = type;
-    emit toolChanged(type);
-}
-
-void DrawingBoard::applySettings() {
-    const auto& s = AppSettings::instance();
-    setBackgroundBrush(s.colors.background);
-    m_grid.setVisible(s.grid.visible);
-    m_grid.setSpacing(s.grid.spacing);
-    m_grid.setSnapEnabled(s.grid.snapEnabled);
-    m_grid.setAxisColor(s.grid.axisColor);
-    m_grid.setGridColor(s.grid.gridColor);
-    m_grid.setLabelColor(s.grid.labelColor);
-    viewport()->update();
-    scene()->update();
-    if (m_activeTool)
-        m_activeTool->activate();
 }
 
 void DrawingBoard::copySelection() {
@@ -177,6 +88,21 @@ void DrawingBoard::pasteSelection() {
                     clipboard,
                     QPointF(50, -50)));
     }
+}
+
+void DrawingBoard::applySettings() {
+    const auto& s = AppSettings::instance();
+    setBackgroundBrush(s.colors.background);
+    m_grid.setVisible(s.grid.visible);
+    m_grid.setSpacing(s.grid.spacing);
+    m_grid.setSnapEnabled(s.grid.snapEnabled);
+    m_grid.setAxisColor(s.grid.axisColor);
+    m_grid.setGridColor(s.grid.gridColor);
+    m_grid.setLabelColor(s.grid.labelColor);
+    viewport()->update();
+    scene()->update();
+    if (m_activeTool)
+        m_activeTool->activate();
 }
 
 void DrawingBoard::onToolChangeRequested(int toolType, int subType) {
@@ -223,4 +149,67 @@ void DrawingBoard::onToolChangeRequested(int toolType, int subType) {
 
 void DrawingBoard::statusMessage(int sbp, const QString &text) {
     emit statusBarTextChanged(static_cast<StatusBarPart>(sbp), text);
+}
+
+void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
+    QGraphicsView::drawBackground(painter, rect);
+    m_grid.drawBackground(painter, rect);
+    drawWatermark(painter);
+}
+
+void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
+    QGraphicsView::drawForeground(painter, rect);
+    if (!m_grid.isVisible()) return;
+
+    painter->save();
+    painter->setTransform(QTransform());
+
+    auto toViewport = [this](QPointF p) -> QPointF {
+        return viewport()->mapFrom(this, mapFromScene(p));
+    };
+
+    m_grid.drawLabels(painter, toViewport, viewport()->width(), viewport()->height());
+    painter->restore();
+}
+
+void DrawingBoard::keyPressEvent(QKeyEvent *event) { m_inputManager->handleKeyPress(event); }
+void DrawingBoard::keyReleaseEvent(QKeyEvent *event) { m_inputManager->handleKeyRelease(event); }
+void DrawingBoard::mousePressEvent(QMouseEvent *event) { m_inputManager->handleMousePress(event); }
+void DrawingBoard::mouseMoveEvent(QMouseEvent *event) { m_inputManager->handleMouseMove(event); }
+void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) { m_inputManager->handleMouseRelease(event); }
+void DrawingBoard::wheelEvent(QWheelEvent *event) { m_inputManager->handleWheel(event); }
+
+void DrawingBoard::resizeEvent(QResizeEvent *event) {
+    QGraphicsView::resizeEvent(event);
+    if (m_resizeCount < 2) {
+        ++m_resizeCount;
+        QPointF origin = mapFromScene(QPointF(0, 0));
+        QPointF center = viewport()->rect().center();
+        QPointF delta  = origin - center;
+
+        horizontalScrollBar()->setValue(
+            horizontalScrollBar()->value() + static_cast<int>(delta.x()));
+        verticalScrollBar()->setValue(
+            verticalScrollBar()->value() + static_cast<int>(delta.y()));
+    }
+    viewport()->update();
+}
+
+void DrawingBoard::drawWatermark(QPainter *painter) const {
+    painter->save();
+    painter->setTransform(QTransform());
+
+    /*QFont font = painter->font();
+    font.setPointSize(72);
+    font.setBold(true);
+    painter->setFont(font);
+    painter->setPen(AppSettings::instance().colors.watermark);
+
+    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");*/
+    const QImage image(":/resources/logo.png");
+    painter->setOpacity(0.1);
+    QPoint vc = viewport()->rect().center();
+    QSize size = image.size();
+    painter->drawImage(vc.x() - size.width() / 2, vc.y() - size.height() / 2, image);
+    painter->restore();
 }

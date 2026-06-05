@@ -5,8 +5,6 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QToolBar>
-#include <QLineEdit>
-#include <QMessageBox>
 #include <QMetaEnum>
 #include <QActionGroup>
 #include <qfileinfo.h>
@@ -33,7 +31,6 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     setWindowTitle(title);
 
     m_drawingBoard = new DrawingBoard(this);
-    //ui->drawingBoardContainer->layout()->addWidget(m_drawingBoard);
     auto layout = new QVBoxLayout(ui->drawingBoardContainer);
     layout->setContentsMargins(0,0,0,0);;
     layout->addWidget(m_drawingBoard);
@@ -50,10 +47,6 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     ui->toolBarGeometry->setEnabled(true);
     ui->toolBarConstructions->setEnabled(false);
     updateRecentFilesMenu();
-
-    /*setupToolBar();
-    setupMenu();
-    setupStatusBar();*/
 
     connect(m_drawingBoard, &DrawingBoard::toolChanged, this, &MainWindow::onToolChanged);
     connect(m_drawingBoard, &DrawingBoard::shortcutModeChanged, this, &MainWindow::onShortcutModeChanged);
@@ -73,6 +66,46 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     m_exportManager->registerExporter(std::make_unique<PdfExporter>());
     m_exportManager->registerExporter(std::make_unique<PngExporter>());
     m_exportManager->registerExporter(std::make_unique<SvgExporter>());
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        if (m_drawingBoard->inputManager())
+            m_drawingBoard->inputManager()->handleKeyPress(static_cast<QKeyEvent *>(event));
+        if (event->isAccepted()) return true;
+    }
+
+    if (event->type() == QEvent::KeyRelease) {
+        if (m_drawingBoard->inputManager())
+            m_drawingBoard->inputManager()->handleKeyRelease(static_cast<QKeyEvent *>(event));
+        if (event->isAccepted()) return true;
+    }
+
+    return QObject::eventFilter(object, event);
+}
+
+void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
+    if (sbp == StatusBarPart::Left && m_statusLeft) {
+        m_statusLeft->setText(text);
+    } else if (sbp == StatusBarPart::Right && m_statusRight) {
+        m_statusRight->setText(text);
+    }
+}
+
+void MainWindow::switchLanguage() {
+    if (!m_translator)
+        return;
+    QString languageCode = AppSettings::instance().general.language;
+    qApp->removeTranslator(m_translator);
+    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode)))
+        qApp->installTranslator(m_translator);
+    ui->retranslateUi(this);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (m_drawingBoard && m_drawingBoard->geoScene())
+        m_drawingBoard->geoScene()->clearGraveyard();
+    event->accept();
 }
 
 void MainWindow::setupConnections() {
@@ -146,39 +179,6 @@ void MainWindow::setupConnections() {
     connect(ui->actionPaste, &QAction::triggered, [this]() { m_drawingBoard->pasteSelection(); });
 }
 
-void MainWindow::onShortcutModeChanged(ShortcutMode mode) {
-    switch (mode) {
-        case ShortcutMode::None:
-            ui->toolBarGeometry->setEnabled(true);
-            ui->toolBarConstructions->setEnabled(true);
-            break;
-        case ShortcutMode::Geometry:
-            ui->toolBarGeometry->setEnabled(true);
-            ui->toolBarConstructions->setEnabled(false);
-            break;
-        case ShortcutMode::Construction:
-            ui->toolBarGeometry->setEnabled(false);
-            ui->toolBarConstructions->setEnabled(true);
-            break;
-    }
-}
-
-void MainWindow::onToolChanged(const ToolType type) const {
-    auto check = [](QAction* a, const bool on) { if (a) a->setChecked(on); };
-
-    check(ui->actionSelect,           type == ToolType::Select);
-    check(ui->actionPoint,            type == ToolType::CreatePoint);
-    check(ui->actionLine,             type == ToolType::CreateLine);
-    check(ui->actionRay,              type == ToolType::CreateRay);
-    check(ui->actionSegment,          type == ToolType::CreateSegment);
-    check(ui->actionCircle,           type == ToolType::CreateCircle);
-    check(ui->actionIntersection,     type == ToolType::CreateIntersection);
-    check(ui->actionMidpoint,         type == ToolType::CreateMidpoint);
-    check(ui->actionParallel,         type == ToolType::CreateParallel);
-    check(ui->actionPerpendicular,    type == ToolType::CreatePerpendicular);
-    check(ui->actionPerpendicularFoot,type == ToolType::CreatePerpendicularFoot);
-}
-
 void MainWindow::updateUndoRedo() const {
     ui->actionUndo->setEnabled(m_drawingBoard->commandStack()->canUndo());
     ui->actionRedo->setEnabled(m_drawingBoard->commandStack()->canRedo());
@@ -217,45 +217,37 @@ void MainWindow::updateRecentFilesMenu() {
         AppSettings::instance().save();
         updateRecentFilesMenu();
     });
-
 }
 
-void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
-    if (sbp == StatusBarPart::Left && m_statusLeft) {
-        m_statusLeft->setText(text);
-    } else if (sbp == StatusBarPart::Right && m_statusRight) {
-        m_statusRight->setText(text);
+void MainWindow::onShortcutModeChanged(ShortcutMode mode) const {
+    switch (mode) {
+        case ShortcutMode::None:
+            ui->toolBarGeometry->setEnabled(true);
+            ui->toolBarConstructions->setEnabled(true);
+            break;
+        case ShortcutMode::Geometry:
+            ui->toolBarGeometry->setEnabled(true);
+            ui->toolBarConstructions->setEnabled(false);
+            break;
+        case ShortcutMode::Construction:
+            ui->toolBarGeometry->setEnabled(false);
+            ui->toolBarConstructions->setEnabled(true);
+            break;
     }
 }
 
-bool MainWindow::eventFilter(QObject *object, QEvent *event) {
-    if (event->type() == QEvent::KeyPress) {
-        if (m_drawingBoard->inputManager())
-            m_drawingBoard->inputManager()->handleKeyPress(static_cast<QKeyEvent *>(event));
-        if (event->isAccepted()) return true;
-    }
+void MainWindow::onToolChanged(const ToolType type) const {
+    auto check = [](QAction* a, const bool on) { if (a) a->setChecked(on); };
 
-    if (event->type() == QEvent::KeyRelease) {
-        if (m_drawingBoard->inputManager())
-            m_drawingBoard->inputManager()->handleKeyRelease(static_cast<QKeyEvent *>(event));
-        if (event->isAccepted()) return true;
-    }
-
-    return QObject::eventFilter(object, event);
-}
-
-void MainWindow::switchLanguage() {
-    if (!m_translator)
-        return;
-    QString languageCode = AppSettings::instance().general.language;
-    qApp->removeTranslator(m_translator);
-    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode)))
-        qApp->installTranslator(m_translator);
-    ui->retranslateUi(this);
-}
-
-void MainWindow::closeEvent(QCloseEvent *event) {
-    if (m_drawingBoard && m_drawingBoard->geoScene())
-        m_drawingBoard->geoScene()->clearGraveyard();
-    event->accept();
+    check(ui->actionSelect,           type == ToolType::Select);
+    check(ui->actionPoint,            type == ToolType::CreatePoint);
+    check(ui->actionLine,             type == ToolType::CreateLine);
+    check(ui->actionRay,              type == ToolType::CreateRay);
+    check(ui->actionSegment,          type == ToolType::CreateSegment);
+    check(ui->actionCircle,           type == ToolType::CreateCircle);
+    check(ui->actionIntersection,     type == ToolType::CreateIntersection);
+    check(ui->actionMidpoint,         type == ToolType::CreateMidpoint);
+    check(ui->actionParallel,         type == ToolType::CreateParallel);
+    check(ui->actionPerpendicular,    type == ToolType::CreatePerpendicular);
+    check(ui->actionPerpendicularFoot,type == ToolType::CreatePerpendicularFoot);
 }
