@@ -19,6 +19,7 @@
 #include "tools/CreateParallelTool.h"
 #include "tools/CreatePerpendicularTool.h"
 #include "tools/CreatePerpendicularFootTool.h"
+#include "tools/SelectTool.h"
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene) {
     AppSettings& s = AppSettings::instance();
@@ -38,31 +39,26 @@ DrawingBoard::DrawingBoard(QWidget *parent) : QGraphicsView(parent), m_adapter(&
     setDragMode(QGraphicsView::NoDrag);
     setFocusPolicy(Qt::StrongFocus);
 
-    auto escShortcut = std::make_unique<QShortcut>(Qt::Key_Escape, this);
-    escShortcut->setContext(Qt::WidgetWithChildrenShortcut);
-    connect(escShortcut.get(), &QShortcut::activated, [this]() {
-        if (m_shortcutMode != ShortcutMode::None) {
-            setShortcutMode(ShortcutMode::None);
-            return;
-        }
-        if (m_activeTool) {
-            QKeyEvent escEvent(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
-            m_activeTool->keyPressEvent(&escEvent);
-            if (escEvent.isAccepted()) return;
-        }
-        emit escapePressed();
-    });
-    escShortcut.release();
+    m_inputManager = new InputManager(this, this);
+
+    connect(m_inputManager, &InputManager::undoRequested, [this]() { m_commandStack.undo(); });
+    connect(m_inputManager, &InputManager::redoRequested, [this]() { m_commandStack.redo(); });
+    connect(m_inputManager, &InputManager::escapePressed, this, &DrawingBoard::escapePressed);
+    connect(m_inputManager, &InputManager::statusMessage, this, &DrawingBoard::statusMessage);
+    connect(m_inputManager, &InputManager::shortcutModeChanged, this, &DrawingBoard::shortcutModeChanged);
+    connect(m_inputManager, &InputManager::toolChangeRequested, this, &DrawingBoard::onToolChangeRequested);
 
     connect(&m_adapter, &SceneAdapter::selectionChanged, [this]() {
         viewport()->update();
     });
 }
 
-void DrawingBoard::setSnapping(bool snapping) {
-    m_snapping = snapping;
-    showStatusRight(m_snapping ? tr("Snapping"): "");
-}
+void DrawingBoard::wheelEvent(QWheelEvent *event) { m_inputManager->handleWheel(event); }
+void DrawingBoard::mousePressEvent(QMouseEvent *event) { m_inputManager->handleMousePress(event); }
+void DrawingBoard::mouseMoveEvent(QMouseEvent *event) { m_inputManager->handleMouseMove(event); }
+void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) { m_inputManager->handleMouseRelease(event); }
+void DrawingBoard::keyPressEvent(QKeyEvent *event) { m_inputManager->handleKeyPress(event); }
+void DrawingBoard::keyReleaseEvent(QKeyEvent *event) { m_inputManager->handleKeyRelease(event); }
 
 void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawBackground(painter, rect);
@@ -104,173 +100,14 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
     painter->restore();
 }
 
-void DrawingBoard::setGridVisible(bool visible) {
+void DrawingBoard::setGridVisible(const bool visible) {
     m_gridVisible = visible;
     viewport()->update();
 }
 
-void DrawingBoard::setGridSpacing(double spacing) {
+void DrawingBoard::setGridSpacing(const double spacing) {
     m_gridSpacing = spacing;
     viewport()->update();
-}
-
-/*
-   ─────────────────────────────────────────────────────────────────────────────
-   ── Zoom ─────────────────────────────────────────────────────────────────────
-   ─────────────────────────────────────────────────────────────────────────────
-*/
-
-void DrawingBoard::wheelEvent(QWheelEvent *event) {
-    // Pan hat Vorrang wenn Space gedrückt
-    if (m_spacePressed) {
-        event->ignore();
-        return;
-    }
-    double factor = event->angleDelta().y() > 0 ? 1.15 : 1.0 / 1.15;
-    scale(factor, factor);
-    event->accept();
-}
-
-/*
-   ─────────────────────────────────────────────────────────────────────────────
-   ── Maus- und Tastaturereignisse: Pan zuerst, dann Tool ──────────────────────
-   ─────────────────────────────────────────────────────────────────────────────
-*/
-
-void DrawingBoard::mousePressEvent(QMouseEvent *event) {
-    if (event->button() == Qt::MiddleButton || (event->button() == Qt::LeftButton && m_spacePressed)) {
-        m_panning = true;
-        m_panStart = event->pos();
-        viewport()->setCursor(Qt::ClosedHandCursor);
-        event->accept();
-        showStatusRight(tr("Panning"));
-        return;
-    }
-
-    // An aktives Tool delegieren
-    if (m_activeTool) {
-        m_activeTool->mousePressEvent(event);
-        if (event->isAccepted())
-            return;
-    }
-
-    QGraphicsView::mousePressEvent(event);
-}
-
-void DrawingBoard::mouseMoveEvent(QMouseEvent *event) {
-    if (m_panning) {
-        QPoint delta = event->pos() - m_panStart;
-        m_panStart = event->pos();
-
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
-        verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
-
-        event->accept();
-        viewport()->update();
-        return;
-    }
-
-    if (m_activeTool) {
-        m_activeTool->mouseMoveEvent(event);
-        if (event->isAccepted())
-            return;
-    }
-
-    QGraphicsView::mouseMoveEvent(event);
-}
-
-void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) {
-    if (m_panning) {
-        m_panning = false;
-        viewport()->setCursor(m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
-        event->accept();
-        showStatusRight("");
-        return;
-    }
-
-    if (m_activeTool) {
-        m_activeTool->mouseReleaseEvent(event);
-        if (event->isAccepted())
-            return;
-    }
-
-    QGraphicsView::mouseReleaseEvent(event);
-}
-
-void DrawingBoard::keyPressEvent(QKeyEvent *event) {
-    // Aktiver Shortcut-Modus hat absoluten Vorrang
-    if (m_shortcutMode != ShortcutMode::None) {
-        handleShortcutKey(event);
-        if (event->isAccepted()) return;
-    }
-
-    // Tool zuerst
-    if (m_activeTool) {
-        m_activeTool->keyPressEvent(event);
-        if (event->isAccepted())
-            return;
-    }
-
-    if (event->key() == Qt::Key_Alt) {
-        setSnapping(true);
-        //showStatusRight(tr("Snapping"));
-    }
-
-    // Undo/Redo
-    if (event->matches(QKeySequence::Undo)) {
-        m_commandStack.undo();
-        event->accept();
-        return;
-    }
-
-    if (event->matches(QKeySequence::Redo)) {
-        m_commandStack.redo();
-        event->accept();
-        return;
-    }
-    
-    // Pan-Modus
-    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        showStatusRight(tr("Panning"));
-        m_spacePressed = true;
-        viewport()->setCursor(Qt::ClosedHandCursor);
-        event->accept();
-        return;
-    }
-
-    if (event->key() == Qt::Key_R && !event->isAutoRepeat()) {
-        resetView();
-        event->accept();
-        return;
-    }
-
-    if (event->key() == Qt::Key_NumberSign && !event->isAutoRepeat()) {
-        m_grid.setVisible(!m_grid.isVisible());
-        event->accept();
-        return;
-    }
-
-    handleShortcutKey(event);
-
-    QGraphicsView::keyPressEvent(event);
-}
-
-void DrawingBoard::keyReleaseEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Alt) {
-        setSnapping(false);
-    }
-
-    if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
-        //emit statusMessageChanged("");
-        showStatusRight("");
-        m_spacePressed = false;
-        if (!m_panning)
-            viewport()->setCursor(Qt::ArrowCursor);
-        event->accept();
-        return;
-    }
-
-    QGraphicsView::keyReleaseEvent(event);
 }
 
 
@@ -307,97 +144,6 @@ void DrawingBoard::resetView() {
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }
 
-void DrawingBoard::setShortcutMode(ShortcutMode mode) {
-    m_shortcutMode = mode;
-    emit shortcutModeChanged(mode);
-    switch (mode) {
-        case ShortcutMode::None:
-            //showStatus("");
-            showStatusLeft("");
-            break;
-        case ShortcutMode::Geometry:
-            showStatusLeft(tr("Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen"));
-            break;
-        case ShortcutMode::Construction:
-            showStatusLeft(tr("Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen"));
-            break;
-    }
-}
-
-void DrawingBoard::handleShortcutKey(QKeyEvent* event) {
-    if (m_shortcutMode == ShortcutMode::None) {
-        switch(event->key()) {
-            case Qt::Key_G:
-                setShortcutMode(ShortcutMode::Geometry);
-                event->accept();
-                return;
-            case Qt::Key_K:
-                setShortcutMode(ShortcutMode::Construction);
-                event->accept();
-                return;
-        }
-        return;
-    }
-
-    if (event->key() == Qt::Key_Escape) {
-        setShortcutMode(ShortcutMode::None);
-        event->accept();
-        return;
-    }
-
-    if (m_shortcutMode == ShortcutMode::Geometry) {
-        setShortcutMode(ShortcutMode::None);
-        switch (event->key()) {
-            case Qt::Key_P:
-                setTool<CreatePointTool>(ToolType::CreatePoint);
-                break;
-            case Qt::Key_L:
-                setTool<CreateLineTool>(ToolType::CreateLine, LinearObjectType::Line);
-                break;
-            case Qt::Key_R:
-                setTool<CreateLineTool>(ToolType::CreateRay, LinearObjectType::Ray);
-                break;
-            case Qt::Key_S:
-                setTool<CreateLineTool>(ToolType::CreateSegment, LinearObjectType::Segment);
-                break;
-            case Qt::Key_C:
-                setTool<CreateCircleTool>(ToolType::CreateCircle);
-                break;
-            default:
-                event->ignore();
-                return;
-        }
-        event->accept();
-        return;
-    }
-
-    if (m_shortcutMode == ShortcutMode::Construction) {
-        setShortcutMode(ShortcutMode::None);
-        switch (event->key()) {
-            case Qt::Key_S:
-                setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
-                break;
-            case Qt::Key_M:
-                setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
-                break;
-            case Qt::Key_P:
-                setTool<CreateParallelTool>(ToolType::CreateParallel);
-                break;
-            case Qt::Key_E:
-                setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
-                break;
-            case Qt::Key_L:
-                setTool<CreatePerpendicularFootTool>(ToolType::CreatePerpendicularFoot);
-                break;
-            default:
-                event->ignore();
-                return;
-        }
-        event->accept();
-        return;
-    }
-}
-
 void DrawingBoard::updateToolType(ToolType type) {
     m_activeToolType = type;
     emit toolChanged(type);
@@ -414,6 +160,8 @@ void DrawingBoard::applySettings() {
     m_grid.setLabelColor(s.grid.labelColor);
     viewport()->update();
     scene()->update();
+    if (m_activeTool)
+        m_activeTool->activate();
 }
 
 void DrawingBoard::copySelection() {
@@ -429,4 +177,50 @@ void DrawingBoard::pasteSelection() {
                     clipboard,
                     QPointF(50, -50)));
     }
+}
+
+void DrawingBoard::onToolChangeRequested(int toolType, int subType) {
+    switch (static_cast<ToolType>(toolType)) {
+        case ToolType::Select:
+            setTool<SelectTool>(ToolType::Select);
+            break;
+        case ToolType::CreatePoint:
+            setTool<CreatePointTool>(ToolType::CreatePoint);
+            break;
+        case ToolType::CreateLine:
+            setTool<CreateLineTool>(ToolType::CreateLine,
+                static_cast<LinearObjectType>(subType));
+            break;
+        case ToolType::CreateRay:
+            setTool<CreateLineTool>(ToolType::CreateRay,
+                static_cast<LinearObjectType>(subType));
+            break;
+        case ToolType::CreateSegment:
+            setTool<CreateLineTool>(ToolType::CreateSegment,
+                static_cast<LinearObjectType>(subType));
+            break;
+        case ToolType::CreateCircle:
+            setTool<CreateCircleTool>(ToolType::CreateCircle);
+            break;
+        case ToolType::CreateIntersection:
+            setTool<CreateIntersectionTool>(ToolType::CreateIntersection);
+            break;
+        case ToolType::CreateMidpoint:
+            setTool<CreateMidpointTool>(ToolType::CreateMidpoint);
+            break;
+        case ToolType::CreateParallel:
+            setTool<CreateParallelTool>(ToolType::CreateParallel);
+            break;
+        case ToolType::CreatePerpendicular:
+            setTool<CreatePerpendicularTool>(ToolType::CreatePerpendicular);
+            break;
+        case ToolType::CreatePerpendicularFoot:
+            setTool<CreatePerpendicularFootTool>(
+                ToolType::CreatePerpendicularFoot);
+            break;
+    }
+}
+
+void DrawingBoard::statusMessage(int sbp, const QString &text) {
+    emit statusBarTextChanged(static_cast<StatusBarPart>(sbp), text);
 }

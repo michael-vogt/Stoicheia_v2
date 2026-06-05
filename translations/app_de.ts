@@ -203,25 +203,21 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="146"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="234"/>
         <source>Panning</source>
-        <translation>Verschieben</translation>
+        <translation type="vanished">Verschieben</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="64"/>
+        <location filename="../src/ui/DrawingBoard.h" line="88"/>
         <source>Snapping</source>
         <translation>Einrasten</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="319"/>
         <source>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</source>
-        <translation>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</translation>
+        <translation type="vanished">Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="322"/>
         <source>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</source>
-        <translation>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</translation>
+        <translation type="vanished">Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -302,6 +298,29 @@
         <location filename="../src/ui/io/FileManager.cpp" line="139"/>
         <source>Stoicheia (Στοιχεῖα) – %1%2</source>
         <translation>Stoicheia (Στοιχεῖα) – %1%2</translation>
+    </message>
+</context>
+<context>
+    <name>InputManager</name>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="47"/>
+        <source>Panning</source>
+        <translation>Verschieben</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="214"/>
+        <source>Geometrie: [P] Punkt  [L] Gerade  [R] Halbgerade  [S] Strecke  [C] Kreis  [Esc] Abbrechen</source>
+        <translation>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="219"/>
+        <source>Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  [P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  [Esc] Abbrechen</source>
+        <translation>Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  [P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  [Esc] Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="311"/>
+        <source>Snapping</source>
+        <translation>Einrasten</translation>
     </message>
 </context>
 <context>

@@ -230,17 +230,15 @@ void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
 
 bool MainWindow::eventFilter(QObject *object, QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Alt) {
-            m_drawingBoard->setSnapping(true);
-        }
+        if (m_drawingBoard->inputManager())
+            m_drawingBoard->inputManager()->handleKeyPress(static_cast<QKeyEvent *>(event));
+        if (event->isAccepted()) return true;
     }
 
     if (event->type() == QEvent::KeyRelease) {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Alt) {
-            m_drawingBoard->setSnapping(false);
-        }
+        if (m_drawingBoard->inputManager())
+            m_drawingBoard->inputManager()->handleKeyRelease(static_cast<QKeyEvent *>(event));
+        if (event->isAccepted()) return true;
     }
 
     return QObject::eventFilter(object, event);

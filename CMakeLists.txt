@@ -112,6 +112,7 @@ add_library(StoicheiaApp STATIC
         src/ui/Grid.cpp
         src/ui/commands/CopyCommand.cpp
         src/ui/commands/MergePointsCommand.cpp
+        src/ui/InputManager.cpp
 )
 
 target_include_directories(StoicheiaApp PUBLIC
