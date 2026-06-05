@@ -11,6 +11,7 @@
 #include "Grid.h"
 //#include "MainWindow.h"
 #include "Enums.h"
+#include "InputManager.h"
 
 
 class DrawingBoard : public QGraphicsView {
@@ -21,11 +22,12 @@ class DrawingBoard : public QGraphicsView {
     SceneAdapter m_adapter;
     CommandStack m_commandStack;
     HitTest m_hitTest{&m_qtScene, 8.0};
+    InputManager* m_inputManager = nullptr;
 
     // Pan
-    bool m_panning = false;
-    bool m_spacePressed = false;
-    QPoint m_panStart;
+    //bool m_panning = false;
+    //bool m_spacePressed = false;
+    //QPoint m_panStart;
 
     // Snap
     bool m_snapping = false;
@@ -43,10 +45,6 @@ class DrawingBoard : public QGraphicsView {
     ToolType m_activeToolType;
 
     SnapHelper m_snapHelper{&m_qtScene, &m_grid};
-
-    ShortcutMode m_shortcutMode = ShortcutMode::None;
-    void handleShortcutKey(QKeyEvent* event);
-    void setShortcutMode(ShortcutMode mode);
 
     void drawWatermark(QPainter *painter) const;
     ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
@@ -71,18 +69,24 @@ public:
         if (m_activeTool) m_activeTool->deactivate();
         m_activeTool = std::make_unique<T>(makeContext(), std::forward<Args>(args)...);
         m_activeToolType = type;
-        m_shortcutMode = ShortcutMode::None;
+        m_inputManager->setActiveTool(m_activeTool.get());
+        //m_shortcutMode = ShortcutMode::None;
         m_activeTool->activate();
         emit toolChanged(type);
     }
 
     Tool* activeTool() const { return m_activeTool.get(); }
     ToolType activeToolType() const { return m_activeToolType; }
+    InputManager* inputManager() const { return m_inputManager; }
     //void showStatus(const QString& message) { emit statusMessageChanged(message); }
     void showStatusLeft(const QString& text) { emit statusBarTextChanged(StatusBarPart::Left, text); }
     void showStatusRight(const QString& text) { emit statusBarTextChanged(StatusBarPart::Right, text); }
     void updateToolType(ToolType type);
-    void setSnapping(bool snapping);
+
+    void setSnapping(bool snapping) {
+        m_snapping = snapping;
+        showStatusRight(m_snapping ? tr("Snapping"): "");
+    }
 
     // Raster
     void setGridVisible(bool visible);
@@ -101,13 +105,14 @@ public:
     void pasteSelection();
 
     signals:
-    void escapePressed();
     //void statusMessageChanged(const QString& text, int timeout = 0);
+    void escapePressed();
     void statusBarTextChanged(StatusBarPart sbp, const QString& text);
     void toolChanged(ToolType type);
     void shortcutModeChanged(ShortcutMode mode);
 
     public slots:
     void applySettings();
-};
+    void onToolChangeRequested(int type, int subType);
+    void statusMessage(int sbp, const QString& text);};
 

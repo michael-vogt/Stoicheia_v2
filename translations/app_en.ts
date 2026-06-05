@@ -203,25 +203,21 @@
 <context>
     <name>DrawingBoard</name>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="146"/>
-        <location filename="../src/ui/DrawingBoard.cpp" line="234"/>
         <source>Panning</source>
-        <translation>Panning</translation>
+        <translation type="vanished">Panning</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="64"/>
+        <location filename="../src/ui/DrawingBoard.h" line="88"/>
         <source>Snapping</source>
         <translation>Snapping</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="319"/>
         <source>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</source>
-        <translation>Geometry: [P] Point [L] Line [R] Ray [S] Segment [C] Circle [Esc] Abort</translation>
+        <translation type="vanished">Geometry: [P] Point [L] Line [R] Ray [S] Segment [C] Circle [Esc] Abort</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.cpp" line="322"/>
         <source>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</source>
-        <translation>Construction: [S] Intersection [M] Midpoint [P] Parallel [E] Perpendicular [L] Perpendicular foot [Esc] Abort</translation>
+        <translation type="vanished">Construction: [S] Intersection [M] Midpoint [P] Parallel [E] Perpendicular [L] Perpendicular foot [Esc] Abort</translation>
     </message>
 </context>
 <context>
@@ -302,6 +298,29 @@
         <location filename="../src/ui/io/FileManager.cpp" line="139"/>
         <source>Stoicheia (Στοιχεῖα) – %1%2</source>
         <translation>Stoicheia (Στοιχεῖα) – %1%2</translation>
+    </message>
+</context>
+<context>
+    <name>InputManager</name>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="47"/>
+        <source>Panning</source>
+        <translation>Panning</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="214"/>
+        <source>Geometrie: [P] Punkt  [L] Gerade  [R] Halbgerade  [S] Strecke  [C] Kreis  [Esc] Abbrechen</source>
+        <translation>Geometry: [P] Point  [L] Line  [R] Ray  [S] Segment  [C] Circle  [Esc] Cancel</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="219"/>
+        <source>Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  [P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  [Esc] Abbrechen</source>
+        <translation>Construction: [S] Intersection Point  [M] Midpoint  [P] Parallel Line  [E] Perpendicular Line  [L] Foot of the Perpendicular  [Esc] Cancel</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/InputManager.cpp" line="311"/>
+        <source>Snapping</source>
+        <translation>Snapping</translation>
     </message>
 </context>
 <context>
