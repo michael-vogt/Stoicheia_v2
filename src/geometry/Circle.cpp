@@ -3,7 +3,9 @@
 #include <complex>
 #include <format>
 
-Circle::Circle(Point *center, Point* radiusPoint) : m_center(center), m_radiusPoint(radiusPoint) {
+Circle::Circle(Point *center, Point* radiusPoint)
+: m_center(center), m_radiusPoint(radiusPoint)
+{
     if (m_center == nullptr || m_radiusPoint == nullptr)
         throw std::invalid_argument("null point");
     m_center->addDependent(this);
@@ -12,9 +14,8 @@ Circle::Circle(Point *center, Point* radiusPoint) : m_center(center), m_radiusPo
 }
 
 Circle::Circle(Point *center, double radius)
-    : m_fixedRadius(radius),
-      m_fixedRadiusPoint(std::make_unique<Point>(
-          center->x() + radius, center->y())), m_center(center)
+: m_fixedRadius(radius),
+  m_fixedRadiusPoint(std::make_unique<Point>(center->x() + radius, center->y())), m_center(center)
 {
     if (m_center == nullptr)
         throw std::invalid_argument("null point");
@@ -46,11 +47,6 @@ void Circle::recompute() {
     notify();
 }
 
-std::string Circle::toString() {
-    std::string str = std::format("C[center {}, radius {}]", m_center->toString(), m_radius);
-    return str;
-}
-
 void Circle::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
     if (m_center == oldSource) m_center = static_cast<Point*>(newSource);
     if (m_radiusPoint == oldSource) m_radiusPoint = static_cast<Point*>(newSource);
@@ -60,4 +56,9 @@ bool Circle::equals(const GeoObject &other) const {
     auto c = dynamic_cast<const Circle*>(&other);
     if (!c) return false;
     return (c->center()->equals(*center()) && c->radiusPoint()->equals(*radiusPoint()));
+}
+
+std::string Circle::toString() {
+    std::string str = std::format("C[center {}, radius {}]", m_center->toString(), m_radius);
+    return str;
 }

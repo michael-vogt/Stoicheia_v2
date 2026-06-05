@@ -4,8 +4,6 @@
 #include <functional>
 
 void Scene::remove(GeoObject* target) {
-    //if (target == nullptr) return;
-
     target->detach();
     std::erase_if(m_objects, [target](const auto& ptr) {
         return ptr.get() == target;
@@ -29,16 +27,6 @@ void Scene::removeCascade(GeoObject* target) {
     });
 }
 
-void Scene::clear() {
-    for (auto& obj : m_objects)
-        obj->detach();
-    m_objects.clear();
-}
-
-bool Scene::contains(GeoObject *obj) const {
-    return std::ranges::any_of(m_objects, [obj](const auto& ptr) { return ptr.get() == obj; });
-}
-
 void Scene::softRemove(GeoObject *target) {
     auto it = std::find_if(m_objects.begin(), m_objects.end(), [target](const auto& p) { return p.get() == target; });
     if (it != m_objects.end()) {
@@ -46,4 +34,14 @@ void Scene::softRemove(GeoObject *target) {
         m_graveyard.push_back(std::move(*it));
         m_objects.erase(it);
     }
+}
+
+bool Scene::contains(GeoObject *obj) const {
+    return std::ranges::any_of(m_objects, [obj](const auto& ptr) { return ptr.get() == obj; });
+}
+
+void Scene::clear() {
+    for (auto& obj : m_objects)
+        obj->detach();
+    m_objects.clear();
 }

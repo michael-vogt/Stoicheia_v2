@@ -8,12 +8,6 @@ void GeoObject::addDependent(GeoObject *dep) {
     dep->m_sources.insert(this); // backward reference
 }
 
-void GeoObject::removeDependent(GeoObject *dep) {
-    if (dep == nullptr) return;
-    m_dependents.erase(dep);
-    dep->m_sources.erase(this);
-}
-
 void GeoObject::detach() {
     updateGuardDequeue(this);
 
@@ -28,3 +22,10 @@ void GeoObject::detach() {
     }
     m_dependents.clear();
 }
+
+void GeoObject::removeDependent(GeoObject *dep) {
+    if (dep == nullptr) return;
+    m_dependents.erase(dep);
+    dep->m_sources.erase(this);
+}
+

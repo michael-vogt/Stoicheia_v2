@@ -70,6 +70,15 @@ void GeoObject::enqueueTransitive() const {
     }
 }
 
+void GeoObject::notify() {
+    if (UpdateGuard::isActive()) {
+        UpdateGuard::enqueue(this);
+        enqueueTransitive();
+    } else {
+        notifyDirect();
+    }
+}
+
 void GeoObject::notifyDirect() {
     std::unordered_set<GeoObject*> visited;
     std::function<void(GeoObject*)> propagate = [&](GeoObject* obj) {
@@ -81,13 +90,4 @@ void GeoObject::notifyDirect() {
         }
     };
     propagate(this);
-}
-
-void GeoObject::notify() {
-    if (UpdateGuard::isActive()) {
-        UpdateGuard::enqueue(this);
-        enqueueTransitive();
-    } else {
-        notifyDirect();
-    }
 }
