@@ -44,11 +44,11 @@ static QHash<QString, QString> buildLanguageMap(const QString& path) {
 }
 
 SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
-    : QDialog(parent), ui(new Ui::SettingsDialog), 
-    m_settings(settings),
-    m_snapshotGrid(settings.grid),
-    m_snapshotColors(settings.colors),
-    m_snapshotGeneral(settings.general)
+: QDialog(parent), ui(new Ui::SettingsDialog),
+m_settings(settings),
+m_snapshotGrid(settings.grid),
+m_snapshotColors(settings.colors),
+m_snapshotGeneral(settings.general)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
@@ -69,7 +69,40 @@ SettingsDialog::SettingsDialog(AppSettings& settings, QWidget* parent)
     readFromSettings();
 }
 
-void SettingsDialog::fillLanguages() {
+void SettingsDialog::reject() {
+    m_settings.grid = m_snapshotGrid;
+    m_settings.colors = m_snapshotColors;
+    m_settings.general = m_snapshotGeneral;
+    m_settings.save();
+    emit settingsChanged();
+    QDialog::reject();
+}
+
+void SettingsDialog::changeEvent(QEvent* event) {
+    QDialog::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        QTimer::singleShot(0, this, [this]() {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
+            ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Abbrechen"));
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
+            ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Standard"));
+        });
+    }
+}
+
+void SettingsDialog::apply() {
+    writeToSettings();
+    m_settings.save();
+    emit settingsChanged();
+}
+
+void SettingsDialog::resetToDefaults() const {
+    m_settings.resetToDefaults();
+    readFromSettings();
+}
+
+void SettingsDialog::fillLanguages() const {
     auto languageMap = buildLanguageMap(":/i18n/");
 
     QVector<QPair<QString, QString>> list;
@@ -84,7 +117,7 @@ void SettingsDialog::fillLanguages() {
     }
 }
 
-void SettingsDialog::readFromSettings() {
+void SettingsDialog::readFromSettings() const {
     ui->m_uiRecentMaxCount->setValue(m_settings.general.recentFiles.maxCount);
     int index = ui->m_uiLanguage->findData(m_settings.general.language);
     if (index != -1)
@@ -108,7 +141,7 @@ void SettingsDialog::readFromSettings() {
     ui->m_watermark->setColor(m_settings.colors.watermark);
 }
 
-void SettingsDialog::writeToSettings() {
+void SettingsDialog::writeToSettings() const {
     m_settings.general.recentFiles.maxCount = ui->m_uiRecentMaxCount->value();
     m_settings.general.language = ui->m_uiLanguage->currentData().toString();
 
@@ -128,37 +161,4 @@ void SettingsDialog::writeToSettings() {
     m_settings.colors.highlighted  = ui->m_highlighted->color();
     m_settings.colors.construction = ui->m_construction->color();
     m_settings.colors.watermark    = ui->m_watermark->color();
-}
-
-void SettingsDialog::apply() {
-    writeToSettings();
-    m_settings.save();
-    emit settingsChanged();
-}
-
-void SettingsDialog::resetToDefaults() {
-    m_settings.resetToDefaults();
-    readFromSettings();
-}
-
-void SettingsDialog::changeEvent(QEvent* event) {
-    QDialog::changeEvent(event);
-    if (event->type() == QEvent::LanguageChange) {
-        ui->retranslateUi(this);
-        QTimer::singleShot(0, this, [this]() {
-            ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
-            ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Abbrechen"));
-            ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
-            ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Standard"));
-        });
-    }
-}
-
-void SettingsDialog::reject() {
-    m_settings.grid = m_snapshotGrid;
-    m_settings.colors = m_snapshotColors;
-    m_settings.general = m_snapshotGeneral;
-    m_settings.save();
-    emit settingsChanged();
-    QDialog::reject();
 }
