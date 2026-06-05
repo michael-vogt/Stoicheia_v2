@@ -50,8 +50,6 @@ add_library(StoicheiaCore STATIC
         src/geometry/UpdateGuard.cpp
         src/geometry/Scene.cpp
         src/geometry/Circle.cpp
-        src/geometry/Triangle.cpp
-        src/geometry/Polygon.cpp
 
         src/constructions/Parallel.cpp
         src/constructions/Midpoint.cpp
