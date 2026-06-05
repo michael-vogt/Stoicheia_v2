@@ -1,18 +1,16 @@
 #pragma once
 #include "Tool.h"
-#include <QGraphicsLineItem>
 #include <QGraphicsEllipseItem>
-#include <QString>
 
-// Abstrakte Basis für alle Konstruktions-Tools.
-// Verwaltet gemeinsame Logik:
-//   - Statusmeldungen für jeden Schritt
-//   - Vorschau-Objekte
-//   - Escape bricht ab und räumt auf
 class ConstructionTool : public Tool {
-    QGraphicsLineItem* m_previewLine = nullptr;
-    QGraphicsEllipseItem* m_previewEllipse = nullptr;
-    std::vector<GeoObject*> m_highlighted;
+public:
+    explicit ConstructionTool(const ToolContext& ctx);
+
+    void activate() override;
+    void deactivate() override;
+
+    void keyPressEvent(QKeyEvent* event) override;
+    QCursor cursor() const override { return Qt::CrossCursor; }
 
 protected:
     // Unterklassen implementieren diese Methoden
@@ -20,7 +18,7 @@ protected:
     virtual void onCancel()   {}
 
     // Statusmeldung anzeigen
-    void showStatus(const QString& msg);
+    void showStatus(const QString& msg) const;
 
     // Vorschau-Hilfsmittel
     void setPreviewLine(const QLineF& line);
@@ -31,12 +29,8 @@ protected:
     void clearHighlights();
     virtual bool hasIntermediateState() const = 0;
 
-public:
-    explicit ConstructionTool(const ToolContext& ctx);
-
-    void activate() override;
-    void deactivate() override;
-
-    void keyPressEvent(QKeyEvent* event) override;
-    QCursor cursor() const override { return Qt::CrossCursor; }
+private:
+    QGraphicsLineItem* m_previewLine = nullptr;
+    QGraphicsEllipseItem* m_previewEllipse = nullptr;
+    std::vector<GeoObject*> m_highlighted;
 };

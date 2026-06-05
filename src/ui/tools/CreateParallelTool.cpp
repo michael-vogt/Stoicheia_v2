@@ -6,14 +6,6 @@ CreateParallelTool::CreateParallelTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreateParallelTool::onActivate() {
-    showStatus(tr("Referenzgerade klicken"));
-}
-
-void CreateParallelTool::onCancel() {
-    m_reference = nullptr;
-}
-
 void CreateParallelTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 

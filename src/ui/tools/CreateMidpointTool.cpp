@@ -7,14 +7,6 @@ CreateMidpointTool::CreateMidpointTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreateMidpointTool::onActivate() {
-    showStatus(tr("Ersten Punkt klicken"));
-}
-
-void CreateMidpointTool::onCancel() {
-    m_firstPoint = nullptr;
-}
-
 void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 

@@ -6,12 +6,9 @@
 #include "ui/ToolContext.h"
 
 class Tool : public QObject {
-protected:
-    ToolContext m_ctx;
-
 public:
     explicit Tool(const ToolContext ctx) : m_ctx(ctx) {}
-    virtual ~Tool() = default;
+    ~Tool() override = default;
 
     virtual void activate() {}
     virtual void deactivate() {}
@@ -24,4 +21,7 @@ public:
     virtual void keyReleaseEvent(QKeyEvent* event) { event->ignore(); }
 
     virtual QCursor cursor() const { return Qt::ArrowCursor; }
+
+protected:
+    ToolContext m_ctx;
 };

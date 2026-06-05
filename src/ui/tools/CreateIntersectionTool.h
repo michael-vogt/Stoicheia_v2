@@ -1,22 +1,21 @@
 #pragma once
 #include "ConstructionTool.h"
 
-// Schnittpunkt zweier Objekte erzeugen.
-// 1. Klick: erstes Objekt (Line oder Circle)
-// 2. Klick: zweites Objekt (Line oder Circle)
 class CreateIntersectionTool : public ConstructionTool {
+
     Q_OBJECT
-    GeoObject* m_firstObject = nullptr;
-
-protected:
-    void onActivate() override;
-    void onCancel() override;
-
-    bool hasIntermediateState() const override { return m_firstObject != nullptr; }
 
 public:
     explicit CreateIntersectionTool(const ToolContext& ctx);
 
     void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override { event->ignore(); }
+
+protected:
+    void onActivate() override { showStatus(tr("Erstes Objekt klicken (Gerade oder Kreis)")); }
+    void onCancel() override { m_firstObject = nullptr; }
+    bool hasIntermediateState() const override { return m_firstObject != nullptr; }
+
+private:
+    GeoObject* m_firstObject = nullptr;
 };

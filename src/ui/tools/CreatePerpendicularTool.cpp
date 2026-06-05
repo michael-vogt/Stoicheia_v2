@@ -7,14 +7,6 @@ CreatePerpendicularTool::CreatePerpendicularTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreatePerpendicularTool::onActivate() {
-    showStatus(tr("Referenzgerade klicken"));
-}
-
-void CreatePerpendicularTool::onCancel() {
-    m_reference = nullptr;
-}
-
 void CreatePerpendicularTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
