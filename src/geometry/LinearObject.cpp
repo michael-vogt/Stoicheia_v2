@@ -14,7 +14,7 @@ LinearObject::LinearObject(Point *p1, Point *p2) : m_p1(p1), m_p2(p2) {
     if (m_p1 == nullptr || m_p2 == nullptr)
         throw std::invalid_argument("null point");
 
-    if (p1->x() < p2->x()) {
+    /*if (p1->x() < p2->x()) {
         m_p1 = p1;
         m_p2 = p2;
     } else if (p1->x() > p2->x()) {
@@ -28,7 +28,7 @@ LinearObject::LinearObject(Point *p1, Point *p2) : m_p1(p1), m_p2(p2) {
             m_p1 = p2;
             m_p2 = p1;
         }
-    }
+    }*/
 
     m_p1->addDependent(this);
     m_p2->addDependent(this);
