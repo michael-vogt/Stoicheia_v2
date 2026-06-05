@@ -2,12 +2,25 @@
 
 #include <complex>
 
-LineCircleIntersection::LineCircleIntersection(LinearObject *line, Circle *circle) : m_line(line), m_circle(circle) {
+LineCircleIntersection::LineCircleIntersection(LinearObject *line, Circle *circle)
+: m_line(line), m_circle(circle)
+{
     if (m_line == nullptr || m_circle == nullptr)
         throw std::invalid_argument("null argument");
     m_line->addDependent(this);
     m_circle->addDependent(this);
     IntersectionSet::recompute();
+}
+
+void LineCircleIntersection::onSourceRemoved(GeoObject *src) {
+    if (src == static_cast<GeoObject*>(m_line)) m_line = nullptr;
+    if (src == static_cast<GeoObject*>(m_circle)) m_circle = nullptr;
+    IntersectionSet::onSourceRemoved(src);
+}
+
+void LineCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
+    if (m_circle == oldSource) m_circle = static_cast<Circle*>(newSource);
 }
 
 void LineCircleIntersection::compute() {
@@ -48,10 +61,4 @@ void LineCircleIntersection::compute() {
         const double t2 = (-b + sqrtDisc) / (2*a);
         setResults(2, x1 + t1*dx, y1 + t1*dy,x1 + t2*dx, y1 + t2*dy);
     }
-}
-
-void LineCircleIntersection::onSourceRemoved(GeoObject *src) {
-    if (src == static_cast<GeoObject*>(m_line)) m_line = nullptr;
-    if (src == static_cast<GeoObject*>(m_circle)) m_circle = nullptr;
-    IntersectionSet::onSourceRemoved(src);
 }

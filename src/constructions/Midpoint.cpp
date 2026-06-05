@@ -2,12 +2,19 @@
 
 #include <stdexcept>
 
-Midpoint::Midpoint(Point *a, Point *b) : Point(0, 0), m_a(a), m_b(b) {
+Midpoint::Midpoint(Point *a, Point *b)
+: Point(0, 0), m_a(a), m_b(b)
+{
     if (m_a == nullptr || m_b == nullptr)
         throw std::invalid_argument("null point");
     m_a->addDependent(this);
     m_b->addDependent(this);
     Midpoint::recompute();
+}
+
+Midpoint::Midpoint(const LinearObject *line)
+: Midpoint(line->p1(), line->p2())
+{
 }
 
 void Midpoint::onSourceRemoved(GeoObject *src) {
@@ -28,6 +35,7 @@ void Midpoint::recompute() {
     moveTo(x, y);
 }
 
-std::string Midpoint::toString() {
-    return Point::toString();
+void Midpoint::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_a == oldSource) m_a = static_cast<Point*>(newSource);
+    if (m_b == oldSource) m_b = static_cast<Point*>(newSource);
 }

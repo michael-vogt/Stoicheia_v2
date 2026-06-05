@@ -6,14 +6,6 @@ CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommand *
     : m_adapter(adapter), m_p1Cmd(p1Cmd), m_p2Cmd(p2Cmd), m_p1(p1), m_p2(p2), m_type(type)
 {}
 
-Point *CreateLineCommand::resolveP1() const {
-    return m_p1Cmd ? m_p1Cmd->point() : m_p1;
-}
-
-Point *CreateLineCommand::resolveP2() const {
-    return m_p2Cmd ? m_p2Cmd->point() : m_p2;
-}
-
 void CreateLineCommand::execute() {
     Point* p1 = resolveP1();
     Point* p2 = resolveP2();
@@ -40,9 +32,9 @@ void CreateLineCommand::undo() {
 
 QString CreateLineCommand::description() const {
     switch (m_type) {
-        case LinearObjectType::Line: return QObject::tr("Gerade erstellen");
-        case LinearObjectType::Ray: return QObject::tr("Halbgerade erstellen");
-        case LinearObjectType::Segment: return QObject::tr("Strecke erstellen");
+        case LinearObjectType::Line: return tr("Gerade erstellen");
+        case LinearObjectType::Ray: return tr("Halbgerade erstellen");
+        case LinearObjectType::Segment: return tr("Strecke erstellen");
     }
     return "";
 }

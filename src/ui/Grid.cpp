@@ -1,4 +1,3 @@
-// ui/Grid.cpp
 #include "Grid.h"
 #include <cmath>
 #include <QFont>
@@ -80,14 +79,14 @@ void Grid::drawLabels(QPainter* painter, std::function<QPointF(QPointF)> toViewp
     painter->drawText(QRect(ox+margin, oy+margin, 20, 14), Qt::AlignLeft, "0");
 }
 
+QPointF Grid::snap(const QPointF& scenePos, const bool forceSnap) const {
+    if (m_snapEnabled || forceSnap)
+        return snapToGrid(scenePos);
+    return scenePos;
+}
+
 QPointF Grid::snapToGrid(const QPointF& scenePos) const {
     double x = std::round(scenePos.x() / m_spacing) * m_spacing;
     double y = std::round(scenePos.y() / m_spacing) * m_spacing;
     return QPointF(x, y);
-}
-
-QPointF Grid::snap(const QPointF& scenePos, bool forceSnap) const {
-    if (m_snapEnabled || forceSnap)
-        return snapToGrid(scenePos);
-    return scenePos;
 }

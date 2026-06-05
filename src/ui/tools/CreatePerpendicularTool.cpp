@@ -7,14 +7,6 @@ CreatePerpendicularTool::CreatePerpendicularTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreatePerpendicularTool::onActivate() {
-    showStatus(QObject::tr("Referenzgerade klicken"));
-}
-
-void CreatePerpendicularTool::onCancel() {
-    m_reference = nullptr;
-}
-
 void CreatePerpendicularTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
@@ -24,7 +16,7 @@ void CreatePerpendicularTool::mousePressEvent(QMouseEvent* event) {
         m_reference = m_ctx.hitTest->linearObjectAt(scenePos);
         if (m_reference) {
             highlightObject(m_reference, true);
-            showStatus(QObject::tr("Punkt klicken durch den die Senkrechte läuft"));
+            showStatus(tr("Punkt klicken durch den die Senkrechte läuft"));
         }
     } else {
         Point* origin = m_ctx.hitTest->pointAt(scenePos);
@@ -34,7 +26,7 @@ void CreatePerpendicularTool::mousePressEvent(QMouseEvent* event) {
                     m_ctx.adapter, origin, m_reference));
             removePreview();
             m_reference = nullptr;
-            showStatus(QObject::tr("Referenzgerade klicken"));
+            showStatus(tr("Referenzgerade klicken"));
         }
     }
     event->accept();

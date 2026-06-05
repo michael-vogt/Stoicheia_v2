@@ -14,7 +14,3 @@ void CreateMidpointCommand::undo() {
     m_adapter->remove(m_result);
     m_result = nullptr;
 }
-
-QString CreateMidpointCommand::description() const {
-    return QObject::tr("Mittelpunkt erstellen");
-}

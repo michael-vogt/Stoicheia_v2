@@ -11,7 +11,7 @@ void ExportManager::registerExporter(std::unique_ptr<Exporter> exporter) {
     m_exporters.push_back(std::move(exporter));
 }
 
-bool ExportManager::exportWithDialog() {
+bool ExportManager::exportWithDialog() const {
     // Filter aus allen Exportern zusammenbauen
     QStringList filters;
     for (auto& e : m_exporters)
@@ -20,7 +20,7 @@ bool ExportManager::exportWithDialog() {
     QString selectedFilter;
     QString filename = QFileDialog::getSaveFileName(
         m_parent,
-        QObject::tr("Exportieren"),
+        tr("Exportieren"),
         {},
         filters.join(";;"),
         &selectedFilter);
@@ -34,7 +34,7 @@ bool ExportManager::exportWithDialog() {
                 filename += "." + e->fileExtension();
             if (!e->exportToFile(m_scene, filename)) {
                 QMessageBox::critical(m_parent,
-                    QObject::tr("Fehler beim Export"), e->lastError());
+                    tr("Fehler beim Export"), e->lastError());
                 return false;
             }
             return true;

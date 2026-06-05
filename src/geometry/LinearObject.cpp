@@ -10,11 +10,13 @@
 /*
  * Constructors and destructor
  */
-LinearObject::LinearObject(Point *p1, Point *p2) : m_p1(p1), m_p2(p2) {
+LinearObject::LinearObject(Point *p1, Point *p2)
+: m_p1(p1), m_p2(p2)
+{
     if (m_p1 == nullptr || m_p2 == nullptr)
         throw std::invalid_argument("null point");
 
-    if (p1->x() < p2->x()) {
+    /*if (p1->x() < p2->x()) {
         m_p1 = p1;
         m_p2 = p2;
     } else if (p1->x() > p2->x()) {
@@ -28,7 +30,7 @@ LinearObject::LinearObject(Point *p1, Point *p2) : m_p1(p1), m_p2(p2) {
             m_p1 = p2;
             m_p2 = p1;
         }
-    }
+    }*/
 
     m_p1->addDependent(this);
     m_p2->addDependent(this);
@@ -41,7 +43,8 @@ LinearObject::LinearObject(Point *p1, Point *p2) : m_p1(p1), m_p2(p2) {
     LinearObject::recompute();
 }
 
-LinearObject::LinearObject(const double a, const double b, const double c) {
+LinearObject::LinearObject(const double a, const double b, const double c)
+{
     m_a = a;
     m_b = b;
     m_c = c;
@@ -71,9 +74,6 @@ double LinearObject::projectParameter(double px, double py) const {
     return ((px - m_p1->x()) * ddx + (py - m_p1->y()) * ddy) / len2;
 }
 
-/*
- * Overridden methods
- */
 void LinearObject::onSourceRemoved(GeoObject *src) {
     m_valid = false;
     if (src == static_cast<GeoObject*>(m_p1)) m_p1 = nullptr;
@@ -96,8 +96,7 @@ void LinearObject::recompute() {
     notify();
 }
 
-std::string LinearObject::toString() {
-    std::string equation = std::format("0 = {}x + {}y + {}", m_a, m_b, m_c);
-    std::string str = std::format("[{}; P1{}--P2{}]", equation, m_p1->toString(), m_p2->toString()); //"Line " + m_p1->toString() + " -- " + m_p2->toString();
-    return str;
+void LinearObject::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_p1 == oldSource) m_p1 = static_cast<Point*>(newSource);
+    if (m_p2 == oldSource) m_p2 = static_cast<Point*>(newSource);
 }

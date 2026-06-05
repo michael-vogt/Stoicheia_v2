@@ -16,15 +16,16 @@ public:
 
     bool contains(const QPointF& point) override;
 
-    void setRadius(double r);
-    void setPen(const QPen& pen);
-    void setBrush(const QBrush& brush);
+    void setRadius(double r) { m_radius = r; update(); }
+    void setPen(const QPen& pen) { m_pen = pen; update(); }
+    void setBrush(const QBrush& brush) { m_brush = brush; update(); }
 
 protected:
+    void updateGeometry() override;
+
     QPen    m_pen     = QPen(Qt::black, 1.5);
     QBrush  m_brush   = QBrush(Qt::white);
     double  m_radius  = 4.0;
-    void updateGeometry() override;
 
 private:
     Point*  m_point = nullptr;

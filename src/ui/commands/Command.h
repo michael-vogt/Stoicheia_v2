@@ -1,9 +1,10 @@
 #pragma once
 #include <qstring.h>
+#include <QObject>
 
-class Command {
+class Command : public QObject {
 public:
-    virtual ~Command() = default;
+    ~Command() override = default;
 
     virtual void execute() = 0;
     virtual void undo() = 0;

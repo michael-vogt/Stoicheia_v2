@@ -5,10 +5,9 @@
 #include <memory>
 #include <QWidget>
 
-class ExportManager {
-    QGraphicsScene* m_scene;
-    QWidget* m_parent;
-    std::vector<std::unique_ptr<Exporter>> m_exporters;
+class ExportManager : QObject {
+
+    Q_OBJECT
 
 public:
     ExportManager(QGraphicsScene* scene, QWidget* parent);
@@ -17,8 +16,10 @@ public:
     void registerExporter(std::unique_ptr<Exporter> exporter);
 
     // Zeigt Dateidialog mit allen verfügbaren Formaten
-    bool exportWithDialog();
+    bool exportWithDialog() const;
 
-    // Direkt in ein bestimmtes Format exportieren
-    bool exportAs(const QString& format, const QString& filename);
+private:
+    QGraphicsScene* m_scene;
+    QWidget* m_parent;
+    std::vector<std::unique_ptr<Exporter>> m_exporters;
 };

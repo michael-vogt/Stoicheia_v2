@@ -7,9 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -------------------------------------------------
 # Qt
 # -------------------------------------------------
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets LinguistTools Svg PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui LinguistTools Svg PrintSupport)
 
 qt_standard_project_setup()
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 # -------------------------------------------------
 # Translation files
@@ -17,6 +20,7 @@ qt_standard_project_setup()
 set(TS_FILES
         translations/app_de.ts
         translations/app_en.ts
+        translations/app_fr.ts
 )
 
 # -------------------------------------------------
@@ -46,8 +50,6 @@ add_library(StoicheiaCore STATIC
         src/geometry/UpdateGuard.cpp
         src/geometry/Scene.cpp
         src/geometry/Circle.cpp
-        src/geometry/Triangle.cpp
-        src/geometry/Polygon.cpp
 
         src/constructions/Parallel.cpp
         src/constructions/Midpoint.cpp
@@ -106,16 +108,17 @@ add_library(StoicheiaApp STATIC
 
         src/ui/SnapHelper.cpp
         src/ui/Grid.cpp
-        src/ui/dialogs/AppSettings.cpp
-        src/ui/dialogs/AppSettings.h
-        src/ui/dialogs/ColorButton.cpp
-        src/ui/dialogs/ColorButton.h
-        src/ui/dialogs/SettingsDialog.cpp
-        src/ui/dialogs/SettingsDialog.h
+        src/ui/commands/CopyCommand.cpp
+        src/ui/commands/MergePointsCommand.cpp
+        src/ui/InputManager.cpp
 )
 
 target_include_directories(StoicheiaApp PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_include_directories(StoicheiaApp PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/dialogs
 )
 
 target_link_libraries(StoicheiaApp PRIVATE
@@ -132,6 +135,13 @@ target_link_libraries(StoicheiaApp PRIVATE
 # GUI LIB (Qt Widgets / Items)
 # -------------------------------------------------
 add_library(StoicheiaQt STATIC
+src/ui/dialogs/AppSettings.cpp
+        src/ui/dialogs/AppSettings.h
+        src/ui/dialogs/ColorButton.cpp
+        src/ui/dialogs/ColorButton.h
+        src/ui/dialogs/SettingsDialog.cpp
+        src/ui/dialogs/SettingsDialog.h
+        src/ui/dialogs/SettingsDialog.ui
         src/ui/GeoGraphicsItem.cpp
         src/ui/GeoPointItem.cpp
         src/ui/GeoLinearObjectItem.cpp
@@ -143,10 +153,15 @@ add_library(StoicheiaQt STATIC
         src/ui/DrawingBoard.h
         src/ui/MainWindow.cpp
         src/ui/MainWindow.h
+        src/ui/MainWindow.ui
 )
 
 target_include_directories(StoicheiaQt PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_include_directories(StoicheiaQt PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/dialogs
 )
 
 target_link_libraries(StoicheiaQt PUBLIC
@@ -159,8 +174,9 @@ target_link_libraries(StoicheiaQt PUBLIC
 # -------------------------------------------------
 # EXECUTABLE (Application)
 # -------------------------------------------------
-qt_add_executable(Stoicheia WIN32
+qt_add_executable(Stoicheia
         main.cpp
+        resources.qrc
 )
 
 target_link_libraries(Stoicheia PRIVATE
@@ -170,6 +186,8 @@ target_link_libraries(Stoicheia PRIVATE
         Qt6::Core
         Qt6::Widgets
 )
+
+target_sources(Stoicheia PRIVATE resources/app.rc)
 
 # -------------------------------------------------
 # Qt Translations (RICHTIG + MODERN)

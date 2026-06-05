@@ -8,9 +8,6 @@ class LinearObject;
 class Circle;
 
 class HitTest {
-    QGraphicsScene* m_scene;
-    double m_tolerance;
-
 public:
     explicit HitTest(QGraphicsScene* scene, double tolerance = 8.0);
 
@@ -27,4 +24,8 @@ public:
     GeoObject* anyObjectAt(const QPointF& scenePos) const;
 
     void setTolerance(const double tolerance) { m_tolerance = tolerance; }
+
+private:
+    QGraphicsScene* m_scene;
+    double m_tolerance;
 };

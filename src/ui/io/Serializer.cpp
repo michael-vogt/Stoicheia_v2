@@ -5,7 +5,6 @@
 #include "../../geometry/Ray.h"
 #include "../../geometry/Segment.h"
 #include "../../geometry/Circle.h"
-#include "../../geometry/Triangle.h"
 #include "../../constructions/Midpoint.h"
 #include "../../constructions/Parallel.h"
 #include "../../constructions/Perpendicular.h"

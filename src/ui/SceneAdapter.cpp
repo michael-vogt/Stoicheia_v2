@@ -7,7 +7,7 @@ SceneAdapter::SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene)
     : m_geoScene(geoScene), m_qtScene(qtScene)
 {}
 
-GeoPointItem* SceneAdapter::addPoint(Point* point, QPen pen) {
+GeoPointItem* SceneAdapter::addPoint(Point* point, const QPen& pen) {
     auto* item = new GeoPointItem(point);
     item->setPen(pen);
     m_qtScene->addItem(item);
@@ -15,7 +15,21 @@ GeoPointItem* SceneAdapter::addPoint(Point* point, QPen pen) {
     return item;
 }
 
-GeoIntersectionPointItem* SceneAdapter::addIntersectionPoint(IntersectionPoint *point, QPen pen) {
+GeoLinearObjectItem* SceneAdapter::addLinearObject(LinearObject* linearObject) {
+    auto* item = new GeoLinearObjectItem(linearObject);
+    m_qtScene->addItem(item);
+    m_map[linearObject] = item;
+    return item;
+}
+
+GeoCircleItem* SceneAdapter::addCircle(Circle* circle) {
+    auto* item = new GeoCircleItem(circle);
+    m_qtScene->addItem(item);
+    m_map[circle] = item;
+    return item;
+}
+
+GeoIntersectionPointItem* SceneAdapter::addIntersectionPoint(IntersectionPoint *point, const QPen& pen) {
     auto* item = new GeoIntersectionPointItem(point);
     item->setPen(pen);
     m_qtScene->addItem(item);
@@ -36,30 +50,8 @@ std::pair<GeoPointItem *, GeoPointItem *> SceneAdapter::addIntersectionSet(Inter
     return result;
 }
 
-GeoLinearObjectItem* SceneAdapter::addLinearObject(LinearObject* lo) {
-    auto* item = new GeoLinearObjectItem(lo);
-    m_qtScene->addItem(item);
-    m_map[lo] = item;
-    return item;
-}
-
-GeoCircleItem* SceneAdapter::addCircle(Circle* circle) {
-    auto* item = new GeoCircleItem(circle);
-    m_qtScene->addItem(item);
-    m_map[circle] = item;
-    return item;
-}
-
-void SceneAdapter::clear() {
-    for (const auto &item: m_map | std::views::values) {
-        m_qtScene->removeItem(item);
-        delete item;
-    }
-    m_map.clear();
-    m_intersectionSets.clear();
-}
-
 void SceneAdapter::remove(GeoObject* geoObject) {
+    if (!geoObject) return;
     if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject))
         m_intersectionSets.erase(iset);
     auto it = m_map.find(geoObject);
@@ -69,7 +61,7 @@ void SceneAdapter::remove(GeoObject* geoObject) {
         m_map.erase(it);
     }
     // Geometrie-Objekt aus der Scene entfernen
-    m_geoScene->remove(geoObject);
+    m_geoScene->softRemove(geoObject);
 }
 
 GeoGraphicsItem* SceneAdapter::itemFor(GeoObject* geoObject) const {
@@ -115,10 +107,44 @@ void SceneAdapter::clearSelection() {
     emit selectionChanged();
 }
 
+void SceneAdapter::clear() {
+    for (const auto &item: m_map | std::views::values) {
+        m_qtScene->removeItem(item);
+        delete item;
+    }
+    m_map.clear();
+    m_intersectionSets.clear();
+}
+
 void SceneAdapter::highlight(GeoObject *obj, bool on) {
     auto it = m_map.find(obj);
     if (it == m_map.end()) {
         return;
     }
     it->second->setHighlighted(on);
+}
+
+void SceneAdapter::hide(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(false);
+}
+
+void SceneAdapter::show(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end())
+        it->second->setVisible(true);
+}
+
+void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
+    auto it = m_map.find(obj);
+    if (it != m_map.end()) {
+        m_qtScene->removeItem(it->second);
+        delete it->second;
+        m_map.erase(it);
+    }
+}
+
+void SceneAdapter::copySelection() {
+    m_clipboard = selection();
 }

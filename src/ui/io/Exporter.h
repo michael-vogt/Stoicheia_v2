@@ -2,7 +2,8 @@
 #include <QString>
 #include <QGraphicsScene>
 
-class Exporter {
+
+class Exporter : public QObject {
 public:
     virtual ~Exporter() = default;
 

@@ -4,29 +4,18 @@
 
 
 class Point : public GeoObject {
+public:
+    Point(double x, double y);
+
+    // Getter
+    double x() const { return m_x; }
+    double y() const { return m_y; }
+
+    // Objekt aktualisieren
+    void moveTo(double nx, double ny);
+    void recompute() override {}
+
+private:
     double m_x;
     double m_y;
-public:
-    /*
-     * Constructor
-     */
-    Point(double x, double y) : m_x(x), m_y(y) {};
-
-    /*
-     * Getter
-     */
-    double x() const { return m_x; };
-    double y() const { return m_y; };
-
-    /*
-     * Modifier
-     */
-    void moveTo(double nx, double ny);
-
-    /*
-     * Overridden methods
-     */
-    void recompute() override {};
-    std::string toString() override;
-
 };

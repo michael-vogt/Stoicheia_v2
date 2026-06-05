@@ -39,7 +39,3 @@ void GeoPointItem::updateGeometry() {
     setVisible(m_point->isValid());
     setPos(m_point->x(), m_point->y());
 }
-
-void GeoPointItem::setRadius(double r) { m_radius = r; update(); }
-void GeoPointItem::setPen(const QPen& pen) { m_pen = pen; update(); }
-void GeoPointItem::setBrush(const QBrush& brush) { m_brush = brush; update(); }

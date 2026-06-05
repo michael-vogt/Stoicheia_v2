@@ -5,12 +5,14 @@
 #include "ui/commands/CreatePointCommand.h"
 #include "ui/commands/MacroCommand.h"
 
-CreateCircleTool::CreateCircleTool(const ToolContext& ctx) : Tool(ctx) {}
+CreateCircleTool::CreateCircleTool(const ToolContext& ctx)
+: Tool(ctx)
+{}
 
 void CreateCircleTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     m_ctx.drawingBoard->viewport()->setMouseTracking(true);
-    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Mittelpunkt klicken"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Mittelpunkt klicken"));
 }
 
 void CreateCircleTool::deactivate() {
@@ -22,11 +24,6 @@ void CreateCircleTool::deactivate() {
 
     m_centerPoint = nullptr;
     m_centerIsNew = false;
-    //m_firstPointCmd = nullptr;
-}
-
-QCursor CreateCircleTool::cursor() const {
-    return Qt::CrossCursor;
 }
 
 void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
@@ -49,7 +46,7 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
             m_centerScenePos = snapped;
         }
 
-        m_ctx.drawingBoard->showStatusLeft(QObject::tr("Punkt auf dem Kreis klicken"));
+        m_ctx.drawingBoard->showStatusLeft(tr("Punkt auf dem Kreis klicken"));
         m_preview = new QGraphicsEllipseItem(m_centerPoint->x(), m_centerPoint->y(), 0, 0);
         m_preview->setPen(QPen(Qt::gray, 1, Qt::DashLine));
         m_ctx.drawingBoard->scene()->addItem(m_preview);
@@ -58,7 +55,7 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
         if (m_centerIsNew)
             m_ctx.adapter->remove(m_centerPoint);
 
-        auto macro = std::make_unique<MacroCommand>(QObject::tr("Kreis erstellen"));
+        auto macro = std::make_unique<MacroCommand>(tr("Kreis erstellen"));
 
         // erster Punkt ins Macro, falls wir ihn erstellt haben
         CreatePointCommand* p1Cmd = nullptr;

@@ -3,9 +3,6 @@
 
 
 class MacroCommand : public Command {
-    QString m_description;
-    std::vector<std::unique_ptr<Command>> m_commands;
-
 public:
     explicit MacroCommand(const QString& description);
 
@@ -13,5 +10,9 @@ public:
 
     void execute() override;
     void undo() override;
-    QString description() const override { return m_description; };
+    QString description() const override { return m_description; }
+
+private:
+    QString m_description;
+    std::vector<std::unique_ptr<Command>> m_commands;
 };

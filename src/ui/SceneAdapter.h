@@ -17,22 +17,17 @@
 // beide Welten bleiben dadurch synchron.
 
 class SceneAdapter : public QObject {
-    Q_OBJECT
-    Scene*          m_geoScene;
-    QGraphicsScene* m_qtScene;
 
-    std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
-    std::unordered_set<GeoObject*> m_selection;
-    std::unordered_set<IntersectionSet*> m_intersectionSets;
+    Q_OBJECT
 
 public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
 
     // Geometrie-Objekt + grafische Repräsentation hinzufügen
-    GeoPointItem*         addPoint(Point* point, QPen pen = QPen(AppSettings::instance().colors.point, 1.5));
-    GeoIntersectionPointItem* addIntersectionPoint(IntersectionPoint* point, QPen pen = QPen(AppSettings::instance().colors.construction, 1.5));
+    GeoPointItem*         addPoint(Point* point, const QPen& pen = QPen(AppSettings::instance().colors.point, 1.5));
     GeoLinearObjectItem*  addLinearObject(LinearObject* linearObject);
     GeoCircleItem*        addCircle(Circle* circle);
+    GeoIntersectionPointItem* addIntersectionPoint(IntersectionPoint* point, const QPen& pen = QPen(AppSettings::instance().colors.construction, 1.5));
     std::pair<GeoPointItem*, GeoPointItem*> addIntersectionSet(IntersectionSet* intersectionSet);
 
     // Geometrie-Objekt und zugehöriges grafisches Objekt entfernen
@@ -56,8 +51,23 @@ public:
     void clear();
 
     void highlight(GeoObject* obj, bool on);
+    void hide(GeoObject* obj);
+    void show(GeoObject* obj);
+    void removeGraphicsOnly(GeoObject* obj);
 
-    signals:
+    void copySelection();
+    std::unordered_set<GeoObject*> clipboard() const { return m_clipboard; };
+
+signals:
     void selectionChanged();
+
+private:
+    Scene*          m_geoScene;
+    QGraphicsScene* m_qtScene;
+
+    std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
+    std::unordered_set<GeoObject*> m_selection;
+    std::unordered_set<IntersectionSet*> m_intersectionSets;
+    std::unordered_set<GeoObject*> m_clipboard;
 
 };

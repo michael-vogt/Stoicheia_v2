@@ -11,7 +11,7 @@ CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : 
 void CreateLineTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
     m_ctx.drawingBoard->viewport()->setMouseTracking(true);
-    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 }
 
 void CreateLineTool::deactivate() {
@@ -23,38 +23,6 @@ void CreateLineTool::deactivate() {
 
     m_firstPoint = nullptr;
     m_firstIsNew = false;
-}
-
-QCursor CreateLineTool::cursor() const {
-    return Qt::CrossCursor;
-}
-
-Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
-    const auto items = m_ctx.drawingBoard->scene()->items(
-        QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
-    for (QGraphicsItem *item : items) {
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item))
-            return pi->point();
-    }
-    return nullptr;
-}
-
-void CreateLineTool::setType(const LinearObjectType type) {
-    m_type = type;
-    ToolType toolType = (type == LinearObjectType::Line)    ? ToolType::CreateLine :
-                        (type == LinearObjectType::Ray)     ? ToolType::CreateRay  :
-                                                              ToolType::CreateSegment;
-    m_ctx.drawingBoard->updateToolType(toolType);
-    if (m_preview)
-        m_preview->setLine(computePreviewLine(m_lastScenePos));
-}
-
-void CreateLineTool::removePreview() {
-    if (m_preview) {
-        m_ctx.drawingBoard->scene()->removeItem(m_preview);
-        delete m_preview;
-        m_preview = nullptr;
-    }
 }
 
 void CreateLineTool::mousePressEvent(QMouseEvent *event) {
@@ -77,7 +45,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
             m_firstScenePos = snapped;
         }
 
-        m_ctx.drawingBoard->showStatusLeft(QObject::tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
+        m_ctx.drawingBoard->showStatusLeft(tr("Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke"));
 
         // Vorschaulinie starten
         m_preview = new QGraphicsLineItem(computePreviewLine(snapped));
@@ -88,7 +56,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         if (m_firstIsNew)
             m_ctx.adapter->remove(m_firstPoint);
 
-        auto macro = std::make_unique<MacroCommand>(QObject::tr(
+        auto macro = std::make_unique<MacroCommand>(tr(
             m_type == LinearObjectType::Line ? "Gerade erstellen" :
             m_type == LinearObjectType::Ray ?  "Halbgerade erstellen" :
                                                "Strecke erstellen"));
@@ -163,6 +131,26 @@ void CreateLineTool::keyPressEvent(QKeyEvent *event) {
     }
 }
 
+Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
+    for (QGraphicsItem *item : items) {
+        if (auto* pi = dynamic_cast<GeoPointItem*>(item))
+            return pi->point();
+    }
+    return nullptr;
+}
+
+void CreateLineTool::setType(const LinearObjectType type) {
+    m_type = type;
+    ToolType toolType = (type == LinearObjectType::Line)    ? ToolType::CreateLine :
+                        (type == LinearObjectType::Ray)     ? ToolType::CreateRay  :
+                                                              ToolType::CreateSegment;
+    m_ctx.drawingBoard->updateToolType(toolType);
+    if (m_preview)
+        m_preview->setLine(computePreviewLine(m_lastScenePos));
+}
+
 QLineF CreateLineTool::computePreviewLine(const QPointF &endPos) const {
     if (!m_firstPoint) return {};
 
@@ -186,4 +174,12 @@ QLineF CreateLineTool::computePreviewLine(const QPointF &endPos) const {
             return QLineF(p1 - u * extent, p1 + u * extent);
     }
     return QLineF(p1, p2);
+}
+
+void CreateLineTool::removePreview() {
+    if (m_preview) {
+        m_ctx.drawingBoard->scene()->removeItem(m_preview);
+        delete m_preview;
+        m_preview = nullptr;
+    }
 }

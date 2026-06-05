@@ -5,7 +5,7 @@
 bool PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
     QRectF rect = scene->itemsBoundingRect();
     if (rect.isEmpty()) {
-        m_lastError = QObject::tr("Keine sichtbaren Objekte");
+        m_lastError = tr("Keine sichtbaren Objekte");
         return false;
     }
 
@@ -28,7 +28,7 @@ bool PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
     image = image.flipped(Qt::Vertical);
 
     if (!image.save(filename)) {
-        m_lastError = QObject::tr("Konnte Datei nicht schreiben");
+        m_lastError = tr("Konnte Datei nicht schreiben");
         return false;
     }
     return true;

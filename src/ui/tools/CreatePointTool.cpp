@@ -8,38 +8,13 @@ CreatePointTool::CreatePointTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void CreatePointTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
-    m_ctx.drawingBoard->showStatusLeft(QObject::tr("Punkt durch Klicken hinzufügen"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Punkt durch Klicken hinzufügen"));
 }
 
 void CreatePointTool::deactivate() {
     if (m_preview)
         m_ctx.drawingBoard->scene()->removeItem(m_preview);
     m_ctx.drawingBoard->showStatusLeft("");
-}
-
-QCursor CreatePointTool::cursor() const {
-    return Qt::CrossCursor;
-}
-
-void CreatePointTool::updatePreview(const QPointF& scenePos) {
-    if (!m_preview) {
-        m_preview = new QGraphicsEllipseItem();
-        m_preview->setPen(QPen(Qt::gray, 1.5));
-        m_preview->setBrush(QBrush(Qt::white));
-        // Preview nicht durch HitTest treffbar
-        m_preview->setFlag(QGraphicsItem::ItemIsSelectable, false);
-        m_ctx.drawingBoard->scene()->addItem(m_preview);
-    }
-
-    m_preview->setRect(scenePos.x() - RADIUS, scenePos.y() - RADIUS, RADIUS * 2, RADIUS * 2);
-}
-
-void CreatePointTool::removePreview() {
-    if (m_preview) {
-        m_ctx.drawingBoard->scene()->removeItem(m_preview);
-        delete m_preview;
-        m_preview = nullptr;
-    }
 }
 
 void CreatePointTool::mousePressEvent(QMouseEvent *event) {
@@ -63,4 +38,25 @@ void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
 
     updatePreview(snapped);
     event->accept();
+}
+
+void CreatePointTool::updatePreview(const QPointF& scenePos) {
+    if (!m_preview) {
+        m_preview = new QGraphicsEllipseItem();
+        m_preview->setPen(QPen(Qt::gray, 1.5));
+        m_preview->setBrush(QBrush(Qt::white));
+        // Preview nicht durch HitTest treffbar
+        m_preview->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        m_ctx.drawingBoard->scene()->addItem(m_preview);
+    }
+
+    m_preview->setRect(scenePos.x() - RADIUS, scenePos.y() - RADIUS, RADIUS * 2, RADIUS * 2);
+}
+
+void CreatePointTool::removePreview() {
+    if (m_preview) {
+        m_ctx.drawingBoard->scene()->removeItem(m_preview);
+        delete m_preview;
+        m_preview = nullptr;
+    }
 }
