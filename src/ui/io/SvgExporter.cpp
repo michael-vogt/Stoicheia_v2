@@ -3,22 +3,14 @@
 #include <QPainter>
 #include <QSvgGenerator>
 
-#include "ui/GeoGraphicsItem.h"
-
 bool SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
     QRectF rect = scene->itemsBoundingRect();
-    /*for (QGraphicsItem *item : scene->items()) {
-        if (item->isVisible())
-            rect = rect.united(item->sceneBoundingRect());
-            //rect = rect.united(item->mapToScene(item->boundingRect()).boundingRect());
-    }*/
-
     if (rect.isEmpty()) {
         m_lastError = tr("Keine sichtbaren Objekte");
         return false;
     }
 
-    const double margin = 20.0;
+    constexpr double margin = 20.0;
     rect.adjust(-margin, -margin, margin, margin);
 
     QSvgGenerator generator;

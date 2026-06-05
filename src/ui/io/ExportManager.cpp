@@ -11,7 +11,7 @@ void ExportManager::registerExporter(std::unique_ptr<Exporter> exporter) {
     m_exporters.push_back(std::move(exporter));
 }
 
-bool ExportManager::exportWithDialog() {
+bool ExportManager::exportWithDialog() const {
     // Filter aus allen Exportern zusammenbauen
     QStringList filters;
     for (auto& e : m_exporters)

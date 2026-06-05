@@ -2,7 +2,6 @@
 #include <QString>
 #include <QGraphicsScene>
 
-#include "ui/commands/MacroCommand.h"
 
 class Exporter : public QObject {
 public:
