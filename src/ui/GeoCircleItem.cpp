@@ -9,12 +9,6 @@ GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
     GeoCircleItem::updateGeometry();
 }
 
-void GeoCircleItem::updateGeometry() {
-    setVisible(isValid());
-    // Kreis zentriert auf Mittelpunkt – Position in Szene setzen
-    setPos(m_circle->center()->x(), m_circle->center()->y());
-}
-
 QRectF GeoCircleItem::boundingRect() const {
     double r = m_circle->radius();
     double extra = m_pen.widthF() / 2.0 + 1.0;
@@ -38,9 +32,6 @@ void GeoCircleItem::paint(QPainter* painter,
     painter->drawEllipse(QPointF(0, 0), r, r);
 }
 
-void GeoCircleItem::setPen(const QPen& pen) { m_pen = pen; update(); }
-void GeoCircleItem::setBrush(const QBrush& brush) { m_brush = brush; update(); }
-
 bool GeoCircleItem::contains(const QPointF &point) {
     if (!m_circle) return false;
 
@@ -52,4 +43,10 @@ bool GeoCircleItem::contains(const QPointF &point) {
 
     const double delta = std::abs(std::sqrt(dx * dx + dy * dy) - r);
     return delta <= 8;
+}
+
+void GeoCircleItem::updateGeometry() {
+    setVisible(isValid());
+    // Kreis zentriert auf Mittelpunkt – Position in Szene setzen
+    setPos(m_circle->center()->x(), m_circle->center()->y());
 }

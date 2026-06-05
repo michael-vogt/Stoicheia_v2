@@ -3,12 +3,11 @@
 #include "GeoPointItem.h"
 #include "Grid.h"
 
-SnapHelper::SnapHelper(QGraphicsScene *scene, const Grid* grid) : m_scene(scene), m_grid(grid) {
-}
+SnapHelper::SnapHelper(QGraphicsScene *scene, const Grid* grid)
+: m_scene(scene), m_grid(grid)
+{}
 
 QPointF SnapHelper::snap(const QPointF &scenePos, bool snapActive) const {
-    //if (!snapActive) return scenePos;
-
     // Punkt-Snap hat Vorrang vor Grid-Snap
     if (Point* p = snapToPoint(scenePos))
         return QPointF(p->x(), p->y());

@@ -5,7 +5,9 @@
 #include "ui/commands/CreatePointCommand.h"
 #include "ui/commands/MacroCommand.h"
 
-CreateCircleTool::CreateCircleTool(const ToolContext& ctx) : Tool(ctx) {}
+CreateCircleTool::CreateCircleTool(const ToolContext& ctx)
+: Tool(ctx)
+{}
 
 void CreateCircleTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
@@ -22,11 +24,6 @@ void CreateCircleTool::deactivate() {
 
     m_centerPoint = nullptr;
     m_centerIsNew = false;
-    //m_firstPointCmd = nullptr;
-}
-
-QCursor CreateCircleTool::cursor() const {
-    return Qt::CrossCursor;
 }
 
 void CreateCircleTool::mousePressEvent(QMouseEvent *event) {

@@ -23,22 +23,24 @@ class SettingsDialog : public QDialog {
 public:
     explicit SettingsDialog(AppSettings& settings, QWidget* parent = nullptr);
 
-    signals:
-        void settingsChanged();
+public slots:
+    void reject() override;
+
+signals:
+    void settingsChanged();
 
 protected:
     void changeEvent(QEvent* event) override;
 
 private slots:
     void apply();
-    void resetToDefaults();
-    void reject() override;
+    void resetToDefaults() const;
 
 private:
-    void fillLanguages();
+    void fillLanguages() const;
 
-    void readFromSettings();
-    void writeToSettings();
+    void readFromSettings() const;
+    void writeToSettings() const;
 
     AppSettings& m_settings;
     GridSettings m_snapshotGrid;

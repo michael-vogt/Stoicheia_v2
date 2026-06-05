@@ -22,11 +22,9 @@ public:
 
     LinearObject* linearObject() const { return m_linearObject; }
 
-    void setPen(const QPen& pen);
+    void setPen(const QPen& pen) { m_pen = pen; update(); }
+    void setExtent(double extent) { m_extent = extent; update(); }
     bool contains(const QPointF &point) override;
-
-    // Ausdehnung für Line/Ray: wie weit über die definierten Punkte hinaus?
-    void setExtent(double extent);
 
 protected:
     void updateGeometry() override;

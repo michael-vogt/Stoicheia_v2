@@ -6,14 +6,6 @@
 #include <QPointF>
 
 class Grid {
-    bool m_visible = true;
-    double m_spacing = 50.0;
-    bool m_snapEnabled = false;
-
-    QColor m_axisColor = QColor(160, 160, 160);
-    QColor m_gridColor = QColor(220, 220, 220);
-    QColor m_labelColor = QColor(120, 120, 120);
-
 public:
     // Zeichnen
     void drawBackground(QPainter* painter, const QRectF& rect) const;
@@ -35,4 +27,13 @@ public:
     void setAxisColor(const QColor& c) { m_axisColor = c; }
     void setGridColor(const QColor& c) { m_gridColor = c; }
     void setLabelColor(const QColor& c) { m_labelColor = c; }
+
+private:
+    bool m_visible = true;
+    double m_spacing = 50.0;
+    bool m_snapEnabled = false;
+
+    QColor m_axisColor = QColor(160, 160, 160);
+    QColor m_gridColor = QColor(220, 220, 220);
+    QColor m_labelColor = QColor(120, 120, 120);
 };

@@ -10,8 +10,7 @@ class CommandStack;
 class FileManager : public QObject {
     Q_OBJECT
 public:
-    FileManager(Scene* scene, SceneAdapter* adapter, CommandStack* commandStack,
-                QWidget* parent);
+    FileManager(Scene* scene, SceneAdapter* adapter, CommandStack* commandStack, QWidget* parent);
 
     // Gibt false zurück wenn der Nutzer abbricht
     bool newFile();

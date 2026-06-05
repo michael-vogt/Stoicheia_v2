@@ -6,14 +6,6 @@ CreatePerpendicularFootTool::CreatePerpendicularFootTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreatePerpendicularFootTool::onActivate() {
-    showStatus(tr("Punkt klicken"));
-}
-
-void CreatePerpendicularFootTool::onCancel() {
-    m_point = nullptr;
-}
-
 void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
@@ -37,8 +29,4 @@ void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
         }
     }
     event->accept();
-}
-
-void CreatePerpendicularFootTool::mouseMoveEvent(QMouseEvent* event) {
-    event->ignore();
 }

@@ -1,11 +1,24 @@
 #include "CircleCircleIntersection.h"
+#include <cmath>
 
-CircleCircleIntersection::CircleCircleIntersection(Circle *c1, Circle *c2) : m_c1(c1), m_c2(c2)
+CircleCircleIntersection::CircleCircleIntersection(Circle *c1, Circle *c2)
+: m_c1(c1), m_c2(c2)
 {
     if (!c1 || !c2) throw std::invalid_argument("null argument");
     c1->addDependent(this);
     c2->addDependent(this);
     IntersectionSet::recompute();
+}
+
+void CircleCircleIntersection::onSourceRemoved(GeoObject *src)  {
+    if (src == static_cast<GeoObject*>(m_c1)) m_c1 = nullptr;
+    if (src == static_cast<GeoObject*>(m_c2)) m_c2 = nullptr;
+    IntersectionSet::onSourceRemoved(src);
+}
+
+void CircleCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_c1 == oldSource) m_c1 = static_cast<Circle*>(newSource);
+    if (m_c2 == oldSource) m_c2 = static_cast<Circle*>(newSource);
 }
 
 void CircleCircleIntersection::compute()  {
@@ -45,21 +58,4 @@ void CircleCircleIntersection::compute()  {
             px + h*nx, py + h*ny,
             px - h*nx, py - h*ny);
     }
-}
-
-void CircleCircleIntersection::onSourceRemoved(GeoObject *src)  {
-    if (src == static_cast<GeoObject*>(m_c1)) m_c1 = nullptr;
-    if (src == static_cast<GeoObject*>(m_c2)) m_c2 = nullptr;
-    IntersectionSet::onSourceRemoved(src);
-}
-
-void CircleCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_c1 == oldSource) m_c1 = static_cast<Circle*>(newSource);
-    if (m_c2 == oldSource) m_c2 = static_cast<Circle*>(newSource);
-}
-
-bool CircleCircleIntersection::equals(const GeoObject &other) const {
-    auto cci = dynamic_cast<const CircleCircleIntersection*>(&other);
-    if (!cci) return false;
-    return cci->c1()->equals(*c1()) && cci->c2()->equals(*c2());
 }

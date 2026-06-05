@@ -42,7 +42,3 @@ void IntersectionSet::setResults(const int count, double x1, double y1, double x
             throw std::invalid_argument("IntersectionSet can only represent 0, 1 or 2 intersection points");
     }
 }
-
-std::string IntersectionSet::toString() {
-    return "";
-}

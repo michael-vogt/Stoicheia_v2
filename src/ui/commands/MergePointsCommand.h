@@ -5,7 +5,21 @@
 
 
 class MergePointsCommand : public Command {
+
     Q_OBJECT
+
+public:
+    MergePointsCommand(SceneAdapter* adapter, Point* survivor, Point* absorbed);
+
+    // Getter
+    Point* survivor() const { return m_survivor; }
+    Point* absorbed() const { return m_absorbed; }
+
+    void execute() override;
+    void undo() override;
+    QString description() const override { return tr("Punkte zusammenführen"); }
+
+private:
     SceneAdapter* m_adapter;
     Point* m_survivor;
     Point* m_absorbed;
@@ -13,14 +27,4 @@ class MergePointsCommand : public Command {
     double m_absorbedY = 0.0;
 
     std::vector<GeoObject*> m_rewired;
-
-public:
-    MergePointsCommand(SceneAdapter* adapter, Point* survivor, Point* absorbed);
-
-    void execute() override;
-    void undo() override;
-    QString description() const override;
-
-    Point* survivor() const { return m_survivor; }
-    Point* absorbed() const { return m_absorbed; }
 };

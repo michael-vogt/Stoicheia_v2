@@ -7,29 +7,24 @@
 
 
 class Perpendicular : public GeoObject {
-    Point* m_origin;
-    LinearObject*  m_reference;
-
-    Point m_phantom;
-    Line  m_line;
-
-    double px() const;
-    double py() const;
 public:
     Perpendicular(Point* origin, LinearObject* reference);
 
     Point* origin() const { return m_origin; }
     LinearObject* reference() const { return m_reference; }
-
-    void recompute() override;
-
-    void onSourceRemoved(GeoObject* src) override;
-
     LinearObject* line() { return &m_line; };
 
-    std::string toString() override;
+    void onSourceRemoved(GeoObject* src) override;
+    void recompute() override;
+    void replaceSource(GeoObject* oldSource, GeoObject* newSource) override;
 
-    void replaceSource(GeoObject* oldSource, GeoObject* newSource);
+private:
+    // Komponenten des Normalenvektors der Referenzlinie
+    double px() const;
+    double py() const;
 
-    bool equals(const GeoObject &other) const override;
+    Point* m_origin;
+    LinearObject*  m_reference;
+    Point m_phantom;
+    Line  m_line;
 };

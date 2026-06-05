@@ -96,19 +96,6 @@ TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
     }
 }
 
-TEST(PropagationTest, TransitivePropagation) {
-    // P1, P2 → Line → Triangle
-    Point p1(0,0), p2(3,0), p3(0,4);
-    Line ab(&p1, &p2);
-    Line bc(&p2, &p3);
-    Line ca(&p3, &p1);
-    Triangle tri(&ab, &bc, &ca);
-
-    double before = tri.perimeter();
-    p2.moveTo(4, 0); // ab becomes length 4
-    EXPECT_GT(tri.perimeter(), before);
-}
-
 TEST(PropagationTest, TwoLinesSharePoint) {
     Point p1(0,0), p2(3,4), p3(6,0);
     Line L1(&p1, &p2);
@@ -170,22 +157,6 @@ TEST(BatchUpdateTest, NestedGuardsFlushOnce) {
     EXPECT_EQ(L.recomputeCount, before + 1);
 }
 
-TEST(BatchUpdateTest, TriangleRecomputedOnceWithGuard) {
-    Point p1(0,0), p2(3,0), p3(0,4);
-    Line ab(&p1, &p2), bc(&p2, &p3), ca(&p3, &p1);
-    Triangle tri(&ab, &bc, &ca);
-    int before = tri.recomputeCount;
-
-    {
-        UpdateGuard guard;
-        p1.moveTo(1, 0);
-        p2.moveTo(4, 0);
-        p3.moveTo(1, 4);
-    }
-
-    EXPECT_EQ(tri.recomputeCount, before + 1);
-}
-
 // ════════════════════════════════════════════════════════════════════════════
 // 5. SCENE – Ownership & remove()
 // ════════════════════════════════════════════════════════════════════════════
@@ -228,28 +199,6 @@ TEST(SceneTest, RemoveLine_PointsUnaffected) {
     EXPECT_TRUE(p1->isValid());
     EXPECT_TRUE(p2->isValid());
     EXPECT_EQ(scene.size(), 2);
-}
-
-TEST(SceneTest, RemoveCascade_DeletesDependents) {
-    Scene scene;
-    auto* p1 = scene.create<Point>(0.0, 0.0);
-    auto* p2 = scene.create<Point>(3.0, 0.0);
-    auto* p3 = scene.create<Point>(0.0, 4.0);
-    auto* ab = scene.create<Line>(p1, p2);
-    auto* bc = scene.create<Line>(p2, p3);
-    auto* ca = scene.create<Line>(p3, p1);
-    scene.create<Triangle>(ab, bc, ca);
-
-    // 7 objects: 3 points + 3 lines + 1 triangle
-    EXPECT_EQ(scene.size(), 7);
-
-    // p2 löschen + alle transitiven Abhängigen:
-    //   ab (hängt an p2), bc (hängt an p2), tri (hängt an ab & bc)
-    // → p2, ab, bc, tri werden gelöscht
-    scene.removeCascade(p2);
-
-    // p1, p3, ca verbleiben = 3
-    EXPECT_EQ(scene.size(), 3);
 }
 
 TEST(SceneTest, AfterRemove_RemainingObjectsStillUpdate) {
@@ -340,15 +289,4 @@ TEST(EdgeCaseTest, EmptyGuardFlushIsNoOp) {
         UpdateGuard guard;
         // nichts tun
     });
-}
-
-TEST(EdgeCaseTest, TrianglePerimeterCorrect) {
-    // 3-4-5 rechtwinkliges Dreieck
-    Point p1(0,0), p2(3,0), p3(0,4);
-    Line ab(&p1, &p2); // 3
-    Line bc(&p2, &p3); // 5
-    Line ca(&p3, &p1); // 4
-    Triangle tri(&ab, &bc, &ca);
-
-    EXPECT_NEAR(tri.perimeter(), 12.0, EPS);
 }

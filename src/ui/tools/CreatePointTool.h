@@ -4,12 +4,8 @@
 #include <QPointF>
 
 class CreatePointTool : public Tool {
-    Q_OBJECT
-    QGraphicsEllipseItem* m_preview = nullptr;
-    static constexpr double RADIUS = 4.0;
 
-    void updatePreview(const QPointF& scenePos);
-    void removePreview();
+    Q_OBJECT
 
 public:
     explicit CreatePointTool(const ToolContext& ctx);
@@ -20,5 +16,12 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-    QCursor cursor() const override;
+    QCursor cursor() const override { return Qt::CrossCursor; }
+
+private:
+    void updatePreview(const QPointF& scenePos);
+    void removePreview();
+
+    QGraphicsEllipseItem* m_preview = nullptr;
+    static constexpr double RADIUS = 4.0;
 };

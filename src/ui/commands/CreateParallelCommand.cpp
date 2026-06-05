@@ -17,7 +17,3 @@ void CreateParallelCommand::undo() {
         m_result = nullptr;
     }
 }
-
-QString CreateParallelCommand::description() const {
-    return tr("Parallele erstellen");
-}

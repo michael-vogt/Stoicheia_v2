@@ -3,7 +3,9 @@
 #include <QPen>
 #include <QKeyEvent>
 
-ConstructionTool::ConstructionTool(const ToolContext& ctx) : Tool(ctx) {}
+ConstructionTool::ConstructionTool(const ToolContext& ctx)
+: Tool(ctx)
+{}
 
 void ConstructionTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
@@ -35,7 +37,7 @@ void ConstructionTool::keyPressEvent(QKeyEvent* event) {
     event->ignore();
 }
 
-void ConstructionTool::showStatus(const QString& msg) {
+void ConstructionTool::showStatus(const QString& msg) const {
     m_ctx.drawingBoard->showStatusLeft(msg);
 }
 

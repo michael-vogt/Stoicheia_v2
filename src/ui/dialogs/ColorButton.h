@@ -2,7 +2,6 @@
 #include <QPushButton>
 #include <QColor>
 
-// Button der eine Farbe anzeigt und beim Klick einen Farbdialog öffnet.
 class ColorButton : public QPushButton {
     Q_OBJECT
 public:
@@ -10,10 +9,10 @@ public:
     explicit ColorButton(const QColor& color, QWidget* parent = nullptr);
 
     QColor color() const { return m_color; }
-    void   setColor(const QColor& color);
+    void setColor(const QColor& color);
 
-    signals:
-        void colorChanged(const QColor& color);
+signals:
+    void colorChanged(const QColor& color);
 
 private:
     void updateAppearance();

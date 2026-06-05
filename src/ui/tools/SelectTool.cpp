@@ -9,7 +9,9 @@
 #include "ui/commands/CopyCommand.h"
 #include "ui/commands/MergePointsCommand.h"
 
-SelectTool::SelectTool(const ToolContext &ctx) : Tool(ctx) {}
+SelectTool::SelectTool(const ToolContext &ctx)
+: Tool(ctx)
+{}
 
 void SelectTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
@@ -24,54 +26,6 @@ void SelectTool::deactivate() {
         m_rubberBand = nullptr;
     }
     m_rubberBanding = false;
-}
-
-QCursor SelectTool::cursor() const {
-    return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor;
-}
-
-Point *SelectTool::pointAt(const QPointF &scenePos) const {
-    const auto items = m_ctx.drawingBoard->scene()->items(
-        QRectF(scenePos - QPointF(8, 8), QSize(16, 16)));
-    for (QGraphicsItem *item : items) {
-        if (auto* pointItem = dynamic_cast<GeoPointItem *>(item))
-            return pointItem->point();
-    }
-    return nullptr;
-}
-
-Point* SelectTool::nearbyPoint(const QPointF &scenePos, Point *exclude) const {
-    const auto items = m_ctx.drawingBoard->scene()->items(
-        QRectF(scenePos - QPointF(10, 10), QSize(20, 20)));
-    for (QGraphicsItem *item : items) {
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
-            Point* p = pi->point();
-            if (p != exclude && p->isValid() && pi->isVisible())
-                return p;
-        }
-    }
-    return nullptr;
-}
-
-GeoGraphicsItem* SelectTool::itemAt(const QPointF &scenePos, const std::type_info& type) const {
-    const auto items = m_ctx.drawingBoard->scene()->items(
-        QRectF(scenePos - QPointF(8, 8), QSize(16, 16)));
-    for (QGraphicsItem *item : items) {
-        if (auto* gi = dynamic_cast<GeoGraphicsItem*>(item)) {
-            if (typeid(*gi) == type && gi->contains(scenePos))
-                return gi;
-        }
-    }
-    return nullptr;
-}
-
-void SelectTool::setMergeCandidate(Point *candidate) {
-    if (m_mergeCandidate == candidate) return;
-    if (m_mergeCandidate)
-        m_ctx.adapter->highlight(m_mergeCandidate, false);
-    m_mergeCandidate = candidate;
-    if (m_mergeCandidate)
-        m_ctx.adapter->highlight(m_mergeCandidate, true);
 }
 
 void SelectTool::mousePressEvent(QMouseEvent *event) {
@@ -113,42 +67,6 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
         startRubberBand(event->pos());
     }
     event->accept();
-}
-
-void SelectTool::startMultiDrag(const QPointF &scenePos) {
-    m_draggedPoints.clear();
-    m_activeMoves.clear();
-
-    const auto& sel = m_ctx.adapter->selection();
-
-    // Alle draggbaren Punkte aus der Selektion sammeln
-    for (GeoObject* obj : sel) {
-        auto* p = dynamic_cast<Point*>(obj);
-        if (!p) continue;
-
-        GeoGraphicsItem* item = m_ctx.adapter->itemFor(p);
-        auto* pi = dynamic_cast<GeoPointItem*>(item);
-        if (!pi || !isDraggable(pi->point())) continue;
-
-        m_draggedPoints.push_back(p);
-
-        Point* radiusPoint = m_ctx.adapter->radiusPointFor(p);
-        if (radiusPoint && !sel.contains(radiusPoint)) {
-            // Kreismittelpunkt mitbewegen
-            m_activeMoves.push_back(std::make_unique<MoveCenterCommand>(p, radiusPoint, p->x(), p->y()));
-        } else if (!radiusPoint) {
-            m_activeMoves.push_back(std::make_unique<MovePointCommand>(p, p->x(), p->y()));
-        }
-    }
-
-    // Drag-Offset: relativ zum ersten Punkt
-    if (!m_draggedPoints.empty()) {
-        Point* first = m_draggedPoints.front();
-        m_dragOffset = scenePos - QPointF(first->x(), first->y());
-    }
-
-    if (!m_draggedPoints.empty())
-        m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
 }
 
 void SelectTool::mouseMoveEvent(QMouseEvent *event) {
@@ -307,8 +225,75 @@ void SelectTool::keyPressEvent(QKeyEvent *event) {
     event->ignore();
 }
 
-bool SelectTool::isDraggable(Point* point) const {
-    return typeid(*point) == typeid(Point);
+Point *SelectTool::pointAt(const QPointF &scenePos) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(8, 8), QSize(16, 16)));
+    for (QGraphicsItem *item : items) {
+        if (auto* pointItem = dynamic_cast<GeoPointItem *>(item))
+            return pointItem->point();
+    }
+    return nullptr;
+}
+
+Point* SelectTool::nearbyPoint(const QPointF &scenePos, Point *exclude) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(10, 10), QSize(20, 20)));
+    for (QGraphicsItem *item : items) {
+        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
+            Point* p = pi->point();
+            if (p != exclude && p->isValid() && pi->isVisible())
+                return p;
+        }
+    }
+    return nullptr;
+}
+
+GeoGraphicsItem* SelectTool::itemAt(const QPointF &scenePos, const std::type_info& type) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(8, 8), QSize(16, 16)));
+    for (QGraphicsItem *item : items) {
+        if (auto* gi = dynamic_cast<GeoGraphicsItem*>(item)) {
+            if (typeid(*gi) == type && gi->contains(scenePos))
+                return gi;
+        }
+    }
+    return nullptr;
+}
+
+void SelectTool::startMultiDrag(const QPointF &scenePos) {
+    m_draggedPoints.clear();
+    m_activeMoves.clear();
+
+    const auto& sel = m_ctx.adapter->selection();
+
+    // Alle draggbaren Punkte aus der Selektion sammeln
+    for (GeoObject* obj : sel) {
+        auto* p = dynamic_cast<Point*>(obj);
+        if (!p) continue;
+
+        GeoGraphicsItem* item = m_ctx.adapter->itemFor(p);
+        auto* pi = dynamic_cast<GeoPointItem*>(item);
+        if (!pi || !isDraggable(pi->point())) continue;
+
+        m_draggedPoints.push_back(p);
+
+        Point* radiusPoint = m_ctx.adapter->radiusPointFor(p);
+        if (radiusPoint && !sel.contains(radiusPoint)) {
+            // Kreismittelpunkt mitbewegen
+            m_activeMoves.push_back(std::make_unique<MoveCenterCommand>(p, radiusPoint, p->x(), p->y()));
+        } else if (!radiusPoint) {
+            m_activeMoves.push_back(std::make_unique<MovePointCommand>(p, p->x(), p->y()));
+        }
+    }
+
+    // Drag-Offset: relativ zum ersten Punkt
+    if (!m_draggedPoints.empty()) {
+        Point* first = m_draggedPoints.front();
+        m_dragOffset = scenePos - QPointF(first->x(), first->y());
+    }
+
+    if (!m_draggedPoints.empty())
+        m_ctx.drawingBoard->viewport()->setCursor(Qt::ClosedHandCursor);
 }
 
 void SelectTool::startRubberBand(const QPoint &viewPos) {
@@ -345,4 +330,13 @@ void SelectTool::finishRubberBand(const QPoint& viewPos) {
                 m_ctx.adapter->select(geoItem->geoObject());
         }
     }
+}
+
+void SelectTool::setMergeCandidate(Point *candidate) {
+    if (m_mergeCandidate == candidate) return;
+    if (m_mergeCandidate)
+        m_ctx.adapter->highlight(m_mergeCandidate, false);
+    m_mergeCandidate = candidate;
+    if (m_mergeCandidate)
+        m_ctx.adapter->highlight(m_mergeCandidate, true);
 }

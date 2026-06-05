@@ -1,11 +1,24 @@
 #include "LineLineIntersection.h"
 
-LineLineIntersection::LineLineIntersection(LinearObject *line1, LinearObject *line2) : m_line1(line1), m_line2(line2) {
+LineLineIntersection::LineLineIntersection(LinearObject *line1, LinearObject *line2)
+: m_line1(line1), m_line2(line2)
+{
     if (m_line1 == nullptr || m_line2 == nullptr)
         throw std::invalid_argument("null line");
     m_line1->addDependent(this);
     m_line2->addDependent(this);
     IntersectionSet::recompute();
+}
+
+void LineLineIntersection::onSourceRemoved(GeoObject *src) {
+    if (src == static_cast<GeoObject*>(m_line1)) m_line1 = nullptr;
+    if (src == static_cast<GeoObject*>(m_line2)) m_line2 = nullptr;
+    IntersectionSet::onSourceRemoved(src);
+}
+
+void LineLineIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
+    if (m_line1 == oldSource) m_line1 = static_cast<LinearObject*>(newSource);
+    if (m_line2 == oldSource) m_line2 = static_cast<LinearObject*>(newSource);
 }
 
 void LineLineIntersection::compute() {
@@ -24,21 +37,4 @@ void LineLineIntersection::compute() {
     }
 
     setResults(1, (b1 * c2 - c1 * b2) / det, (c1 * a2 - a1 * c2) / det);
-}
-
-void LineLineIntersection::onSourceRemoved(GeoObject *src) {
-    if (src == static_cast<GeoObject*>(m_line1)) m_line1 = nullptr;
-    if (src == static_cast<GeoObject*>(m_line2)) m_line2 = nullptr;
-    IntersectionSet::onSourceRemoved(src);
-}
-
-void LineLineIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_line1 == oldSource) m_line1 = static_cast<LinearObject*>(newSource);
-    if (m_line2 == oldSource) m_line2 = static_cast<LinearObject*>(newSource);
-}
-
-bool LineLineIntersection::equals(const GeoObject &other) const {
-    const auto lli = dynamic_cast<const LineLineIntersection*>(&other);
-    if (!lli) return false;
-    return lli->L1()->equals(*L1()) && lli->L2()->equals(*L2());
 }

@@ -1,6 +1,8 @@
 #include "MacroCommand.h"
 
-MacroCommand::MacroCommand(const QString &description) : m_description(description) {}
+MacroCommand::MacroCommand(const QString &description)
+: m_description(description)
+{}
 
 void MacroCommand::add(std::unique_ptr<Command> cmd) {
     m_commands.push_back(std::move(cmd));

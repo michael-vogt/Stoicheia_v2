@@ -12,7 +12,7 @@
 <context>
     <name>CopyCommand</name>
     <message>
-        <location filename="../src/ui/commands/CopyCommand.cpp" line="42"/>
+        <location filename="../src/ui/commands/CopyCommand.h" line="16"/>
         <source>Kopieren</source>
         <translation>Copier</translation>
     </message>
@@ -20,7 +20,7 @@
 <context>
     <name>CreateCircleCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateCircleCommand.cpp" line="31"/>
+        <location filename="../src/ui/commands/CreateCircleCommand.h" line="17"/>
         <source>Kreis erstellen</source>
         <translation>Créer un cercle</translation>
     </message>
@@ -46,7 +46,7 @@
 <context>
     <name>CreateIntersectionCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateIntersectionCommand.cpp" line="43"/>
+        <location filename="../src/ui/commands/CreateIntersectionCommand.h" line="17"/>
         <source>Schnittpunkt erstellen</source>
         <translation>Créer une intersection</translation>
     </message>
@@ -68,17 +68,17 @@
 <context>
     <name>CreateLineCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="43"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="35"/>
         <source>Gerade erstellen</source>
         <translation>Créer une droite</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="44"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="36"/>
         <source>Halbgerade erstellen</source>
         <translation>Créer une demi-droite</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="45"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="37"/>
         <source>Strecke erstellen</source>
         <translation>Créer un segment</translation>
     </message>
@@ -99,7 +99,7 @@
 <context>
     <name>CreateMidpointCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateMidpointCommand.cpp" line="19"/>
+        <location filename="../src/ui/commands/CreateMidpointCommand.h" line="14"/>
         <source>Mittelpunkt erstellen</source>
         <translation>Créer un milieu</translation>
     </message>
@@ -121,7 +121,7 @@
 <context>
     <name>CreateParallelCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateParallelCommand.cpp" line="22"/>
+        <location filename="../src/ui/commands/CreateParallelCommand.h" line="15"/>
         <source>Parallele erstellen</source>
         <translation>Créer une parallèle</translation>
     </message>
@@ -143,7 +143,7 @@
 <context>
     <name>CreatePerpendicularCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreatePerpendicularCommand.cpp" line="22"/>
+        <location filename="../src/ui/commands/CreatePerpendicularCommand.h" line="15"/>
         <source>Senkrechte erstellen</source>
         <translation>Créer une perpendiculaire</translation>
     </message>
@@ -151,7 +151,7 @@
 <context>
     <name>CreatePerpendicularFootCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreatePerpendicularFootCommand.cpp" line="22"/>
+        <location filename="../src/ui/commands/CreatePerpendicularFootCommand.h" line="14"/>
         <source>Lotfußpunkt erstellen</source>
         <translation>Créer un pied de perpendiculaire</translation>
     </message>
@@ -185,6 +185,14 @@
     </message>
 </context>
 <context>
+    <name>CreatePointCommand</name>
+    <message>
+        <location filename="../src/ui/commands/CreatePointCommand.h" line="18"/>
+        <source>Punkt (%1, %2) erstellen</source>
+        <translation>Créer un point (%1, %2)</translation>
+    </message>
+</context>
+<context>
     <name>CreatePointTool</name>
     <message>
         <location filename="../src/ui/tools/CreatePointTool.cpp" line="11"/>
@@ -195,7 +203,7 @@
 <context>
     <name>DeleteObjectCommand</name>
     <message>
-        <location filename="../src/ui/commands/DeleteObjectCommand.cpp" line="159"/>
+        <location filename="../src/ui/commands/DeleteObjectCommand.h" line="14"/>
         <source>Objekt löschen</source>
         <translation>Supprimer l&apos;objet</translation>
     </message>
@@ -506,7 +514,7 @@
 <context>
     <name>MergePointsCommand</name>
     <message>
-        <location filename="../src/ui/commands/MergePointsCommand.cpp" line="39"/>
+        <location filename="../src/ui/commands/MergePointsCommand.h" line="20"/>
         <source>Punkte zusammenführen</source>
         <translation>Fusionner les points</translation>
     </message>
@@ -514,9 +522,17 @@
 <context>
     <name>MoveCenterCommand</name>
     <message>
-        <location filename="../src/ui/commands/MoveCenterCommand.cpp" line="27"/>
+        <location filename="../src/ui/commands/MoveCenterCommand.h" line="15"/>
         <source>Mittelpunkt verschieben</source>
         <translation>Déplacer le centre</translation>
+    </message>
+</context>
+<context>
+    <name>MovePointCommand</name>
+    <message>
+        <location filename="../src/ui/commands/MovePointCommand.h" line="15"/>
+        <source>Punkt verschieben nach (%1, %2)</source>
+        <translation>Déplacement du point vers (%12, %2)</translation>
     </message>
 </context>
 <context>

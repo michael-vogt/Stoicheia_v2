@@ -1,6 +1,7 @@
 #include "CreatePointCommand.h"
 
-CreatePointCommand::CreatePointCommand(SceneAdapter *adapter, double x, double y) : m_adapter(adapter), m_x(x), m_y(y)
+CreatePointCommand::CreatePointCommand(SceneAdapter *adapter, double x, double y)
+: m_adapter(adapter), m_x(x), m_y(y)
 {}
 
 void CreatePointCommand::execute() {
@@ -11,8 +12,4 @@ void CreatePointCommand::execute() {
 void CreatePointCommand::undo() {
     m_adapter->remove(m_point);
     m_point = nullptr;
-}
-
-QString CreatePointCommand::description() const {
-    return QString("Punkt (%1, %2) erstellen").arg(m_x).arg(m_y);
 }

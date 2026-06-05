@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <QMouseEvent>
 #include <QRubberBand>
 
 #include "Tool.h"
@@ -10,28 +9,8 @@
 #include "ui/commands/MovePointCommand.h"
 
 class SelectTool : public Tool {
+
     Q_OBJECT
-    std::vector<std::unique_ptr<MoveCommand>> m_activeMoves;
-    std::vector<Point*> m_draggedPoints;
-    /*Point* m_draggedPoint = nullptr;
-    std::unique_ptr<MoveCommand> m_activeMove;*/
-    QPointF m_dragOffset;
-    bool m_rubberBanding = false;
-    QPoint m_rubberStart;
-    QRubberBand* m_rubberBand = nullptr;
-    Point* m_mergeCandidate = nullptr;
-
-    Point* pointAt(const QPointF& scenePos) const;
-    Point* nearbyPoint(const QPointF& scenePos, Point* exclude) const;
-    GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
-    bool isDraggable(Point* p) const;
-    void startMultiDrag(const QPointF& scenePos);
-
-    void startRubberBand(const QPoint& viewPos);
-    void updateRubberBand(const QPoint& viewPos);
-    void finishRubberBand(const QPoint& viewPos);
-
-    void setMergeCandidate(Point* candidate);
 
 public:
     explicit SelectTool(const ToolContext& ctx);
@@ -45,5 +24,24 @@ public:
 
     void keyPressEvent(QKeyEvent* event) override;
 
-    QCursor cursor() const override;
+    QCursor cursor() const override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }
+
+private:
+    Point* pointAt(const QPointF& scenePos) const;
+    Point* nearbyPoint(const QPointF& scenePos, Point* exclude) const;
+    GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
+    bool isDraggable(Point* point) const { return typeid(*point) == typeid(Point); }
+    void startMultiDrag(const QPointF& scenePos);
+    void startRubberBand(const QPoint& viewPos);
+    void updateRubberBand(const QPoint& viewPos);
+    void finishRubberBand(const QPoint& viewPos);
+    void setMergeCandidate(Point* candidate);
+
+    std::vector<std::unique_ptr<MoveCommand>> m_activeMoves;
+    std::vector<Point*> m_draggedPoints;
+    QPointF m_dragOffset;
+    bool m_rubberBanding = false;
+    QPoint m_rubberStart;
+    QRubberBand* m_rubberBand = nullptr;
+    Point* m_mergeCandidate = nullptr;
 };

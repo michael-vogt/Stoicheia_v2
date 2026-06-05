@@ -15,7 +15,7 @@ public:
     explicit InputManager(DrawingBoard* board, QObject* parent = nullptr);
 
     void setActiveTool(Tool* tool) { m_activeTool = tool; }
-    Tool* activeTool() const       { return m_activeTool; }
+    [[nodiscard]] Tool* activeTool() const { return m_activeTool; }
 
     // DrawingBoard delegiert alle Events hierher
     void handleMousePress  (QMouseEvent*  event);
@@ -46,11 +46,11 @@ private:
     // Shortcut-System
     void handleShortcutKey(QKeyEvent* event);
     void setShortcutMode  (ShortcutMode mode);
-    void showStatus       (int sbp, const QString& msg);
+    void showStatus       (int sbp, const QString& msg) { emit statusMessage(sbp, msg); }
 
     // Snap
     void setSnapping(bool snapping);
-    bool snapping   () const        { return m_snapping; }
+    bool snapping() const { return m_snapping; }
 
     DrawingBoard* m_board;
     Tool*         m_activeTool   = nullptr;

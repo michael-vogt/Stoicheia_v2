@@ -33,39 +33,6 @@ InputManager::InputManager(DrawingBoard* board, QObject* parent)
     });
 }
 
-// ── Pan ──────────────────────────────────────────────────────────────────────
-
-bool InputManager::isPanTrigger(QMouseEvent* event) const {
-    return event->button() == Qt::MiddleButton ||
-           (event->button() == Qt::LeftButton && m_spacePressed);
-}
-
-void InputManager::startPan(QMouseEvent* event) {
-    m_panning  = true;
-    m_panStart = event->pos();
-    m_board->viewport()->setCursor(Qt::ClosedHandCursor);
-    showStatus(std::to_underlying(StatusBarPart::Right), tr("Panning"));
-    event->accept();
-}
-
-void InputManager::updatePan(QMouseEvent* event) {
-    QPoint delta = event->pos() - m_panStart;
-    m_panStart   = event->pos();
-    m_board->horizontalScrollBar()->setValue(
-        m_board->horizontalScrollBar()->value() - delta.x());
-    m_board->verticalScrollBar()->setValue(
-        m_board->verticalScrollBar()->value() - delta.y());
-    event->accept();
-}
-
-void InputManager::endPan(QMouseEvent* event) {
-    m_panning = false;
-    m_board->viewport()->setCursor(
-        m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
-    showStatus(std::to_underlying(StatusBarPart::Right), "");
-    event->accept();
-}
-
 // ── Mouse Events ─────────────────────────────────────────────────────────────
 
 void InputManager::handleMousePress(QMouseEvent* event) {
@@ -195,33 +162,42 @@ void InputManager::handleKeyRelease(QKeyEvent* event) {
     event->ignore();
 }
 
+// ── Pan ──────────────────────────────────────────────────────────────────────
+
+bool InputManager::isPanTrigger(QMouseEvent* event) const {
+    return event->button() == Qt::MiddleButton ||
+           (event->button() == Qt::LeftButton && m_spacePressed);
+}
+
+void InputManager::startPan(QMouseEvent* event) {
+    m_panning  = true;
+    m_panStart = event->pos();
+    m_board->viewport()->setCursor(Qt::ClosedHandCursor);
+    showStatus(std::to_underlying(StatusBarPart::Right), tr("Panning"));
+    event->accept();
+}
+
+void InputManager::updatePan(QMouseEvent* event) {
+    QPoint delta = event->pos() - m_panStart;
+    m_panStart   = event->pos();
+    m_board->horizontalScrollBar()->setValue(
+        m_board->horizontalScrollBar()->value() - delta.x());
+    m_board->verticalScrollBar()->setValue(
+        m_board->verticalScrollBar()->value() - delta.y());
+    event->accept();
+}
+
+void InputManager::endPan(QMouseEvent* event) {
+    m_panning = false;
+    m_board->viewport()->setCursor(
+        m_spacePressed ? Qt::OpenHandCursor : Qt::ArrowCursor);
+    showStatus(std::to_underlying(StatusBarPart::Right), "");
+    event->accept();
+}
+
+
+
 // ── Shortcut-System ───────────────────────────────────────────────────────────
-
-void InputManager::showStatus(int sbp, const QString& msg) {
-    emit statusMessage(sbp, msg);
-}
-
-void InputManager::setShortcutMode(ShortcutMode mode) {
-    m_shortcutMode = mode;
-    emit shortcutModeChanged(mode);
-
-    constexpr int sbLeft = std::to_underlying(StatusBarPart::Left);
-
-    switch (mode) {
-        case ShortcutMode::None:
-            break;
-        case ShortcutMode::Geometry:
-            showStatus(sbLeft, tr("Geometrie: [P] Punkt  [L] Gerade  "
-                          "[R] Halbgerade  [S] Strecke  [C] Kreis  "
-                          "[Esc] Abbrechen"));
-            break;
-        case ShortcutMode::Construction:
-            showStatus(sbLeft, tr("Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  "
-                          "[P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  "
-                          "[Esc] Abbrechen"));
-            break;
-    }
-}
 
 void InputManager::handleShortcutKey(QKeyEvent* event) {
     if (m_shortcutMode == ShortcutMode::None) {
@@ -303,6 +279,28 @@ void InputManager::handleShortcutKey(QKeyEvent* event) {
         emit toolChangeRequested(toolType);
         event->accept();
         return;
+    }
+}
+
+void InputManager::setShortcutMode(ShortcutMode mode) {
+    m_shortcutMode = mode;
+    emit shortcutModeChanged(mode);
+
+    constexpr int sbLeft = std::to_underlying(StatusBarPart::Left);
+
+    switch (mode) {
+        case ShortcutMode::None:
+            break;
+        case ShortcutMode::Geometry:
+            showStatus(sbLeft, tr("Geometrie: [P] Punkt  [L] Gerade  "
+                          "[R] Halbgerade  [S] Strecke  [C] Kreis  "
+                          "[Esc] Abbrechen"));
+            break;
+        case ShortcutMode::Construction:
+            showStatus(sbLeft, tr("Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  "
+                          "[P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  "
+                          "[Esc] Abbrechen"));
+            break;
     }
 }
 

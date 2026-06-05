@@ -6,14 +6,6 @@ CreateIntersectionTool::CreateIntersectionTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
 {}
 
-void CreateIntersectionTool::onActivate() {
-    showStatus(tr("Erstes Objekt klicken (Gerade oder Kreis)"));
-}
-
-void CreateIntersectionTool::onCancel() {
-    m_firstObject = nullptr;
-}
-
 void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
@@ -41,8 +33,4 @@ void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
         showStatus(tr("Erstes Objekt klicken (Gerade oder Kreis)"));
     }
     event->accept();
-}
-
-void CreateIntersectionTool::mouseMoveEvent(QMouseEvent* event) {
-    event->ignore();
 }

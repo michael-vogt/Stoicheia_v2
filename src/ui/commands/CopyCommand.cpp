@@ -38,10 +38,6 @@ void CopyCommand::undo() {
     m_copies.clear();
 }
 
-QString CopyCommand::description() const {
-    return tr("Kopieren");
-}
-
 Point* CopyCommand::resolvePoint(Point *p) const {
     auto it = m_map.find(p);
     return it != m_map.end() ? static_cast<Point*>(it->second) : p;

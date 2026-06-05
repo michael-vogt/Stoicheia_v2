@@ -25,38 +25,6 @@ void CreateLineTool::deactivate() {
     m_firstIsNew = false;
 }
 
-QCursor CreateLineTool::cursor() const {
-    return Qt::CrossCursor;
-}
-
-Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
-    const auto items = m_ctx.drawingBoard->scene()->items(
-        QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
-    for (QGraphicsItem *item : items) {
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item))
-            return pi->point();
-    }
-    return nullptr;
-}
-
-void CreateLineTool::setType(const LinearObjectType type) {
-    m_type = type;
-    ToolType toolType = (type == LinearObjectType::Line)    ? ToolType::CreateLine :
-                        (type == LinearObjectType::Ray)     ? ToolType::CreateRay  :
-                                                              ToolType::CreateSegment;
-    m_ctx.drawingBoard->updateToolType(toolType);
-    if (m_preview)
-        m_preview->setLine(computePreviewLine(m_lastScenePos));
-}
-
-void CreateLineTool::removePreview() {
-    if (m_preview) {
-        m_ctx.drawingBoard->scene()->removeItem(m_preview);
-        delete m_preview;
-        m_preview = nullptr;
-    }
-}
-
 void CreateLineTool::mousePressEvent(QMouseEvent *event) {
     if (event->button() != Qt::LeftButton) {
         event->ignore();
@@ -163,6 +131,26 @@ void CreateLineTool::keyPressEvent(QKeyEvent *event) {
     }
 }
 
+Point* CreateLineTool::pointAt(const QPointF &scenePos) const {
+    const auto items = m_ctx.drawingBoard->scene()->items(
+        QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
+    for (QGraphicsItem *item : items) {
+        if (auto* pi = dynamic_cast<GeoPointItem*>(item))
+            return pi->point();
+    }
+    return nullptr;
+}
+
+void CreateLineTool::setType(const LinearObjectType type) {
+    m_type = type;
+    ToolType toolType = (type == LinearObjectType::Line)    ? ToolType::CreateLine :
+                        (type == LinearObjectType::Ray)     ? ToolType::CreateRay  :
+                                                              ToolType::CreateSegment;
+    m_ctx.drawingBoard->updateToolType(toolType);
+    if (m_preview)
+        m_preview->setLine(computePreviewLine(m_lastScenePos));
+}
+
 QLineF CreateLineTool::computePreviewLine(const QPointF &endPos) const {
     if (!m_firstPoint) return {};
 
@@ -186,4 +174,12 @@ QLineF CreateLineTool::computePreviewLine(const QPointF &endPos) const {
             return QLineF(p1 - u * extent, p1 + u * extent);
     }
     return QLineF(p1, p2);
+}
+
+void CreateLineTool::removePreview() {
+    if (m_preview) {
+        m_ctx.drawingBoard->scene()->removeItem(m_preview);
+        delete m_preview;
+        m_preview = nullptr;
+    }
 }
