@@ -34,7 +34,3 @@ void MergePointsCommand::undo() {
     m_absorbed->moveTo(m_absorbedX, m_absorbedY);
     m_adapter->addPoint(m_absorbed);
 }
-
-QString MergePointsCommand::description() const {
-    return tr("Punkte zusammenführen");
-}

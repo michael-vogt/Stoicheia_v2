@@ -17,7 +17,3 @@ void CreatePerpendicularFootCommand::undo() {
         m_result = nullptr;
     }
 }
-
-QString CreatePerpendicularFootCommand::description() const {
-    return tr("Lotfußpunkt erstellen");
-}

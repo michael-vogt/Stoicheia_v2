@@ -7,8 +7,21 @@
 #include <constructions/LineCircleIntersection.h>
 #include <constructions/CircleCircleIntersection.h>
 
-DeleteObjectCommand::DeleteObjectCommand(SceneAdapter *adapter, GeoObject *object) : m_adapter(adapter), m_object(object)
+DeleteObjectCommand::DeleteObjectCommand(SceneAdapter *adapter, GeoObject *object)
+: m_adapter(adapter), m_object(object)
 {}
+
+void DeleteObjectCommand::execute() {
+    m_undoFactory = buildUndoFactory();
+    m_object->detach();
+    m_adapter->removeGraphicsOnly(m_object);
+}
+
+void DeleteObjectCommand::undo() {
+    if (m_undoFactory) {
+        m_undoFactory();
+    }
+}
 
 std::function<void()> DeleteObjectCommand::buildUndoFactory() {
     // Zustand vor dem Löschen erfassen - je nach Typ
@@ -141,20 +154,4 @@ std::function<void()> DeleteObjectCommand::buildUndoFactory() {
     }
 
     return {}; // unbekannter Typ
-}
-
-void DeleteObjectCommand::execute() {
-    m_undoFactory = buildUndoFactory();
-    m_object->detach();
-    m_adapter->removeGraphicsOnly(m_object);
-}
-
-void DeleteObjectCommand::undo() {
-    if (m_undoFactory) {
-        m_undoFactory();
-    }
-}
-
-QString DeleteObjectCommand::description() const {
-    return tr("Objekt löschen");
 }

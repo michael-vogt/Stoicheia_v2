@@ -38,7 +38,3 @@ void CreateIntersectionCommand::undo() {
         m_result = nullptr;
     }
 }
-
-QString CreateIntersectionCommand::description() const {
-    return tr("Schnittpunkt erstellen");
-}
