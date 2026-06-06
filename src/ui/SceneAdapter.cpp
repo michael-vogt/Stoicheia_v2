@@ -52,8 +52,18 @@ std::pair<GeoPointItem *, GeoPointItem *> SceneAdapter::addIntersectionSet(Inter
 
 void SceneAdapter::remove(GeoObject* geoObject) {
     if (!geoObject) return;
-    if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject))
+    if (auto* iset = dynamic_cast<IntersectionSet*>(geoObject)) {
         m_intersectionSets.erase(iset);
+        // Die Kindpunkte sind member des IntersectionSet und in m_map eingetragen
+        for (IntersectionPoint* pt : {iset->first(), iset->second()}) {
+            auto it = m_map.find(pt);
+            if (it != m_map.end()) {
+                m_qtScene->removeItem(it->second);
+                delete it->second;
+                m_map.erase(it);
+            }
+        }
+    }
     auto it = m_map.find(geoObject);
     if (it != m_map.end()) {
         m_qtScene->removeItem(it->second);
