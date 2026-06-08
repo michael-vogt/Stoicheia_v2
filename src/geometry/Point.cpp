@@ -1,13 +1,11 @@
 #include "Point.h"
 
-#include <format>
-
-Point::Point(double x, double y)
-: m_x(x), m_y(y)
+Point::Point(double pos_x, double pos_y)
+: m_x(pos_x), m_y(pos_y)
 {}
 
-void Point::moveTo(const double nx, const double ny) {
-    m_x = nx;
-    m_y = ny;
+void Point::moveTo(const double new_x, const double new_y) {
+    m_x = new_x;
+    m_y = new_y;
     notify();
 }

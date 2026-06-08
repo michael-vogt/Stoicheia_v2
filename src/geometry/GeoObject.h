@@ -1,8 +1,7 @@
 #pragma once
 
-#include <string>
 #include <unordered_set>
-#include <typeinfo>
+#include "../Structs.h"
 
 class UpdateGuard;
 void updateGuardDequeue(class GeoObject* obj);
@@ -12,9 +11,9 @@ public:
     virtual ~GeoObject() { detach(); }
 
     // Getter
-    bool isValid() const { return m_valid; }
-    std::unordered_set<GeoObject*> dependents() { return m_dependents; }
-    std::unordered_set<GeoObject*>& sources() { return m_sources; }
+    [[nodiscard]] auto isValid() const -> bool { return m_valid; }
+    auto dependents() -> std::unordered_set<GeoObject*> { return m_dependents; }
+    auto sources() -> std::unordered_set<GeoObject*>& { return m_sources; }
 
     // Objekt aktualisieren
     void addDependent(GeoObject* dep);
@@ -22,7 +21,7 @@ public:
     virtual void onSourceRemoved(GeoObject* src) { m_valid = false; };
     virtual void recompute() = 0;
     void removeDependent(GeoObject* dep);
-    virtual void replaceSource(GeoObject* oldSource, GeoObject* newSource) {};
+    virtual void replaceSource(GeoObjectPair source) {};
 
 protected:
     // notify and helpers are implemented in UpdateGuard.cpp

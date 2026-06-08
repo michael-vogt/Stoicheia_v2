@@ -1,12 +1,16 @@
 #include "Parallel.h"
+#include "Structs.h"
 
 #include <stdexcept>
 
 Parallel::Parallel(Point *origin, LinearObject *reference)
-: m_origin(origin), m_phantom(origin->x(), origin->y()), m_reference(reference), m_line(&m_phantom, origin)
+: m_origin(origin), m_phantom(origin->x(), origin->y()), m_reference(reference)
 {
-    if (m_origin == nullptr || m_reference == nullptr)
+    if (m_origin == nullptr || m_reference == nullptr) {
         throw std::invalid_argument("null argument");
+    }
+    PointPairForLinearObject pointPair{.point1=&m_phantom, .point2=origin};
+    m_line = new Line(pointPair);
     m_origin->addDependent(this);
     m_reference->addDependent(this);
     Parallel::recompute();
@@ -14,8 +18,8 @@ Parallel::Parallel(Point *origin, LinearObject *reference)
 
 void Parallel::onSourceRemoved(GeoObject *src) {
     m_valid = false;
-    if (src == static_cast<GeoObject*>(m_origin)) m_origin = nullptr;
-    if (src == static_cast<GeoObject*>(m_reference)) m_reference = nullptr;
+    if (src == static_cast<GeoObject*>(m_origin)) { m_origin = nullptr; }
+    if (src == static_cast<GeoObject*>(m_reference)) { m_reference = nullptr; }
 }
 
 void Parallel::recompute() {
@@ -26,22 +30,23 @@ void Parallel::recompute() {
 
     m_valid = true;
 
-    double vx = dx(), vy = dy();
-    m_phantom.moveTo(m_origin->x() + vx, m_origin->y() + vy);
+    double dir_x = dx();
+    double dir_y = dy();
+    m_phantom.moveTo(m_origin->x() + dir_x, m_origin->y() + dir_y);
     notify();
 }
 
-void Parallel::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_origin == oldSource) m_origin = static_cast<Point*>(newSource);
-    if (m_reference == oldSource) m_reference = static_cast<LinearObject*>(newSource);
+void Parallel::replaceSource(GeoObjectPair source) {
+    if (m_origin == source.oldGeoObject) { m_origin = static_cast<Point*>(source.newGeoObject); }
+    if (m_reference == source.oldGeoObject) { m_reference = static_cast<LinearObject*>(source.newGeoObject); }
 }
 
-double Parallel::dx() const {
+auto Parallel::dx() const -> double {
     auto [p1, p2] = m_reference->points();
     return p2->x() - p1->x();
 }
 
-double Parallel::dy() const {
+auto Parallel::dy() const -> double {
     auto [p1, p2] = m_reference->points();
     return p2->y() - p1->y();
 }

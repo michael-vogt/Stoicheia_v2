@@ -9,8 +9,6 @@
 #include "Enums.h"
 #include "io/ExportManager.h"
 
-enum class ToolType;
-enum class ShortcutMode;
 
 namespace Ui { class MainWindow; }
 

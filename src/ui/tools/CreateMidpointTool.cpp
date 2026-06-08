@@ -1,6 +1,7 @@
 #include "CreateMidpointTool.h"
 #include "../DrawingBoard.h"
 #include "../commands/CreateMidpointCommand.h"
+#include "Structs.h"
 #include <cmath>
 
 CreateMidpointTool::CreateMidpointTool(const ToolContext& ctx)
@@ -23,7 +24,7 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
         if (hit != m_firstPoint) {
             m_ctx.commandStack->execute(
                 std::make_unique<CreateMidpointCommand>(
-                    m_ctx.adapter, m_firstPoint, hit));
+                    m_ctx.adapter, PointPairForLinearObject{.point1=m_firstPoint, .point2=hit}));
         }
         removePreview();
         m_firstPoint = nullptr;

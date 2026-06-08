@@ -2,101 +2,91 @@
 
 #include <cassert>
 #include <cmath>
-#include <format>
-#include <iostream>
+#include <limits>
+#include <stdexcept>
 
+#include "Structs.h"
 #include "geometryHelper.h"
 
-/*
- * Constructors and destructor
- */
-LinearObject::LinearObject(Point *p1, Point *p2)
-: m_p1(p1), m_p2(p2)
+
+constexpr double eps = std::numeric_limits<double>::epsilon();
+
+LinearObject::LinearObject(PointPairForLinearObject points)
+: m_point1(points.point1), m_point2(points.point2)
 {
-    if (m_p1 == nullptr || m_p2 == nullptr)
+    if (m_point1 == nullptr || m_point2 == nullptr) {
         throw std::invalid_argument("null point");
+    }
 
-    /*if (p1->x() < p2->x()) {
-        m_p1 = p1;
-        m_p2 = p2;
-    } else if (p1->x() > p2->x()) {
-        m_p1 = p2;
-        m_p2 = p1;
-    } else {
-        if (p1->y() < p2->y()) {
-            m_p1 = p1;
-            m_p2 = p2;
-        } else {
-            m_p1 = p2;
-            m_p2 = p1;
-        }
-    }*/
+    m_point1->addDependent(this);
+    m_point2->addDependent(this);
 
-    m_p1->addDependent(this);
-    m_p2->addDependent(this);
-
-    auto [a, b, c] = lineParametersFromPoints(m_p1, m_p2);
-    m_a = a;
-    m_b = b;
-    m_c = c;
-
+    m_lineParameters = lineParametersFromPoints(m_point1, m_point2);
     LinearObject::recompute();
 }
 
-LinearObject::LinearObject(const double a, const double b, const double c)
+LinearObject::LinearObject(LineParameters params)
+: m_lineParameters(params)
 {
-    m_a = a;
-    m_b = b;
-    m_c = c;
-
-    auto [p1, p2] = linePointsFromParameters(a, b, c);
+    auto [p1, p2] = linePointsFromParameters(params.a, params.b, params.c);
     p1->addDependent(this);
     p2->addDependent(this);
-    m_p1 = p1;
-    m_p2 = p2;
+    m_point1 = p1;
+    m_point2 = p2;
 }
 
-bool LinearObject::contains(double px, double py, double eps) const {
-    double t = projectParameter(px, py);
-    if (!containsT(t))
+// Ein Punkt P liegt auf der Geraden, wenn für die Projektion Q auf die Linie gilt: P = Q
+auto LinearObject::contains(DoublePair point) const -> bool {
+    double param_t = projectParameter(point);
+    if (!containsT(param_t)) {
         return false;
+    }
 
-    double qx = m_p1->x() + t*dx() - px;
-    double qy = m_p1->y() + t*dy() - py;
-    return std::sqrt(qx*qx + qy*qy) < eps;
+    // Vektor zwischen Projektion auf Linie und tatsächlichem Punkt
+    double delta_x = m_point1->x() + (param_t*dx()) - point.x;
+    double delta_y = m_point1->y() + (param_t*dy()) - point.y;
+    return std::sqrt((delta_x*delta_x) + (delta_y*delta_y)) < eps;
 }
 
-double LinearObject::projectParameter(double px, double py) const {
+auto LinearObject::projectParameter(DoublePair point) const -> double {
     double ddx = dx();
     double ddy = dy();
-    double len2 = ddx*ddx + ddy*ddy;
-    if (len2 < 1e-20) return 0.0;
-    return ((px - m_p1->x()) * ddx + (py - m_p1->y()) * ddy) / len2;
+    double len2 = (ddx*ddx) + (ddy*ddy);
+    if (len2 < eps*eps) {
+        return 0.0;
+    }
+    return (((point.x - m_point1->x()) * ddx) + ((point.y - m_point1->y()) * ddy)) / len2;
 }
 
 void LinearObject::onSourceRemoved(GeoObject *src) {
     m_valid = false;
-    if (src == static_cast<GeoObject*>(m_p1)) m_p1 = nullptr;
-    if (src == static_cast<GeoObject*>(m_p2)) m_p2 = nullptr;
+    if (src == static_cast<GeoObject*>(m_point1)) { 
+        m_point1 = nullptr;
+    }
+    if (src == static_cast<GeoObject*>(m_point2)) { 
+        m_point2 = nullptr;
+    }
 }
 
 void LinearObject::recompute() {
-    if (m_p1 == nullptr || m_p2 == nullptr)
+    if (m_point1 == nullptr || m_point2 == nullptr) {
         return;
+    }
 
-    auto [a, b, c] = lineParametersFromPoints(m_p1, m_p2);
-    m_a = a;
-    m_b = b;
-    m_c = c;
-
-    double ddx = m_p2->x() - m_p1->x();
-    double ddy = m_p2->y() - m_p1->y();
-    m_length = std::sqrt(ddx*ddx + ddy*ddy);
+    m_lineParameters = lineParametersFromPoints(m_point1, m_point2);
+    
+    double ddx = m_point2->x() - m_point1->x();
+    double ddy = m_point2->y() - m_point1->y();
+    m_length = std::sqrt((ddx*ddx) + (ddy*ddy));
     recomputeCount++;
     notify();
 }
 
-void LinearObject::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_p1 == oldSource) m_p1 = static_cast<Point*>(newSource);
-    if (m_p2 == oldSource) m_p2 = static_cast<Point*>(newSource);
+void LinearObject::replaceSource(GeoObjectPair source) {
+    if (m_point1 == source.oldGeoObject) { 
+        m_point1 = static_cast<Point*>(source.newGeoObject);
+    }
+    if (m_point2 == source.oldGeoObject) { 
+        m_point2 = static_cast<Point*>(source.newGeoObject);
+    }
 }

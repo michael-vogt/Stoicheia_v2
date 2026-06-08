@@ -8,13 +8,13 @@ class MoveCenterCommand : public MoveCommand {
     Q_OBJECT
 
 public:
-    MoveCenterCommand(Point* centerPoint, Point* radiusPoint, double newX, double newY);
+    MoveCenterCommand(Point* centerPoint, Point* radiusPoint, double new_x, double new_y);
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Mittelpunkt verschieben"); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Mittelpunkt verschieben"); }
 
-    void setTarget(double x, double y) override;
+    void setTarget(double new_x, double new_y) override;
 
 private:
     Point* m_centerPoint;

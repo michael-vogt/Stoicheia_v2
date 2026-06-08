@@ -14,7 +14,9 @@ void CommandStack::pushWithoutExecute(std::unique_ptr<Command> cmd) {
 }
 
 void CommandStack::undo() {
-    if (!canUndo()) return;
+    if (!canUndo()) {
+        return;
+    }
     auto& cmd = m_undoStack.back();
     cmd->undo();
     m_redoStack.push_back(std::move(cmd));
@@ -23,7 +25,9 @@ void CommandStack::undo() {
 }
 
 void CommandStack::redo() {
-    if (!canRedo()) return;
+    if (!canRedo()) {
+        return;
+    }
     auto& cmd = m_redoStack.back();
     cmd->execute();
     m_undoStack.push_back(std::move(cmd));
@@ -31,11 +35,11 @@ void CommandStack::redo() {
     emit changed();
 }
 
-QString CommandStack::nextUndoDescription() const {
+auto CommandStack::nextUndoDescription() const -> QString {
     return canUndo() ? m_undoStack.back()->description() : QString();
 }
 
-QString CommandStack::nextRedoDescription() const {
+auto CommandStack::nextRedoDescription() const -> QString {
     return canRedo() ? m_redoStack.back()->description() : QString();
 }
 

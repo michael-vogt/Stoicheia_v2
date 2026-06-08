@@ -1,5 +1,6 @@
 #include "CreateLineTool.h"
 
+#include "Structs.h"
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/CreateLineCommand.h"
@@ -83,7 +84,7 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
             macro->add(std::move(cmd));
         }
 
-        macro->add(std::make_unique<CreateLineCommand>(m_ctx.adapter, p1Cmd, p2Cmd, p1, p2, m_type));
+        macro->add(std::make_unique<CreateLineCommand>(m_ctx.adapter, CreatePointCommandPair{.centerPointCmd=p1Cmd, .radiusPointCmd=p2Cmd}, PointPairForLinearObject{.point1=p1, .point2=p2}, m_type));
         m_ctx.commandStack->execute(std::move(macro));
 
         removePreview();

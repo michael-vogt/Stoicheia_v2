@@ -8,12 +8,12 @@ class PerpendicularFoot : public Point {
 public:
     PerpendicularFoot(Point* point, LinearObject* line);
 
-    Point* point() const { return m_point; }
-    LinearObject* line() const { return m_line; }
+    [[nodiscard]] auto point() const -> Point* { return m_point; }
+    [[nodiscard]] auto line() const -> LinearObject* { return m_line; }
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 private:
     Point* m_point;

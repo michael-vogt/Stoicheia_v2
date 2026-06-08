@@ -1,7 +1,7 @@
 #pragma once
 #include "Command.h"
 #include "CreatePointCommand.h"
-#include "LinearObjectType.h"
+#include "Structs.h"
 #include "ui/SceneAdapter.h"
 
 class CreateCircleCommand : public Command {
@@ -9,23 +9,23 @@ class CreateCircleCommand : public Command {
     Q_OBJECT
 
 public:
-    explicit CreateCircleCommand(SceneAdapter* adapter, Point* p1, Point* p2);
-    explicit CreateCircleCommand(SceneAdapter* adapter, CreatePointCommand* p1Cmd, CreatePointCommand* p2Cmd, Point* p1, Point* p2);
+    explicit CreateCircleCommand(SceneAdapter* adapter, PointPairForCircle points);
+    explicit CreateCircleCommand(SceneAdapter* adapter, CreatePointCommandPair cmds, PointPairForCircle points);
 
     void execute() override;
     void undo() override;
-    [[nodiscard]] QString description() const override { return tr("Kreis erstellen"); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Kreis erstellen"); }
 
-    [[nodiscard]] Circle* circle() const { return m_circle; }
+    [[nodiscard]] auto circle() const -> Circle* { return m_circle; }
 
 private:
-    Point* resolveP1() const { return m_p1Cmd ? m_p1Cmd->point() : m_p1; }
-    Point* resolveP2() const { return m_p2Cmd ? m_p2Cmd->point() : m_p2; }
+    [[nodiscard]] auto resolveP1() const -> Point* { return (m_p1Cmd != nullptr) ? m_p1Cmd->point() : m_center; }
+    [[nodiscard]] auto resolveP2() const -> Point* { return (m_p2Cmd != nullptr) ? m_p2Cmd->point() : m_radiusPoint; }
 
     SceneAdapter* m_adapter;
     CreatePointCommand* m_p1Cmd = nullptr;
     CreatePointCommand* m_p2Cmd = nullptr;
-    Point* m_p1;
-    Point* m_p2;
+    Point* m_center;
+    Point* m_radiusPoint;
     Circle* m_circle = nullptr;
 };

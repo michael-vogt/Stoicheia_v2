@@ -1,4 +1,7 @@
 #include "DeleteObjectCommand.h"
+#include "Structs.h"
+#include "geometry/Ray.h"
+#include "geometry/Segment.h"
 #include <constructions/Midpoint.h>
 #include <constructions/Parallel.h>
 #include <constructions/Perpendicular.h>
@@ -22,125 +25,126 @@ void DeleteObjectCommand::undo() {
     }
 }
 
-std::function<void()> DeleteObjectCommand::buildUndoFactory() {
+auto DeleteObjectCommand::buildUndoFactory() -> std::function<void()> {
     // Zustand vor dem Löschen erfassen - je nach Typ
-    if (auto* p = dynamic_cast<Point*>(m_object)) {
-        double x = p->x(), y = p->y();
-        return [this, x, y]() {
-            auto* pt = m_adapter->geoScene()->create<Point>(x, y);
-            m_adapter->addPoint(pt);
-            m_object = pt;
+    if (auto* point = dynamic_cast<Point*>(m_object)) {
+        double coord_x = point->x();
+        double coord_y = point->y();
+        return [this, coord_x, coord_y]() -> void {
+            auto* point = m_adapter->geoScene()->create<Point>(coord_x, coord_y);
+            m_adapter->addPoint(point);
+            m_object = point;
         };
     }
 
-    if (auto* l = dynamic_cast<Line*>(m_object)) {
-        Point* p1 = l->p1();
-        Point* p2 = l->p2();
-        return [this, p1, p2]() {
-            auto* line = m_adapter->geoScene()->create<Line>(p1, p2);
+    if (auto* line = dynamic_cast<Line*>(m_object)) {
+        Point* point1 = line->p1();
+        Point* point2 = line->p2();
+        return [this, point1, point2]() -> void {
+            auto* line = m_adapter->geoScene()->create<Line>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(line);
             m_object = line;
         };
     }
 
-    if (auto* r = dynamic_cast<Ray*>(m_object)) {
-        Point* p1 = r->p1();
-        Point* p2 = r->p2();
-        return [this, p1, p2]() {
-            auto* ray = m_adapter->geoScene()->create<Ray>(p1, p2);
+    if (auto* ray = dynamic_cast<Ray*>(m_object)) {
+        Point* point1 = ray->p1();
+        Point* point2 = ray->p2();
+        return [this, point1, point2]() -> void {
+            auto* ray = m_adapter->geoScene()->create<Ray>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(ray);
             m_object = ray;
         };
     }
 
-    if (auto* s = dynamic_cast<Segment*>(m_object)) {
-        Point* p1 = s->p1();
-        Point* p2 = s->p2();
-        return [this, p1, p2]() {
-            auto* segment = m_adapter->geoScene()->create<Segment>(p1, p2);
+    if (auto* segment = dynamic_cast<Segment*>(m_object)) {
+        Point* point1 = segment->p1();
+        Point* point2 = segment->p2();
+        return [this, point1, point2]() -> void {
+            auto* segment = m_adapter->geoScene()->create<Segment>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(segment);
             m_object = segment;
         };
     }
 
-    if (auto* c = dynamic_cast<Circle*>(m_object)) {
-        Point* center = c->center();
-        Point* rp = c->radiusPoint();
-        return [this, center, rp]() {
-            auto* circle = m_adapter->geoScene()->create<Circle>(center, rp);
+    if (auto* circle = dynamic_cast<Circle*>(m_object)) {
+        Point* center = circle->center();
+        Point* radiusPoint = circle->radiusPoint();
+        return [this, center, radiusPoint]() -> void {
+            auto* circle = m_adapter->geoScene()->create<Circle>(PointPairForCircle{.center=center,.radiusPoint=radiusPoint});
             m_adapter->addCircle(circle);
             m_object = circle;
         };
     }
 
-    if (auto* m = dynamic_cast<Midpoint*>(m_object)) {
-        Point* p1 = m->p1();
-        Point* p2 = m->p2();
-        return [this, p1, p2]() {
-            auto* mid = m_adapter->geoScene()->create<Midpoint>(p1, p2);
+    if (auto* midpoint = dynamic_cast<Midpoint*>(m_object)) {
+        Point* point1 = midpoint->point1();
+        Point* point2 = midpoint->point2();
+        return [this, point1, point2]() -> void {
+            auto* mid = m_adapter->geoScene()->create<Midpoint>(point1, point2);
             m_adapter->addPoint(mid);
             m_object = mid;
         };
     }
 
-    if (auto* p = dynamic_cast<Parallel*>(m_object)) {
-        Point* origin = p->origin();
-        LinearObject* ref = p->reference();
-        return [this, origin, ref]() {
+    if (auto* parallel = dynamic_cast<Parallel*>(m_object)) {
+        Point* origin = parallel->origin();
+        LinearObject* ref = parallel->reference();
+        return [this, origin, ref]() -> void {
             auto* par = m_adapter->geoScene()->create<Parallel>(origin, ref);
             m_adapter->addLinearObject(par->line());
             m_object = par;
         };
     }
 
-    if (auto* p = dynamic_cast<Perpendicular*>(m_object)) {
-        Point* origin = p->origin();
-        LinearObject* ref = p->reference();
-        return [this, origin, ref]() {
+    if (auto* perp = dynamic_cast<Perpendicular*>(m_object)) {
+        Point* origin = perp->origin();
+        LinearObject* ref = perp->reference();
+        return [this, origin, ref]() -> void {
             auto* perp = m_adapter->geoScene()->create<Perpendicular>(origin, ref);
             m_adapter->addLinearObject(perp->line());
             m_object = perp;
         };
     }
 
-    if (auto* f = dynamic_cast<PerpendicularFoot*>(m_object)) {
-        Point* pt = f->point();
-        LinearObject* line = f->line();
-        return [this, pt, line]() {
-            auto* foot = m_adapter->geoScene()->create<PerpendicularFoot>(pt, line);
+    if (auto* perp_foot = dynamic_cast<PerpendicularFoot*>(m_object)) {
+        Point* point = perp_foot->point();
+        LinearObject* line = perp_foot->line();
+        return [this, point, line]() -> void {
+            auto* foot = m_adapter->geoScene()->create<PerpendicularFoot>(point, line);
             m_adapter->addPoint(foot);
             m_object = foot;
         };
     }
 
     // Schnittpunkte - IntersectionSet
-    if (auto* ll = dynamic_cast<LineLineIntersection*>(m_object)) {
-        LinearObject* l1 = ll->L1();
-        LinearObject* l2 = ll->L2();
-        return [this, l1, l2]() {
-            auto* s = m_adapter->geoScene()->create<LineLineIntersection>(l1, l2);
-            m_adapter->addIntersectionSet(s);
-            m_object = s;
+    if (auto* lli = dynamic_cast<LineLineIntersection*>(m_object)) {
+        LinearObject* lo1 = lli->L1();
+        LinearObject* lo2 = lli->L2();
+        return [this, lo1, lo2]() -> void {
+            auto* intersectionSet = m_adapter->geoScene()->create<LineLineIntersection>(lo1, lo2);
+            m_adapter->addIntersectionSet(intersectionSet);
+            m_object = intersectionSet;
         };
     }
 
-    if (auto* lc = dynamic_cast<LineCircleIntersection*>(m_object)) {
-        LinearObject* l = lc->line();
-        Circle* c = lc->circle();
-        return [this, l, c]() {
-            auto* s = m_adapter->geoScene()->create<LineCircleIntersection>(l, c);
-            m_adapter->addIntersectionSet(s);
-            m_object = s;
+    if (auto* lci = dynamic_cast<LineCircleIntersection*>(m_object)) {
+        LinearObject* linearObject = lci->line();
+        Circle* circle = lci->circle();
+        return [this, linearObject, circle]() -> void {
+            auto* intersectionSet = m_adapter->geoScene()->create<LineCircleIntersection>(linearObject, circle);
+            m_adapter->addIntersectionSet(intersectionSet);
+            m_object = intersectionSet;
         };
     }
 
-    if (auto* cc = dynamic_cast<CircleCircleIntersection*>(m_object)) {
-        Circle* c1 = cc->c1();
-        Circle* c2 = cc->c2();
-        return [this, c1, c2]() {
-            auto* s = m_adapter->geoScene()->create<CircleCircleIntersection>(c1, c2);
-            m_adapter->addIntersectionSet(s);
-            m_object = s;
+    if (auto* cci = dynamic_cast<CircleCircleIntersection*>(m_object)) {
+        Circle* circle1 = cci->circle1();
+        Circle* circle2 = cci->circle2();
+        return [this, circle1, circle2]() -> void {
+            auto* intersectionSet = m_adapter->geoScene()->create<CircleCircleIntersection>(circle1, circle2);
+            m_adapter->addIntersectionSet(intersectionSet);
+            m_object = intersectionSet;
         };
     }
 

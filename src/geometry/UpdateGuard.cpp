@@ -29,7 +29,9 @@ void UpdateGuard::flush() {
 
     std::queue<GeoObject*> ready;
     for (auto& [obj, degree] : inDegree) {
-        if (degree == 0) ready.push(obj);
+        if (degree == 0) {
+            ready.push(obj);
+        }
     }
 
     std::vector<GeoObject*> order;
@@ -39,7 +41,9 @@ void UpdateGuard::flush() {
         order.push_back(obj);
 
         for (GeoObject* dep : obj->dependents()) {
-            if (!pending.contains(dep)) continue;
+            if (!pending.contains(dep)) {
+                continue;
+            }
             if (--inDegree[dep] == 0) {
                 ready.push(dep);
             }
@@ -83,7 +87,9 @@ void GeoObject::notifyDirect() {
     std::unordered_set<GeoObject*> visited;
     std::function<void(GeoObject*)> propagate = [&](GeoObject* obj) {
         for (GeoObject* dep : obj->dependents()) {
-            if (visited.contains(dep)) continue;
+            if (visited.contains(dep)) {
+                continue;
+            }
             visited.insert(dep);
             dep->recompute();
             propagate(dep);

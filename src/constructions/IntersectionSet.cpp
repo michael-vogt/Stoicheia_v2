@@ -1,4 +1,6 @@
 #include "IntersectionSet.h"
+#include "Structs.h"
+#include <stdexcept>
 
 void IntersectionSet::onSourceRemoved(GeoObject *src) {
     m_valid = false;
@@ -11,25 +13,25 @@ void IntersectionSet::recompute() {
     notify();
 }
 
-void IntersectionSet::setResults(const int count, double x1, double y1, double x2, double y2) {
+void IntersectionSet::setResults(const int count, DoublePair point1, DoublePair point2) {
     if (count == 2) {
-        if (x1 > x2 || (x1 == x2 && y1 > y2)) {
-            std::swap(x1, x2);
-            std::swap(y1, y2);
+        if (point1.x > point2.x || (point1.x == point2.x && point1.y > point2.y)) {
+            std::swap(point1.x, point2.x);
+            std::swap(point1.y, point2.y);
         }
     }
 
     switch (count) {
         case 2:
             m_pts[0].m_valid = true;
-            m_pts[0].moveTo(x1, y1);
+            m_pts[0].moveTo(point1.x, point1.y);
             m_pts[1].m_valid = true;
-            m_pts[1].moveTo(x2, y2);
+            m_pts[1].moveTo(point2.x, point2.y);
             m_valid = true;
             break;
         case 1:
             m_pts[0].m_valid = true;
-            m_pts[0].moveTo(x1, y1);
+            m_pts[0].moveTo(point1.x, point1.y);
             m_pts[1].m_valid = false;
             m_valid = true;
             break;

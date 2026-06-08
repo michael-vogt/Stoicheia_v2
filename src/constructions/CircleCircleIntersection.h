@@ -2,23 +2,24 @@
 
 #include "IntersectionSet.h"
 #include "../geometry/Circle.h"
+#include "Structs.h"
 
 class CircleCircleIntersection : public IntersectionSet {
 public:
-    CircleCircleIntersection(Circle* c1, Circle* c2);
+    CircleCircleIntersection(Circle* circle1, Circle* circle2);
 
     // Getter
-    Circle* c1() const { return m_c1; }
-    Circle* c2() const { return m_c2; }
+    [[nodiscard]] auto circle1() const -> Circle* { return m_circle1; }
+    [[nodiscard]] auto circle2() const -> Circle* { return m_circle2; }
 
     // Quellen aktualisieren
     void onSourceRemoved(GeoObject* src) override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 protected:
     void compute() override;
 
 private:
-    Circle* m_c1 = nullptr;
-    Circle* m_c2 = nullptr;
+    Circle* m_circle1 = nullptr;
+    Circle* m_circle2 = nullptr;
 };

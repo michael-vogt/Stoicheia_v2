@@ -1,7 +1,7 @@
 #pragma once
 #include "Command.h"
-#include "CreatePointCommand.h"
 #include "geometry/GeoObject.h"
+#include "ui/SceneAdapter.h"
 
 
 class CopyCommand : public Command {
@@ -13,16 +13,16 @@ public:
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Kopieren"); };
+    [[nodiscard]] auto description() const -> QString override { return tr("Kopieren"); };
 
     // Gibt die neu erzeugten Objekte zurück (nach execute())
-    const std::vector<GeoObject*>& copies() const { return m_copies; }
+    [[nodiscard]] auto copies() const -> const std::vector<GeoObject*>& { return m_copies; }
 
 private:
     // Löst einen Pointer auf: original -> Kopie (falls vorhanden)
-    Point* resolvePoint(Point* p) const;
-    LinearObject* resolveLinearObject(LinearObject* lo) const;
-    Circle* resolveCircle(Circle* c) const;
+    auto resolvePoint(Point* point) const -> Point*;
+    auto resolveLinearObject(LinearObject* linearObject) const -> LinearObject*;
+    auto resolveCircle(Circle* circle) const -> Circle*;
 
     void createCopies();
     void removeCopies();

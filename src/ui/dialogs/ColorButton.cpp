@@ -6,19 +6,22 @@ ColorButton::ColorButton(QWidget* parent) : ColorButton(Qt::white, parent) {}
 ColorButton::ColorButton(const QColor& color, QWidget* parent)
     : QPushButton(parent), m_color(color)
 {
-    setFixedSize(40, 24);
+    setFixedSize(DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT);
     updateAppearance();
     connect(this, &QPushButton::clicked, [this]() {
-        QColor c = QColorDialog::getColor(
+        QColor color = QColorDialog::getColor(
             m_color, this, tr("Farbe wählen"),
             QColorDialog::ShowAlphaChannel);
-        if (c.isValid())
-            setColor(c);
+        if (color.isValid()) {
+            setColor(color);
+        }
     });
 }
 
 void ColorButton::setColor(const QColor& color) {
-    if (m_color == color) return;
+    if (m_color == color) {
+        return;
+    }
     m_color = color;
     updateAppearance();
     emit colorChanged(m_color);

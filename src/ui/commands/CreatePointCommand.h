@@ -8,14 +8,14 @@ class CreatePointCommand : public Command {
     Q_OBJECT
 
 public:
-    CreatePointCommand(SceneAdapter* adapter, double x, double y);
+    CreatePointCommand(SceneAdapter* adapter, double pos_x, double pos_y);
 
     // Getter
-    Point* point() const { return m_point; }
+    [[nodiscard]] auto point() const -> Point* { return m_point; }
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Punkt (%1, %2) erstellen").arg(m_x).arg(m_y); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Punkt (%1, %2) erstellen").arg(m_x).arg(m_y); }
 
 private:
     SceneAdapter* m_adapter;

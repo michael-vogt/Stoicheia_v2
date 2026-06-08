@@ -1,14 +1,16 @@
 #include "Midpoint.h"
+#include "Structs.h"
 
 #include <stdexcept>
 
-Midpoint::Midpoint(Point *a, Point *b)
-: Point(0, 0), m_a(a), m_b(b)
+Midpoint::Midpoint(Point *point1, Point *point2)
+: Point(0, 0), m_point1(point1), m_point2(point2)
 {
-    if (m_a == nullptr || m_b == nullptr)
+    if (m_point1 == nullptr || m_point2 == nullptr) {
         throw std::invalid_argument("null point");
-    m_a->addDependent(this);
-    m_b->addDependent(this);
+    }
+    m_point1->addDependent(this);
+    m_point2->addDependent(this);
     Midpoint::recompute();
 }
 
@@ -19,23 +21,23 @@ Midpoint::Midpoint(const LinearObject *line)
 
 void Midpoint::onSourceRemoved(GeoObject *src) {
     m_valid = false;
-    if (src == static_cast<GeoObject*>(m_a)) m_a = nullptr;
-    if (src == static_cast<GeoObject*>(m_b)) m_b = nullptr;
+    if (src == static_cast<GeoObject*>(m_point1)) { m_point1 = nullptr; }
+    if (src == static_cast<GeoObject*>(m_point2)) { m_point2 = nullptr; }
 }
 
 void Midpoint::recompute() {
-    if (m_a == nullptr || m_b == nullptr) {
+    if (m_point1 == nullptr || m_point2 == nullptr) {
         m_valid = false;
         return;
     }
 
     m_valid = true;
-    double x = (m_a->x() + m_b->x()) / 2.0;
-    double y = (m_a->y() + m_b->y()) / 2.0;
-    moveTo(x, y);
+    double coord_x = (m_point1->x() + m_point2->x()) / 2;
+    double coord_y = (m_point1->y() + m_point2->y()) / 2;
+    moveTo(coord_x, coord_y);
 }
 
-void Midpoint::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_a == oldSource) m_a = static_cast<Point*>(newSource);
-    if (m_b == oldSource) m_b = static_cast<Point*>(newSource);
+void Midpoint::replaceSource(GeoObjectPair source) {
+    if (m_point1 == source.oldGeoObject) { m_point1 = static_cast<Point*>(source.newGeoObject); }
+    if (m_point2 == source.oldGeoObject) { m_point2 = static_cast<Point*>(source.newGeoObject); }
 }

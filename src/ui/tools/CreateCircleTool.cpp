@@ -1,5 +1,6 @@
 #include "CreateCircleTool.h"
 
+#include "Structs.h"
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CreateCircleCommand.h"
 #include "ui/commands/CreatePointCommand.h"
@@ -78,7 +79,7 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
             macro->add(std::move(cmd));
         }
 
-        macro->add(std::make_unique<CreateCircleCommand>(m_ctx.adapter, p1Cmd, p2Cmd, p1, p2));
+        macro->add(std::make_unique<CreateCircleCommand>(m_ctx.adapter, CreatePointCommandPair{.centerPointCmd=p1Cmd, .radiusPointCmd=p2Cmd}, PointPairForCircle{.center=p1, .radiusPoint=p2}));
         m_ctx.commandStack->execute(std::move(macro));
 
         removePreview();

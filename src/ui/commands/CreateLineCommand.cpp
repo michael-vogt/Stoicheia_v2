@@ -1,24 +1,29 @@
 #include "CreateLineCommand.h"
+#include "Structs.h"
+#include "geometry/Line.h"
+#include "geometry/Ray.h"
+#include "geometry/Segment.h"
 
-CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, Point *p1, Point *p2, LinearObjectType type) : m_adapter(adapter), m_p1(p1), m_p2(p2), m_type(type) {}
+CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, PointPairForLinearObject points, LinearObjectType type) 
+: m_adapter(adapter), m_point1(points.point1), m_point2(points.point2), m_type(type) {}
 
-CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommand *p1Cmd, CreatePointCommand *p2Cmd, Point *p1, Point *p2, LinearObjectType type)
-    : m_adapter(adapter), m_p1Cmd(p1Cmd), m_p2Cmd(p2Cmd), m_p1(p1), m_p2(p2), m_type(type)
+CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommandPair cmds, PointPairForLinearObject points, LinearObjectType type)
+    : m_adapter(adapter), m_p1Cmd(cmds.centerPointCmd), m_p2Cmd(cmds.radiusPointCmd), m_point1(points.point1), m_point2(points.point2), m_type(type)
 {}
 
 void CreateLineCommand::execute() {
-    Point* p1 = resolveP1();
-    Point* p2 = resolveP2();
+    Point* point1 = resolveP1();
+    Point* point2 = resolveP2();
 
     switch (m_type) {
         case LinearObjectType::Line:
-            m_linear = m_adapter->geoScene()->create<Line>(p1, p2);
+            m_linear = m_adapter->geoScene()->create<Line>(PointPairForLinearObject{.point1=point1, .point2=point2});
             break;
         case LinearObjectType::Ray:
-            m_linear = m_adapter->geoScene()->create<Ray>(p1, p2);
+            m_linear = m_adapter->geoScene()->create<Ray>(PointPairForLinearObject{.point1=point1, .point2=point2});
             break;
         case LinearObjectType::Segment:
-            m_linear = m_adapter->geoScene()->create<Segment>(p1, p2);
+            m_linear = m_adapter->geoScene()->create<Segment>(PointPairForLinearObject{.point1=point1, .point2=point2});
             break;
     }
 
@@ -30,7 +35,7 @@ void CreateLineCommand::undo() {
     m_linear = nullptr;
 }
 
-QString CreateLineCommand::description() const {
+auto CreateLineCommand::description() const -> QString {
     switch (m_type) {
         case LinearObjectType::Line: return tr("Gerade erstellen");
         case LinearObjectType::Ray: return tr("Halbgerade erstellen");

@@ -4,9 +4,9 @@ AppSettings::AppSettings()
     : m_settings("Stoicheia", "Stoicheia")
 {}
 
-AppSettings& AppSettings::instance() {
-    static AppSettings s;
-    return s;
+auto AppSettings::instance() -> AppSettings& {
+    static AppSettings instance;
+    return instance;
 }
 
 void AppSettings::addRecentFile(const QString &fileName) {
@@ -22,7 +22,7 @@ void AppSettings::load() {
     m_settings.beginGroup("General");
     m_settings.beginGroup("recentFiles");
     general.recentFiles.files = m_settings.value("files", QStringList()).toStringList();
-    general.recentFiles.maxCount = m_settings.value("maxCount",  5).toInt();
+    general.recentFiles.maxCount = m_settings.value("maxCount",  DEFAULT_GENERAL_RECENT_MAXCOUNT).toInt();
     m_settings.endGroup();
     general.language = m_settings.value("language", general.language).toString();
     m_settings.endGroup();

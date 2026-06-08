@@ -11,10 +11,10 @@ public:
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Objekt löschen"); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Objekt löschen"); }
 
 private:
-    std::function<void()> buildUndoFactory();
+    auto buildUndoFactory() -> std::function<void()>;
 
     SceneAdapter* m_adapter;
     GeoObject* m_object;

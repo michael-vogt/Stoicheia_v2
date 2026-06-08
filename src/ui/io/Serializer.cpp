@@ -12,6 +12,7 @@
 #include "../../constructions/LineLineIntersection.h"
 #include "../../constructions/LineCircleIntersection.h"
 #include "../../constructions/CircleCircleIntersection.h"
+#include "Structs.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -180,8 +181,8 @@ QJsonObject Serializer::serializeObject(GeoObject* obj, int id, const std::unord
         o["radius"] = ref(c->radiusPoint());
     } else if (auto* m = dynamic_cast<Midpoint*>(obj)) {
         o["type"] = "Midpoint";
-        o["p1"]   = ref(m->p1());
-        o["p2"]   = ref(m->p2());
+        o["p1"]   = ref(m->point1());
+        o["p2"]   = ref(m->point2());
     } else if (auto* p = dynamic_cast<Parallel*>(obj)) {
         o["type"]      = "Parallel";
         o["origin"]    = ref(p->origin());
@@ -204,8 +205,8 @@ QJsonObject Serializer::serializeObject(GeoObject* obj, int id, const std::unord
         o["circle"] = ref(s->circle());
     } else if (auto* s = dynamic_cast<CircleCircleIntersection*>(obj)) {
         o["type"] = "CircleCircleIntersection";
-        o["c1"]   = ref(s->c1());
-        o["c2"]   = ref(s->c2());
+        o["c1"]   = ref(s->circle1());
+        o["c2"]   = ref(s->circle2());
     }
 
     return o;
@@ -280,7 +281,7 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
             auto* p1 = dynamic_cast<Point*>(ref("p1"));
             auto* p2 = dynamic_cast<Point*>(ref("p2"));
             if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* l = m_scene->create<Line>(p1, p2);
+            auto* l = m_scene->create<Line>(PointPairForLinearObject{.point1=p1, .point2=p2});
             m_adapter->addLinearObject(l);
             obj = l;
 
@@ -288,7 +289,7 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
             auto* p1 = dynamic_cast<Point*>(ref("p1"));
             auto* p2 = dynamic_cast<Point*>(ref("p2"));
             if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* r = m_scene->create<Ray>(p1, p2);
+            auto* r = m_scene->create<Ray>(PointPairForLinearObject{.point1=p1, .point2=p2});
             m_adapter->addLinearObject(r);
             obj = r;
 
@@ -296,7 +297,7 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
             auto* p1 = dynamic_cast<Point*>(ref("p1"));
             auto* p2 = dynamic_cast<Point*>(ref("p2"));
             if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* s = m_scene->create<Segment>(p1, p2);
+            auto* s = m_scene->create<Segment>(PointPairForLinearObject{.point1=p1, .point2=p2});
             m_adapter->addLinearObject(s);
             obj = s;
 
@@ -304,7 +305,7 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
             auto* center = dynamic_cast<Point*>(ref("center"));
             auto* radius = dynamic_cast<Point*>(ref("radius"));
             if (!center || !radius) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* c = m_scene->create<Circle>(center, radius);
+            auto* c = m_scene->create<Circle>(PointPairForCircle{.center=center,.radiusPoint=radius});
             m_adapter->addCircle(c);
             obj = c;
 

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "IntersectionSet.h"
+#include "Structs.h"
+#include "geometry/Circle.h"
+#include "geometry/LinearObject.h"
 
 
 class LineCircleIntersection : public IntersectionSet {
@@ -8,12 +11,12 @@ public:
     LineCircleIntersection(LinearObject* line, Circle* circle);
 
     // Getter
-    Circle* circle() const { return m_circle; }
-    LinearObject* line() const { return m_line; }
+    [[nodiscard]] auto circle() const -> Circle* { return m_circle; }
+    [[nodiscard]] auto line() const -> LinearObject* { return m_line; }
 
     // Quellen aktualisieren
     void onSourceRemoved(GeoObject *src) override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 protected:
     void compute() override;

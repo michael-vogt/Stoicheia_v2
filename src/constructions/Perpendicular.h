@@ -4,27 +4,28 @@
 #include "../geometry/Line.h"
 #include "../geometry/LinearObject.h"
 #include "../geometry/Point.h"
+#include "Structs.h"
 
 
 class Perpendicular : public GeoObject {
 public:
     Perpendicular(Point* origin, LinearObject* reference);
 
-    Point* origin() const { return m_origin; }
-    LinearObject* reference() const { return m_reference; }
-    LinearObject* line() { return &m_line; };
+    [[nodiscard]] auto origin() const -> Point* { return m_origin; }
+    [[nodiscard]] auto reference() const -> LinearObject* { return m_reference; }
+    auto line() -> LinearObject* { return m_line; };
 
     void onSourceRemoved(GeoObject* src) override;
     void recompute() override;
-    void replaceSource(GeoObject* oldSource, GeoObject* newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 private:
     // Komponenten des Normalenvektors der Referenzlinie
-    double px() const;
-    double py() const;
+    [[nodiscard]] auto px() const -> double;
+    [[nodiscard]] auto py() const -> double;
 
     Point* m_origin;
-    LinearObject*  m_reference;
+    LinearObject* m_reference;
     Point m_phantom;
-    Line  m_line;
+    Line* m_line = nullptr;
 };

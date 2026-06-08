@@ -11,7 +11,7 @@ public:
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Lotfußpunkt erstellen"); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Lotfußpunkt erstellen"); }
 
 private:
     SceneAdapter* m_adapter;

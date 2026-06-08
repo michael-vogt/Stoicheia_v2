@@ -1,7 +1,7 @@
 #include "MovePointCommand.h"
 
-MovePointCommand::MovePointCommand(Point *point, double newX, double newY)
-: m_point(point), m_oldX(point->x()), m_oldY(point->y()), m_newX(newX), m_newY(newY)
+MovePointCommand::MovePointCommand(Point *point, double new_x, double new_y)
+: m_point(point), m_oldX(point->x()), m_oldY(point->y()), m_newX(new_x), m_newY(new_y)
 {}
 
 void MovePointCommand::execute() {
@@ -12,7 +12,7 @@ void MovePointCommand::undo() {
     m_point->moveTo(m_oldX, m_oldY);
 }
 
-void MovePointCommand::setTarget(double x, double y) {
-    m_newX = x;
-    m_newY = y;
+void MovePointCommand::setTarget(double new_x, double new_y) {
+    m_newX = new_x;
+    m_newY = new_y;
 }

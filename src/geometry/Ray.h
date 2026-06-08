@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LinearObject.h"
+#include <limits>
 
 
 class Ray : public LinearObject {
@@ -8,9 +9,9 @@ public:
     using LinearObject::LinearObject;
 
     // Getter
-    Point* origin() const { return m_p1; };
-    Point* direction() const { return m_p2; };
+    [[nodiscard]] auto origin() const -> Point* { return m_point1; };
+    [[nodiscard]] auto direction() const -> Point* { return m_point2; };
 
 protected:
-    bool containsT(const double t) const override { return t >= -1e-10; };
+    [[nodiscard]] auto containsT(const double param_t) const -> bool override { return param_t >= -std::numeric_limits<double>::epsilon() ; };
 };

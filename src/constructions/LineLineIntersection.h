@@ -1,18 +1,20 @@
 #pragma once
 
 #include "IntersectionSet.h"
+#include "Structs.h"
+#include "geometry/LinearObject.h"
 
 class LineLineIntersection : public IntersectionSet {
 public:
     LineLineIntersection(LinearObject* line1, LinearObject* line2);
 
     // Getter
-    LinearObject* L1() const { return m_line1; }
-    LinearObject* L2() const { return m_line2; }
+    [[nodiscard]] auto L1() const -> LinearObject* { return m_line1; }
+    [[nodiscard]] auto L2() const -> LinearObject* { return m_line2; }
 
     // Quellen aktualisieren
     void onSourceRemoved(GeoObject *src) override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 protected:
     void compute() override;

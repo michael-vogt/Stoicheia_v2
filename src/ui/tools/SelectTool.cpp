@@ -8,6 +8,7 @@
 
 #include "ui/commands/CopyCommand.h"
 #include "ui/commands/MergePointsCommand.h"
+#include "geometry/UpdateGuard.h"
 
 SelectTool::SelectTool(const ToolContext &ctx)
 : Tool(ctx)
