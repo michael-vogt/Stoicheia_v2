@@ -13,24 +13,24 @@ public:
     FileManager(Scene* scene, SceneAdapter* adapter, CommandStack* commandStack, QWidget* parent);
 
     // Gibt false zurück wenn der Nutzer abbricht
-    bool newFile();
-    bool open();
-    bool openFile(const QString& filename);
-    bool save();
-    bool saveAs();
-    bool exportSVG() const;
+    auto newFile() -> bool;
+    auto open() -> bool;
+    auto openFile(const QString& filename) -> bool;
+    auto save() -> bool;
+    auto saveAs() -> bool;
+    [[nodiscard]] auto exportSVG() const -> bool;
 
-    bool hasUnsavedChanges() const { return m_unsavedChanges; }
+    [[nodiscard]] auto hasUnsavedChanges() const -> bool { return m_unsavedChanges; }
 
-    QString currentFile() const { return m_currentFile; }
+    [[nodiscard]] auto currentFile() const -> QString { return m_currentFile; }
 
-public slots:
+public slots: // NOLINT
         void markSaved()               { m_unsavedChanges = false; updateTitle(); }
         void markChanged()             { m_unsavedChanges = true;  updateTitle(); }
 
 private:
-    bool saveToFile(const QString& filename);
-    bool loadFromFile(const QString& filename);
+    auto saveToFile(const QString& filename) -> bool;
+    auto loadFromFile(const QString& filename) -> bool;
     void clearScene() const;
     void updateTitle() const;
 

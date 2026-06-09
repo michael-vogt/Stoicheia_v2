@@ -13,14 +13,19 @@
 #include "../../constructions/LineCircleIntersection.h"
 #include "../../constructions/CircleCircleIntersection.h"
 #include "Structs.h"
+#include "geometry/GeoObject.h"
 
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <qjsonobject.h>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 static constexpr int FILE_VERSION = 1;
+//constexpr double eps = std::numeric_limits<double>::epsilon();
 
 Serializer::Serializer(Scene* scene, SceneAdapter* adapter)
     : m_scene(scene), m_adapter(adapter)
@@ -28,7 +33,7 @@ Serializer::Serializer(Scene* scene, SceneAdapter* adapter)
 
 // ── Save ─────────────────────────────────────────────────────────────────────
 
-bool Serializer::save(const QString& filename) const {
+auto Serializer::save(const QString& filename) const -> bool {
     QJsonDocument doc(serializeScene());
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -39,90 +44,18 @@ bool Serializer::save(const QString& filename) const {
     return true;
 }
 
-QJsonObject Serializer::serializeScene() const {
+auto Serializer::serializeScene() const -> QJsonObject {
     const auto& items = m_adapter->geoGraphicsItems();
 
-    // Nur sichtbare, valide, nicht-IntersectionPoint Objekte speichern
-    std::unordered_set<GeoObject*> saveable;
-    for (auto& [obj, item] : items) {
-        if (!item->isVisible()) continue;
-        if (!obj->isValid())    continue;
-        //if (dynamic_cast<IntersectionPoint*>(obj)) continue;
-        saveable.insert(obj);
-    }
-
-    // IntersectionSets explizit hinzufügen
-    for (IntersectionSet* iset : m_adapter->intersectionSets()) {
-        if (iset->isValid())
-            saveable.insert(iset);
-    }
-
-    bool changed = true;
-    while (changed) {
-        changed = false;
-        for (GeoObject* obj : saveable) {
-            for (GeoObject* src : obj->sources()) {
-                if (!saveable.contains(src) && src->isValid()) {
-                    saveable.insert(src);
-                    changed = true;
-                }
-            }
-        }
-    }
-
-    // Topologisch sortieren – nur saveables
-    std::unordered_map<GeoObject*, int> idMap;
-    std::vector<GeoObject*> sorted;
-    std::unordered_set<GeoObject*> visited;
-
-    std::function<void(GeoObject*)> collect = [&](GeoObject* obj) {
-        if (visited.contains(obj)) return;
-        visited.insert(obj);
-
-        // Normale Quellen
-        for (GeoObject* src : obj->sources())
-            if (saveable.contains(src))
-                collect(src);
-
-        // IntersectionPoint: IntersectionSet als implizite Quelle behandeln
-        if (auto* ip = dynamic_cast<IntersectionPoint*>(obj)) {
-            for (auto& [geoObj, _] : m_adapter->geoGraphicsItems()) {
-                if (auto* iset = dynamic_cast<IntersectionSet*>(geoObj)) {
-                    if (iset->first() == ip || iset->second() == ip) {
-                        if (saveable.contains(iset))
-                            collect(iset);
-                        break;
-                    }
-                }
-            }
-        }
-
-        sorted.push_back(obj);
-    };
-
-    for (GeoObject* obj : saveable)
-        collect(obj);
-
-    // IDs in topologischer Reihenfolge vergeben
-    // IntersectionPoints bekommen auch IDs (für Referenzen aus anderen Objekten)
-    for (int i = 0; i < static_cast<int>(sorted.size()); ++i)
-        idMap[sorted[i]] = i;
-
-    // IntersectionPoints der gespeicherten IntersectionSets mit IDs versehen
-    int nextId = static_cast<int>(sorted.size());
-    for (GeoObject* obj : sorted) {
-        if (auto* iset = dynamic_cast<IntersectionSet*>(obj)) {
-            if (!idMap.contains(iset->first()))
-                idMap[iset->first()]  = nextId++;
-            if (!idMap.contains(iset->second()))
-                idMap[iset->second()] = nextId++;
-        }
-    }
+    auto saveable = collectSaveableObjects();
+    auto sorted = buildDependencyOrder(saveable);
+    auto idMap = buildIdMap(sorted);
 
     // Serialisieren
     QJsonArray objects;
-    for (int i = 0; i < static_cast<int>(sorted.size()); ++i)
+    for (int i = 0; i < static_cast<int>(sorted.size()); ++i) {
         objects.append(serializeObject(sorted[i], i, idMap));
+    }
 
     QJsonObject root;
     root["version"] = FILE_VERSION;
@@ -130,91 +63,85 @@ QJsonObject Serializer::serializeScene() const {
     return root;
 }
 
-QJsonObject Serializer::serializeObject(GeoObject* obj, int id, const std::unordered_map<GeoObject*, int>& idMap) const {
-    /*const auto& items = m_adapter->geoGraphicsItems();
-    std::unordered_map<GeoObject*, int> idMap;
-    int i = 0;
-    for (auto& [o, _] : items)
-        idMap[o] = i++;*/
-
-    auto ref = [&](GeoObject* o) -> int {
-        auto it = idMap.find(o);
-        return it != idMap.end() ? it->second : -1;
+auto Serializer::serializeObject(GeoObject* obj, int ident, const std::unordered_map<GeoObject*, int>& idMap) const -> QJsonObject {
+    auto ref = [&](GeoObject* obj) -> int {
+        auto iter = idMap.find(obj);
+        return iter != idMap.end() ? iter->second : -1;
     };
 
-    QJsonObject o;
-    o["id"] = id;
+    QJsonObject jsobObj;
+    jsobObj["id"] = ident;
 
-    if (auto* ip = dynamic_cast<IntersectionPoint*>(obj)) {
-        o["type"] = "IntersectionPoint";
+    if (auto* intersectionPoint = dynamic_cast<IntersectionPoint*>(obj)) {
+        jsobObj["type"] = "IntersectionPoint";
         for (IntersectionSet* iset : m_adapter->intersectionSets()) {
-            if (iset->first() == ip) {
-                o["intersectionSet"] = ref(iset);
-                o["index"] = 0;
+            if (iset->first() == intersectionPoint) {
+                jsobObj["intersectionSet"] = ref(iset);
+                jsobObj["index"] = 0;
                 break;
             }
-            if (iset->second() == ip) {
-                o["intersectionSet"] = ref(iset);
-                o["index"] = 1;
+            if (iset->second() == intersectionPoint) {
+                jsobObj["intersectionSet"] = ref(iset);
+                jsobObj["index"] = 1;
                 break;
             }
         }
-    } else if (auto* p = dynamic_cast<Point*>(obj)) {
-        o["type"] = "Point";
-        o["x"]    = p->x();
-        o["y"]    = p->y();
-    } else if (auto* l = dynamic_cast<Line*>(obj)) {
-        o["type"] = "Line";
-        o["p1"]   = ref(l->p1());
-        o["p2"]   = ref(l->p2());
-    } else if (auto* r = dynamic_cast<Ray*>(obj)) {
-        o["type"] = "Ray";
-        o["p1"]   = ref(r->p1());
-        o["p2"]   = ref(r->p2());
-    } else if (auto* s = dynamic_cast<Segment*>(obj)) {
-        o["type"] = "Segment";
-        o["p1"]   = ref(s->p1());
-        o["p2"]   = ref(s->p2());
-    } else if (auto* c = dynamic_cast<Circle*>(obj)) {
-        o["type"]   = "Circle";
-        o["center"] = ref(c->center());
-        o["radius"] = ref(c->radiusPoint());
-    } else if (auto* m = dynamic_cast<Midpoint*>(obj)) {
-        o["type"] = "Midpoint";
-        o["p1"]   = ref(m->point1());
-        o["p2"]   = ref(m->point2());
-    } else if (auto* p = dynamic_cast<Parallel*>(obj)) {
-        o["type"]      = "Parallel";
-        o["origin"]    = ref(p->origin());
-        o["reference"] = ref(p->reference());
-    } else if (auto* p = dynamic_cast<Perpendicular*>(obj)) {
-        o["type"]      = "Perpendicular";
-        o["origin"]    = ref(p->origin());
-        o["reference"] = ref(p->reference());
-    } else if (auto* f = dynamic_cast<PerpendicularFoot*>(obj)) {
-        o["type"]  = "PerpendicularFoot";
-        o["point"] = ref(f->point());
-        o["line"]  = ref(f->line());
-    } else if (auto* s = dynamic_cast<LineLineIntersection*>(obj)) {
-        o["type"] = "LineLineIntersection";
-        o["l1"]   = ref(s->L1());
-        o["l2"]   = ref(s->L2());
-    } else if (auto* s = dynamic_cast<LineCircleIntersection*>(obj)) {
-        o["type"]   = "LineCircleIntersection";
-        o["line"]   = ref(s->line());
-        o["circle"] = ref(s->circle());
-    } else if (auto* s = dynamic_cast<CircleCircleIntersection*>(obj)) {
-        o["type"] = "CircleCircleIntersection";
-        o["c1"]   = ref(s->circle1());
-        o["c2"]   = ref(s->circle2());
+    } else if (auto* point = dynamic_cast<Point*>(obj)) {
+        jsobObj["type"] = "Point";
+        jsobObj["x"]    = point->x();
+        jsobObj["y"]    = point->y();
+    } else if (auto* line = dynamic_cast<Line*>(obj)) {
+        jsobObj["type"] = "Line";
+        jsobObj["p1"]   = ref(line->p1());
+        jsobObj["p2"]   = ref(line->p2());
+    } else if (auto* ray = dynamic_cast<Ray*>(obj)) {
+        jsobObj["type"] = "Ray";
+        jsobObj["p1"]   = ref(ray->p1());
+        jsobObj["p2"]   = ref(ray->p2());
+    } else if (auto* segment = dynamic_cast<Segment*>(obj)) {
+        jsobObj["type"] = "Segment";
+        jsobObj["p1"]   = ref(segment->p1());
+        jsobObj["p2"]   = ref(segment->p2());
+    } else if (auto* circle = dynamic_cast<Circle*>(obj)) {
+        jsobObj["type"]   = "Circle";
+        jsobObj["center"] = ref(circle->center());
+        jsobObj["radius"] = ref(circle->radiusPoint());
+    } else if (auto* midpoint = dynamic_cast<Midpoint*>(obj)) {
+        jsobObj["type"] = "Midpoint";
+        jsobObj["p1"]   = ref(midpoint->point1());
+        jsobObj["p2"]   = ref(midpoint->point2());
+    } else if (auto* para = dynamic_cast<Parallel*>(obj)) {
+        jsobObj["type"]      = "Parallel";
+        jsobObj["origin"]    = ref(para->origin());
+        jsobObj["reference"] = ref(para->reference());
+    } else if (auto* perp = dynamic_cast<Perpendicular*>(obj)) {
+        jsobObj["type"]      = "Perpendicular";
+        jsobObj["origin"]    = ref(perp->origin());
+        jsobObj["reference"] = ref(perp->reference());
+    } else if (auto* perp_foot = dynamic_cast<PerpendicularFoot*>(obj)) {
+        jsobObj["type"]  = "PerpendicularFoot";
+        jsobObj["point"] = ref(perp_foot->point());
+        jsobObj["line"]  = ref(perp_foot->line());
+    } else if (auto* lli = dynamic_cast<LineLineIntersection*>(obj)) {
+        jsobObj["type"] = "LineLineIntersection";
+        jsobObj["l1"]   = ref(lli->L1());
+        jsobObj["l2"]   = ref(lli->L2());
+    } else if (auto* lci = dynamic_cast<LineCircleIntersection*>(obj)) {
+        jsobObj["type"]   = "LineCircleIntersection";
+        jsobObj["line"]   = ref(lci->line());
+        jsobObj["circle"] = ref(lci->circle());
+    } else if (auto* cci = dynamic_cast<CircleCircleIntersection*>(obj)) {
+        jsobObj["type"] = "CircleCircleIntersection";
+        jsobObj["c1"]   = ref(cci->circle1());
+        jsobObj["c2"]   = ref(cci->circle2());
     }
 
-    return o;
+    return jsobObj;
 }
 
 // ── Load ─────────────────────────────────────────────────────────────────────
 
-bool Serializer::load(const QString& filename) {
+auto Serializer::load(const QString& filename) -> bool {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         m_lastError = file.errorString();
@@ -237,7 +164,7 @@ bool Serializer::load(const QString& filename) {
     return deserializeScene(root["objects"].toArray());
 }
 
-bool Serializer::deserializeScene(const QJsonArray& objects) {
+auto Serializer::deserializeScene(const QJsonArray& objects) -> bool {
     // Zwei Durchläufe:
     // 1. Alle Objekte erzeugen (damit Referenzen aufgelöst werden können)
     // 2. Referenzen auflösen und grafische Objekte anlegen
@@ -245,135 +172,181 @@ bool Serializer::deserializeScene(const QJsonArray& objects) {
     std::unordered_map<int, GeoObject*> idMap;
 
     for (const auto& val : objects) {
-        QJsonObject o    = val.toObject();
-        int         id   = o["id"].toInt();
-        QString     type = o["type"].toString();
-
-        auto ref = [&](const QString& key) -> GeoObject* {
-            int refId = o[key].toInt(-1);
-            auto it = idMap.find(refId);
-            return it != idMap.end() ? it->second : nullptr;
-        };
-
-        GeoObject* obj = nullptr;
-
-        if (type == "IntersectionPoint") {
-            int setId  = o["intersectionSet"].toInt(-1);
-            int index  = o["index"].toInt(0);
-            auto it = idMap.find(setId);
-            if (it == idMap.end()) {
-                m_lastError = "IntersectionSet nicht gefunden";
-                return false;
-            }
-            auto* iset = dynamic_cast<IntersectionSet*>(it->second);
-            if (!iset) { m_lastError = "Kein IntersectionSet"; return false; }
-            obj = (index == 0) ? iset->first() : iset->second();
-            // Kein addPoint nötig – Item wurde bereits von addIntersectionSet erzeugt
-            idMap[id] = obj;
-            continue; // kein erneutes addPoint
-        } else if (type == "Point") {
-            auto* p = m_scene->create<Point>(o["x"].toDouble(),
-                                              o["y"].toDouble());
-            m_adapter->addPoint(p);
-            obj = p;
-
-        } else if (type == "Line") {
-            auto* p1 = dynamic_cast<Point*>(ref("p1"));
-            auto* p2 = dynamic_cast<Point*>(ref("p2"));
-            if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* l = m_scene->create<Line>(PointPairForLinearObject{.point1=p1, .point2=p2});
-            m_adapter->addLinearObject(l);
-            obj = l;
-
-        } else if (type == "Ray") {
-            auto* p1 = dynamic_cast<Point*>(ref("p1"));
-            auto* p2 = dynamic_cast<Point*>(ref("p2"));
-            if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* r = m_scene->create<Ray>(PointPairForLinearObject{.point1=p1, .point2=p2});
-            m_adapter->addLinearObject(r);
-            obj = r;
-
-        } else if (type == "Segment") {
-            auto* p1 = dynamic_cast<Point*>(ref("p1"));
-            auto* p2 = dynamic_cast<Point*>(ref("p2"));
-            if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* s = m_scene->create<Segment>(PointPairForLinearObject{.point1=p1, .point2=p2});
-            m_adapter->addLinearObject(s);
-            obj = s;
-
-        } else if (type == "Circle") {
-            auto* center = dynamic_cast<Point*>(ref("center"));
-            auto* radius = dynamic_cast<Point*>(ref("radius"));
-            if (!center || !radius) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* c = m_scene->create<Circle>(PointPairForCircle{.center=center,.radiusPoint=radius});
-            m_adapter->addCircle(c);
-            obj = c;
-
-        } else if (type == "Midpoint") {
-            auto* p1 = dynamic_cast<Point*>(ref("p1"));
-            auto* p2 = dynamic_cast<Point*>(ref("p2"));
-            if (!p1 || !p2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* m = m_scene->create<Midpoint>(p1, p2);
-            m_adapter->addPoint(m);
-            obj = m;
-
-        } else if (type == "Parallel") {
-            auto* origin = dynamic_cast<Point*>(ref("origin"));
-            auto* refObj = dynamic_cast<LinearObject*>(ref("reference"));
-            if (!origin || !refObj) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* p = m_scene->create<Parallel>(origin, refObj);
-            m_adapter->addLinearObject(p->line());
-            obj = p;
-
-        } else if (type == "Perpendicular") {
-            auto* origin = dynamic_cast<Point*>(ref("origin"));
-            auto* refObj = dynamic_cast<LinearObject*>(ref("reference"));
-            if (!origin || !refObj) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* p = m_scene->create<Perpendicular>(origin, refObj);
-            m_adapter->addLinearObject(p->line());
-            obj = p;
-
-        } else if (type == "PerpendicularFoot") {
-            auto* point = dynamic_cast<Point*>(ref("point"));
-            auto* line  = dynamic_cast<LinearObject*>(ref("line"));
-            if (!point || !line) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* f = m_scene->create<PerpendicularFoot>(point, line);
-            m_adapter->addPoint(f);
-            obj = f;
-
-        } else if (type == "LineLineIntersection") {
-            auto* l1 = dynamic_cast<LinearObject*>(ref("l1"));
-            auto* l2 = dynamic_cast<LinearObject*>(ref("l2"));
-            if (!l1 || !l2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* s = m_scene->create<LineLineIntersection>(l1, l2);
-            m_adapter->addIntersectionSet(s);
-            obj = s;
-
-        } else if (type == "LineCircleIntersection") {
-            auto* line   = dynamic_cast<LinearObject*>(ref("line"));
-            auto* circle = dynamic_cast<Circle*>(ref("circle"));
-            if (!line || !circle) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* s = m_scene->create<LineCircleIntersection>(line, circle);
-            m_adapter->addIntersectionSet(s);
-            obj = s;
-
-        } else if (type == "CircleCircleIntersection") {
-            auto* c1 = dynamic_cast<Circle*>(ref("c1"));
-            auto* c2 = dynamic_cast<Circle*>(ref("c2"));
-            if (!c1 || !c2) { m_lastError = "Ungültige Referenz"; return false; }
-            auto* s = m_scene->create<CircleCircleIntersection>(c1, c2);
-            m_adapter->addIntersectionSet(s);
-            obj = s;
+        if (!deserializeObject(val, idMap)) {
+            return false;
         }
-
-        if (obj) idMap[id] = obj;
     }
+    return true;
+}
+
+auto Serializer::ref(const QString& key, const QJsonObject& jsonObj, const std::unordered_map<int, GeoObject*>& idMap) -> GeoObject* {
+    int refId = jsonObj[key].toInt(-1);
+    auto iter = idMap.find(refId);
+    return (iter != idMap.end()) ? iter->second : nullptr;
+}
+
+auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered_map<int, GeoObject*>& idMap) -> bool { // NOLINT
+    QJsonObject jsonObj = val.toObject();
+    int         ident   = jsonObj["id"].toInt();
+    QString     type    = jsonObj["type"].toString();
+
+    GeoObject* obj = nullptr;
+
+    if (type == "IntersectionPoint") {
+        int setId  = jsonObj["intersectionSet"].toInt(-1);
+        int index  = jsonObj["index"].toInt(0);
+        auto iter = idMap.find(setId);
+        if (iter == idMap.end()) {
+            m_lastError = "IntersectionSet nicht gefunden";
+            return false;
+        }
+        auto* iset = dynamic_cast<IntersectionSet*>(iter->second);
+        if (iset == nullptr) { 
+            m_lastError = "Kein IntersectionSet";
+            return false;
+        }
+        obj = (index == 0) ? iset->first() : iset->second();
+        // Kein addPoint nötig – Item wurde bereits von addIntersectionSet erzeugt
+        idMap[ident] = obj;
+        //continue; // kein erneutes addPoint
+    } 
+    
+    if (type == "Point") {
+        auto* point = m_scene->create<Point>(jsonObj["x"].toDouble(), jsonObj["y"].toDouble());
+        m_adapter->addPoint(point);
+        obj = point;
+    } else if (type == "Line") {
+        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        if ((point1 == nullptr) || (point2 == nullptr)) { 
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* line = m_scene->create<Line>(PointPairForLinearObject{.point1=point1, .point2=point2});
+        m_adapter->addLinearObject(line);
+        obj = line;
+
+    } else if (type == "Ray") {
+        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        if ((point1 == nullptr) || (point2 == nullptr)) { 
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* ray = m_scene->create<Ray>(PointPairForLinearObject{.point1=point1, .point2=point2});
+        m_adapter->addLinearObject(ray);
+        obj = ray;
+
+    } else if (type == "Segment") {
+        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        if ((point1 == nullptr) || (point2 == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* segment = m_scene->create<Segment>(PointPairForLinearObject{.point1=point1, .point2=point2});
+        m_adapter->addLinearObject(segment);
+        obj = segment;
+
+    } else if (type == "Circle") {
+        auto* center = dynamic_cast<Point*>(ref("center", jsonObj, idMap));
+        auto* radius = dynamic_cast<Point*>(ref("radius", jsonObj, idMap));
+        if ((center == nullptr) || (radius == nullptr)) { 
+            m_lastError = "Ungültige Referenz"; 
+            return false; 
+        }
+        auto* circle = m_scene->create<Circle>(PointPairForCircle{.center=center,.radiusPoint=radius});
+        m_adapter->addCircle(circle);
+        obj = circle;
+
+    } else if (type == "Midpoint") {
+        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        if ((point1 == nullptr) || (point2 == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* midpoint = m_scene->create<Midpoint>(point1, point2);
+        m_adapter->addPoint(midpoint);
+        obj = midpoint;
+
+    } else if (type == "Parallel") {
+        auto* origin = dynamic_cast<Point*>(ref("origin", jsonObj, idMap));
+        auto* refObj = dynamic_cast<LinearObject*>(ref("reference", jsonObj, idMap));
+        if ((origin == nullptr) || (refObj == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* para = m_scene->create<Parallel>(origin, refObj);
+        m_adapter->addLinearObject(para->line());
+        obj = para;
+
+    } else if (type == "Perpendicular") {
+        auto* origin = dynamic_cast<Point*>(ref("origin", jsonObj, idMap));
+        auto* refObj = dynamic_cast<LinearObject*>(ref("reference", jsonObj, idMap));
+        if ((origin == nullptr) || (refObj == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* perp = m_scene->create<Perpendicular>(origin, refObj);
+        m_adapter->addLinearObject(perp->line());
+        obj = perp;
+
+    } else if (type == "PerpendicularFoot") {
+        auto* point = dynamic_cast<Point*>(ref("point", jsonObj, idMap));
+        auto* line  = dynamic_cast<LinearObject*>(ref("line", jsonObj, idMap));
+        if ((point == nullptr) || (line == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* perp_foot = m_scene->create<PerpendicularFoot>(point, line);
+        m_adapter->addPoint(perp_foot);
+        obj = perp_foot;
+
+    } else if (type == "LineLineIntersection") {
+        auto* line1 = dynamic_cast<LinearObject*>(ref("l1", jsonObj, idMap));
+        auto* line2 = dynamic_cast<LinearObject*>(ref("l2", jsonObj, idMap));
+        if ((line1 == nullptr) || (line2 == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* lli = m_scene->create<LineLineIntersection>(line1, line2);
+        m_adapter->addIntersectionSet(lli);
+        obj = lli;
+
+    } else if (type == "LineCircleIntersection") {
+        auto* line   = dynamic_cast<LinearObject*>(ref("line", jsonObj, idMap));
+        auto* circle = dynamic_cast<Circle*>(ref("circle", jsonObj, idMap));
+        if ((line == nullptr) || (circle == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* lci = m_scene->create<LineCircleIntersection>(line, circle);
+        m_adapter->addIntersectionSet(lci);
+        obj = lci;
+
+    } else if (type == "CircleCircleIntersection") {
+        auto* circle1 = dynamic_cast<Circle*>(ref("c1", jsonObj, idMap));
+        auto* circle2 = dynamic_cast<Circle*>(ref("c2", jsonObj, idMap));
+        if ((circle1 == nullptr) || (circle2 == nullptr)) {
+            m_lastError = "Ungültige Referenz";
+            return false; 
+        }
+        auto* cci = m_scene->create<CircleCircleIntersection>(circle1, circle2);
+        m_adapter->addIntersectionSet(cci);
+        obj = cci;
+    }
+
+    if (obj != nullptr) {
+        idMap[ident] = obj;
+    }
+
     return true;
 }
 
 // ── SVG Export ────────────────────────────────────────────────────────────────
 
-bool Serializer::exportSVG(const QString& filename) const {
+auto Serializer::exportSVG(const QString& filename) const -> bool {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         m_lastError = file.errorString();
@@ -383,36 +356,46 @@ bool Serializer::exportSVG(const QString& filename) const {
     return true;
 }
 
-QString Serializer::buildSVG() const {
+auto Serializer::buildSVG() const -> QString {
     // Bounding box aus allen Objekten bestimmen
-    double minX =  1e10, minY =  1e10;
-    double maxX = -1e10, maxY = -1e10;
+    double minX =  DEFAULT_SVG_BB_SIZE;
+    double minY =  DEFAULT_SVG_BB_SIZE;
+    double maxX = -DEFAULT_SVG_BB_SIZE;
+    double maxY = -DEFAULT_SVG_BB_SIZE;
 
     const auto& items = m_adapter->geoGraphicsItems();
 
-    auto expand = [&](double x, double y) {
-        minX = std::min(minX, x); minY = std::min(minY, y);
-        maxX = std::max(maxX, x); maxY = std::max(maxY, y);
+    auto expand = [&](double pos_x, double pos_y) -> void {
+        minX = std::min(minX, pos_x); minY = std::min(minY, pos_y);
+        maxX = std::max(maxX, pos_x); maxY = std::max(maxY, pos_y);
     };
 
-    for (auto& [obj, item] : items) {
-        if (!item->isVisible() || !obj->isValid()) continue;
-        if (auto* p = dynamic_cast<Point*>(obj))
-            expand(p->x(), p->y());
+    for (const auto& [obj, item] : items) {
+        if (!item->isVisible() || !obj->isValid()) {
+            continue;
+        }
+        if (auto* point = dynamic_cast<Point*>(obj)) {
+            expand(point->x(), point->y());
+        }
     }
 
-    const double margin = 50.0;
-    if (minX > maxX) { minX = -100; maxX = 100; minY = -100; maxY = 100; }
-    minX -= margin; minY -= margin; maxX += margin; maxY += margin;
+    if (minX > maxX) { 
+        minX = -DEFAULT_SVG_MINSIZE;
+        maxX = DEFAULT_SVG_MINSIZE;
+        minY = -DEFAULT_SVG_MINSIZE;
+        maxY = DEFAULT_SVG_MINSIZE; 
+    }
+    minX -= DEFAULT_SVG_MARGIN;
+    minY -= DEFAULT_SVG_MARGIN;
+    maxX += DEFAULT_SVG_MARGIN;
+    maxY += DEFAULT_SVG_MARGIN;
 
-    double w = maxX - minX;
-    double h = maxY - minY;
+    double width = maxX - minX;
+    double height = maxY - minY;
 
     // SVG-Koordinaten: Y-Achse invertieren (SVG hat Y nach unten)
-    auto svgX = [&](double x) { return x - minX; };
-    auto svgY = [&](double y) { return h - (y - minY); }; // Y-Flip
-
-    const double ext = 10000.0; // Ausdehnung für Geraden
+    auto svgX = [&](double pos_x) -> double { return pos_x - minX; };
+    auto svgY = [&](double pos_y) -> double { return height - (pos_y - minY); }; // Y-Flip
 
     QString svg;
     svg += QString(R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -420,52 +403,164 @@ QString Serializer::buildSVG() const {
      width="%1" height="%2"
      viewBox="0 0 %1 %2">
 <rect width="%1" height="%2" fill="white"/>
-)").arg(w).arg(h);
+)").arg(width).arg(height);
 
-    for (auto& [obj, item] : items) {
-        if (!item->isVisible() || !obj->isValid()) continue;
+    for (const auto& [obj, item] : items) {
+        if (!item->isVisible() || !obj->isValid()) {
+            continue;
+        }
 
-        if (auto* lo = dynamic_cast<LinearObject*>(obj)) {
-            double dx = lo->dx(), dy = lo->dy();
-            double len = std::sqrt(dx*dx + dy*dy);
-            if (len < 1e-10) continue;
-            double ux = dx/len, uy = dy/len;
+        if (auto* linearObject = dynamic_cast<LinearObject*>(obj)) {
+            double delta_x = linearObject->dx();
+            double delta_y = linearObject->dy();
+            double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
+            if (len < eps) {
+                continue;
+            }
+            double dir_x = delta_x/len;
+            double dir_y = delta_y/len;
 
-            double x1, y1, x2, y2;
-            if (dynamic_cast<Segment*>(lo)) {
-                x1 = lo->p1()->x(); y1 = lo->p1()->y();
-                x2 = lo->p2()->x(); y2 = lo->p2()->y();
-            } else if (dynamic_cast<Ray*>(lo)) {
-                x1 = lo->p1()->x();       y1 = lo->p1()->y();
-                x2 = lo->p1()->x()+ux*ext; y2 = lo->p1()->y()+uy*ext;
-            } else {
-                x1 = lo->p1()->x()-ux*ext; y1 = lo->p1()->y()-uy*ext;
-                x2 = lo->p1()->x()+ux*ext; y2 = lo->p1()->y()+uy*ext;
+            double p1_x = linearObject->p1()->x();
+            double p1_y = linearObject->p1()->y();
+            double p2_x = linearObject->p2()->x();
+            double p2_y = linearObject->p2()->y();
+            if (dynamic_cast<Ray*>(linearObject) != nullptr) {
+                p2_x += (dir_x*DEFAULT_SVG_LINEEXTEND);
+                p2_y += (dir_y*DEFAULT_SVG_LINEEXTEND);
+            } else if (dynamic_cast<Line*>(linearObject) != nullptr) {
+                p1_x -= (dir_x*DEFAULT_SVG_LINEEXTEND);
+                p1_y -= (dir_y*DEFAULT_SVG_LINEEXTEND);
+                p2_x += (dir_x*DEFAULT_SVG_LINEEXTEND);
+                p2_y += (dir_y*DEFAULT_SVG_LINEEXTEND);
             }
 
             svg += QString(R"(  <line x1="%1" y1="%2" x2="%3" y2="%4"
         stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(x1)).arg(svgY(y1))
-                .arg(svgX(x2)).arg(svgY(y2));
+                .arg(svgX(p1_x)).arg(svgY(p1_y))
+                .arg(svgX(p2_x)).arg(svgY(p2_y));
 
-        } else if (auto* c = dynamic_cast<Circle*>(obj)) {
+        } else if (auto* circle = dynamic_cast<Circle*>(obj)) {
             svg += QString(R"(  <circle cx="%1" cy="%2" r="%3"
         fill="none" stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(c->center()->x()))
-                .arg(svgY(c->center()->y()))
-                .arg(c->radius());
+                .arg(svgX(circle->center()->x()))
+                .arg(svgY(circle->center()->y()))
+                .arg(circle->radius());
 
-        } else if (auto* p = dynamic_cast<Point*>(obj)) {
+        } else if (auto* point = dynamic_cast<Point*>(obj)) {
             svg += QString(R"(  <circle cx="%1" cy="%2" r="4"
         fill="white" stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(p->x()))
-                .arg(svgY(p->y()));
+                .arg(svgX(point->x()))
+                .arg(svgY(point->y()));
         }
     }
 
     svg += "</svg>\n";
     return svg;
+}
+
+auto Serializer::buildDependencyOrder(const std::unordered_set<GeoObject*>& saveable) const -> std::vector<GeoObject*> {
+    // Topologisch sortieren – nur saveables
+    std::vector<GeoObject*> sorted;
+    std::unordered_set<GeoObject*> visited;
+
+    for (GeoObject* obj : saveable) {
+        collectDependencies(obj, visited, sorted, saveable);
+    }
+
+    return sorted;
+}
+
+auto Serializer::buildIdMap(const std::vector<GeoObject*>& sorted) -> std::unordered_map<GeoObject*, int> {
+    std::unordered_map<GeoObject*, int> idMap;
+    // IDs in topologischer Reihenfolge vergeben
+    // IntersectionPoints bekommen auch IDs (für Referenzen aus anderen Objekten)
+    for (int i = 0; i < static_cast<int>(sorted.size()); ++i) {
+        idMap[sorted[i]] = i;
+    }
+
+    // IntersectionPoints der gespeicherten IntersectionSets mit IDs versehen
+    int nextId = static_cast<int>(sorted.size());
+    for (GeoObject* obj : sorted) {
+        if (auto* iset = dynamic_cast<IntersectionSet*>(obj)) {
+            if (!idMap.contains(iset->first())) {
+                idMap[iset->first()]  = nextId++;
+            }
+            if (!idMap.contains(iset->second())) {
+                idMap[iset->second()] = nextId++;
+            }
+        }
+    }
+
+    return idMap;
+}
+
+void Serializer::collectDependencies(GeoObject* obj, std::unordered_set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::unordered_set<GeoObject*>& saveable) const {
+    if (visited.contains(obj)) {
+            return;
+        }
+        visited.insert(obj);
+
+        // Normale Quellen
+        for (GeoObject* src : obj->sources()) {
+            if (saveable.contains(src)) {
+                collectDependencies(src, visited, sorted, saveable);
+            }
+        }
+
+        // IntersectionPoint: IntersectionSet als implizite Quelle behandeln
+        if (auto* intersectionPoint = dynamic_cast<IntersectionPoint*>(obj)) {
+            for (auto& [geoObj, unused] : m_adapter->geoGraphicsItems()) {
+                if (auto* iset = dynamic_cast<IntersectionSet*>(geoObj)) {
+                    if (iset->first() == intersectionPoint || iset->second() == intersectionPoint) {
+                        if (saveable.contains(iset)) {
+                            collectDependencies(iset, visited, sorted, saveable);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        sorted.push_back(obj);
+}
+
+auto Serializer::collectSaveableObjects() const -> std::unordered_set<GeoObject*> {
+    const auto& items = m_adapter->geoGraphicsItems();
+    // Nur sichtbare, valide, nicht-IntersectionPoint Objekte speichern
+    std::unordered_set<GeoObject*> saveable;
+    for (const auto& [obj, item] : items) {
+        if (!item->isVisible()) {
+            continue;
+        }
+        if (!obj->isValid()) {
+            continue;
+        }
+        //if (dynamic_cast<IntersectionPoint*>(obj)) continue;
+        saveable.insert(obj);
+    }
+
+    // IntersectionSets explizit hinzufügen
+    for (IntersectionSet* iset : m_adapter->intersectionSets()) {
+        if (iset->isValid()) {
+            saveable.insert(iset);
+        }
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (GeoObject* obj : saveable) {
+            for (GeoObject* src : obj->sources()) {
+                if (!saveable.contains(src) && src->isValid()) {
+                    saveable.insert(src);
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    return saveable;
 }

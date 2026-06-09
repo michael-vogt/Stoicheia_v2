@@ -2,34 +2,50 @@
 #include <QString>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <qjsonvalue.h>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 class Scene;
 class SceneAdapter;
 class GeoObject;
+
+constexpr double DEFAULT_SVG_BB_SIZE = 1e10;
+constexpr double DEFAULT_SVG_MARGIN = 50;
+constexpr double DEFAULT_SVG_MINSIZE = 100;
+constexpr double DEFAULT_SVG_LINEEXTEND = 10000;
 
 class Serializer {
 public:
     Serializer(Scene* scene, SceneAdapter* adapter);
 
     // JSON Save/Load
-    bool save(const QString& filename) const;
-    bool load(const QString& filename);
+    auto save(const QString& filename) const -> bool;
+    auto load(const QString& filename) -> bool;
 
     // SVG Export
-    bool exportSVG(const QString& filename) const;
+    auto exportSVG(const QString& filename) const -> bool;
 
-    QString lastError() const { return m_lastError; }
+    auto lastError() const -> QString { return m_lastError; }
 
 private:
     // Save
-    QJsonObject serializeScene()      const;
-    QJsonObject serializeObject(GeoObject* obj, int id, const std::unordered_map<GeoObject*, int>& idMap) const;
+    auto serializeScene() const -> QJsonObject;
+    auto serializeObject(GeoObject* obj, int ident, const std::unordered_map<GeoObject*, int>& idMap) const -> QJsonObject;
 
     // Load
-    bool deserializeScene(const QJsonArray& objects);
+    auto deserializeScene(const QJsonArray& objects) -> bool;
+    auto deserializeObject(const QJsonValueConstRef& val, std::unordered_map<int, GeoObject*>& idMap) -> bool;
+    static auto ref(const QString& key, const QJsonObject& jsonObj, const std::unordered_map<int, GeoObject*>& idMap) -> GeoObject*;
 
     // SVG
-    QString buildSVG() const;
+    auto buildSVG() const -> QString;
+
+    auto buildDependencyOrder(const std::unordered_set<GeoObject*>& saveable) const -> std::vector<GeoObject*>;
+    static auto buildIdMap(const std::vector<GeoObject*>& sorted)  -> std::unordered_map<GeoObject*, int>;
+    void collectDependencies(GeoObject* obj, std::unordered_set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::unordered_set<GeoObject*>& saveable) const;
+    auto collectSaveableObjects() const -> std::unordered_set<GeoObject*>;
 
     Scene*        m_scene;
     SceneAdapter* m_adapter;

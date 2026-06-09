@@ -17,15 +17,19 @@ FileManager::FileManager(Scene* scene, SceneAdapter* adapter,
       m_commandStack(commandStack), m_parent(parent)
 {}
 
-bool FileManager::newFile() {
+auto FileManager::newFile() -> bool {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,
             tr("Ungespeicherte Änderungen"),
             tr("Möchten Sie die aktuellen Änderungen speichern?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-        if (btn == QMessageBox::Cancel)  return false;
-        if (btn == QMessageBox::Save && !save()) return false;
+        if (btn == QMessageBox::Cancel)  {
+            return false;
+        }
+        if (btn == QMessageBox::Save && !save()) {
+            return false;
+        }
     }
     clearScene();
     m_currentFile.clear();
@@ -34,70 +38,90 @@ bool FileManager::newFile() {
     return true;
 }
 
-bool FileManager::open() {
+auto FileManager::open() -> bool {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,
             tr("Ungespeicherte Änderungen"),
             tr("Möchten Sie die aktuellen Änderungen speichern?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-        if (btn == QMessageBox::Cancel)  return false;
-        if (btn == QMessageBox::Save && !save()) return false;
+        if (btn == QMessageBox::Cancel) {
+            return false;
+        }
+        if (btn == QMessageBox::Save && !save()) {
+            return false;
+        }
     }
 
     QString filename = QFileDialog::getOpenFileName(
         m_parent, tr("Datei öffnen"), {}, FILTER_JSON);
-    if (filename.isEmpty()) return false;
+    if (filename.isEmpty()) {
+        return false;
+    }
 
     return loadFromFile(filename);
 }
 
-bool FileManager::openFile(const QString& filename) {
+auto FileManager::openFile(const QString& filename) -> bool {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,
             tr("Ungespeicherte Änderungen"),
             tr("Möchten Sie die aktuellen Änderungen speichern?"),
             QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        if (btn == QMessageBox::Cancel)  return false;
-        if (btn == QMessageBox::Save && !save()) return false;
+        if (btn == QMessageBox::Cancel) {
+            return false;
+        }
+        if (btn == QMessageBox::Save && !save()) {
+            return false;
+        }
     }
     return loadFromFile(filename);
 
 }
 
-bool FileManager::save() {
-    if (m_currentFile.isEmpty()) return saveAs();
+auto FileManager::save() -> bool {
+    if (m_currentFile.isEmpty()) {
+        return saveAs();
+    }
     return saveToFile(m_currentFile);
 }
 
-bool FileManager::saveAs() {
+auto FileManager::saveAs() -> bool {
     QString filename = QFileDialog::getSaveFileName(
         m_parent, tr("Datei speichern"), {}, FILTER_JSON);
-    if (filename.isEmpty()) return false;
-    if (!filename.endsWith(".sto")) filename += ".sto";
+    if (filename.isEmpty()) {
+        return false;
+    }
+    if (!filename.endsWith(".sto")) {
+        filename += ".sto";
+    }
     return saveToFile(filename);
 }
 
-bool FileManager::exportSVG() const {
+auto FileManager::exportSVG() const -> bool {
     QString filename = QFileDialog::getSaveFileName(
         m_parent, tr("SVG exportieren"), {}, FILTER_SVG);
-    if (filename.isEmpty()) return false;
-    if (!filename.endsWith(".svg")) filename += ".svg";
+    if (filename.isEmpty()) {
+        return false;
+    }
+    if (!filename.endsWith(".svg")) {
+        filename += ".svg";
+    }
 
-    Serializer s(m_scene, m_adapter);
-    if (!s.exportSVG(filename)) {
+    Serializer serializer(m_scene, m_adapter);
+    if (!serializer.exportSVG(filename)) {
         QMessageBox::critical(m_parent,
-            tr("Fehler"), s.lastError());
+            tr("Fehler"), serializer.lastError());
         return false;
     }
     return true;
 }
 
-bool FileManager::saveToFile(const QString& filename) {
-    Serializer s(m_scene, m_adapter);
-    if (!s.save(filename)) {
+auto FileManager::saveToFile(const QString& filename) -> bool {
+    Serializer serializer(m_scene, m_adapter);
+    if (!serializer.save(filename)) {
         QMessageBox::critical(m_parent,
-            tr("Fehler beim Speichern"), s.lastError());
+            tr("Fehler beim Speichern"), serializer.lastError());
         return false;
     }
     m_currentFile    = filename;
@@ -107,13 +131,13 @@ bool FileManager::saveToFile(const QString& filename) {
     return true;
 }
 
-bool FileManager::loadFromFile(const QString& filename) {
+auto FileManager::loadFromFile(const QString& filename) -> bool {
     clearScene();
 
-    Serializer s(m_scene, m_adapter);
-    if (!s.load(filename)) {
+    Serializer serializer(m_scene, m_adapter);
+    if (!serializer.load(filename)) {
         QMessageBox::critical(m_parent,
-            tr("Fehler beim Laden"), s.lastError());
+            tr("Fehler beim Laden"), serializer.lastError());
         return false;
     }
     m_currentFile    = filename;
@@ -131,11 +155,11 @@ void FileManager::clearScene() const {
 }
 
 void FileManager::updateTitle() const {
-    if (auto* w = qobject_cast<QMainWindow*>(m_parent)) {
+    if (auto* wnd = qobject_cast<QMainWindow*>(m_parent)) {
         QString name = m_currentFile.isEmpty()
             ? tr("Unbenannt")
             : QFileInfo(m_currentFile).baseName();
-        w->setWindowTitle(
+        wnd->setWindowTitle(
             QString(tr("Stoicheia (Στοιχεῖα) – %1%2"))
                 .arg(name)
                 .arg(m_unsavedChanges ? " *" : ""));

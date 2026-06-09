@@ -5,9 +5,9 @@
 class PdfExporter : public Exporter {
     Q_OBJECT
 public:
-    bool exportToFile(QGraphicsScene* scene, const QString& filename) override;
+    auto exportToFile(QGraphicsScene* scene, const QString& filename) -> bool override;
 
-    QString formatName() const override { return "PDF"; }
-    QString fileExtension() const override { return "pdf"; }
-    QString fileFilter() const override { return tr("PDF-Dateien (*.pdf)"); }
+    auto formatName() const -> QString override { return "PDF"; }
+    auto fileExtension() const -> QString override { return "pdf"; }
+    auto fileFilter() const -> QString override { return tr("PDF-Dateien (*.pdf)"); }
 };
