@@ -9,19 +9,19 @@ CreateIntersectionCommand::CreateIntersectionCommand(SceneAdapter* adapter, GeoO
 {}
 
 void CreateIntersectionCommand::execute() {
-    auto* l1 = dynamic_cast<LinearObject*>(m_obj1);
-    auto* l2 = dynamic_cast<LinearObject*>(m_obj2);
-    auto* c1 = dynamic_cast<Circle*>(m_obj1);
-    auto* c2 = dynamic_cast<Circle*>(m_obj2);
+    auto* linearObject1 = dynamic_cast<LinearObject*>(m_obj1);
+    auto* linearObject2 = dynamic_cast<LinearObject*>(m_obj2);
+    auto* circle1 = dynamic_cast<Circle*>(m_obj1);
+    auto* circle2 = dynamic_cast<Circle*>(m_obj2);
 
-    if (l1 && l2) {
-        m_result = m_adapter->geoScene()->create<LineLineIntersection>(l1, l2);
-    } else if (l1 && c2) {
-        m_result = m_adapter->geoScene()->create<LineCircleIntersection>(l1, c2);
-    } else if (c1 && l2) {
-        m_result = m_adapter->geoScene()->create<LineCircleIntersection>(l2, c1);
-    } else if (c1 && c2) {
-        m_result = m_adapter->geoScene()->create<CircleCircleIntersection>(c1, c2);
+    if ((linearObject1 != nullptr) && (linearObject2 != nullptr)) {
+        m_result = m_adapter->geoScene()->create<LineLineIntersection>(linearObject1, linearObject2);
+    } else if ((linearObject1 != nullptr) && (circle1 != nullptr)) {
+        m_result = m_adapter->geoScene()->create<LineCircleIntersection>(linearObject1, circle2);
+    } else if ((circle1 != nullptr) && (linearObject2 != nullptr)) {
+        m_result = m_adapter->geoScene()->create<LineCircleIntersection>(linearObject2, circle1);
+    } else if ((circle1 != nullptr) && (circle2 != nullptr)) {
+        m_result = m_adapter->geoScene()->create<CircleCircleIntersection>(circle1, circle2);
     } else {
         return; // ungültige Kombination
     }
@@ -30,7 +30,7 @@ void CreateIntersectionCommand::execute() {
 }
 
 void CreateIntersectionCommand::undo() {
-    if (m_result) {
+    if (m_result != nullptr) {
         m_adapter->remove(m_result);
         m_result = nullptr;
     }

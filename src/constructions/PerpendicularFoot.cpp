@@ -1,11 +1,17 @@
 #include "PerpendicularFoot.h"
+#include "Structs.h"
 
+#include <limits>
 #include <stdexcept>
+
+constexpr double eps = std::numeric_limits<double>::epsilon();
 
 PerpendicularFoot::PerpendicularFoot(Point *point, LinearObject *line)
 : Point(0, 0), m_point(point), m_line(line)
 {
-    if (m_point == nullptr || m_line == nullptr) throw std::invalid_argument("null argument");
+    if (m_point == nullptr || m_line == nullptr) {
+        throw std::invalid_argument("null argument");
+    }
     m_point->addDependent(this);
     m_line->addDependent(this);
     PerpendicularFoot::recompute();
@@ -13,8 +19,12 @@ PerpendicularFoot::PerpendicularFoot(Point *point, LinearObject *line)
 
 void PerpendicularFoot::onSourceRemoved(GeoObject *src) {
     m_valid = false;
-    if (src == static_cast<GeoObject*>(m_point)) m_point = nullptr;
-    if (src == static_cast<GeoObject*>(m_line)) m_line = nullptr;
+    if (src == static_cast<GeoObject*>(m_point)) {
+        m_point = nullptr;
+    }
+    if (src == static_cast<GeoObject*>(m_line)) {
+        m_line = nullptr;
+    }
 }
 
 void PerpendicularFoot::recompute() {
@@ -23,26 +33,31 @@ void PerpendicularFoot::recompute() {
         return;
     }
 
-    const Point* p1 = m_line->p1();
-    const Point* p2 = m_line->p2();
-    const double dx = p2->x() - p1->x();
-    const double dy = p2->y() - p1->y();
-    const double len2 = dx*dx + dy*dy;
+    const Point* point1 = m_line->p1();
+    const Point* point2 = m_line->p2();
+    const double delta_x = point2->x() - point1->x();
+    const double delta_y = point2->y() - point1->y();
+    const double len2 = (delta_x*delta_x) + (delta_y*delta_y);
 
-    if (len2 < 1e-20) { // degenerate line
+    if (len2 < eps*eps) { // degenerate line
         m_valid = false;
         return;
     }
 
-    const double px = m_point->x() - p1->x();
-    const double py = m_point->y() - p1->y();
-    const double t = (px * dx + py * dy) / len2;
+    // Projektion von point1->m_point auf point1->point2
+    const double dir_x = m_point->x() - point1->x();
+    const double dir_y = m_point->y() - point1->y();
+    const double param_t = ((dir_x * delta_x) + (dir_y * delta_y)) / len2;
 
     m_valid = true;
-    moveTo(p1->x() + t * dx, p1->y() + t * dy);
+    moveTo(point1->x() + (param_t * delta_x), point1->y() + (param_t * delta_y));
 }
 
-void PerpendicularFoot::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_point == oldSource) m_point = static_cast<Point*>(newSource);
-    if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
+void PerpendicularFoot::replaceSource(GeoObjectPair source) {
+    if (m_point == source.oldGeoObject) { 
+        m_point = static_cast<Point*>(source.newGeoObject); 
+    }
+    if (m_line == source.oldGeoObject) { 
+        m_line = static_cast<LinearObject*>(source.newGeoObject);
+    }
 }

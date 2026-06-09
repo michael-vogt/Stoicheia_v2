@@ -4,28 +4,33 @@
 #include <QPen>
 #include <QBrush>
 
+
+constexpr double DEFAULT_POINTITEM_PENWIDTH_NORMAL = 1.5;
+constexpr double DEFAULT_POINTITEM_PENWIDTH_THICK = 2.5;
+constexpr double DEFAULT_POINTITEM_RADIUS = 4;
+
 class GeoPointItem : public GeoGraphicsItem {
 public:
     explicit GeoPointItem(Point* point, QGraphicsItem* parent = nullptr);
 
-    QRectF boundingRect() const override;
-    Point*  point() const { return m_point; };
+    [[nodiscard]] auto boundingRect() const -> QRectF override;
+    [[nodiscard]] auto  point() const -> Point* { return m_point; };
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
 
-    bool contains(const QPointF& point) override;
+    auto contains(const QPointF& point) -> bool override;
 
-    void setRadius(double r) { m_radius = r; update(); }
+    void setRadius(double radius) { m_radius = radius; update(); }
     void setPen(const QPen& pen) { m_pen = pen; update(); }
     void setBrush(const QBrush& brush) { m_brush = brush; update(); }
 
 protected:
     void updateGeometry() override;
 
-    QPen    m_pen     = QPen(Qt::black, 1.5);
+    QPen    m_pen     = QPen(Qt::black, DEFAULT_POINTITEM_PENWIDTH_NORMAL);
     QBrush  m_brush   = QBrush(Qt::white);
-    double  m_radius  = 4.0;
+    double  m_radius  = DEFAULT_POINTITEM_RADIUS;
 
 private:
     Point*  m_point = nullptr;

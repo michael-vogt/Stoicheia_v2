@@ -1,12 +1,15 @@
 #include "GeoLinearObjectItem.h"
+#include "GeoCircleItem.h"
 #include "dialogs/AppSettings.h"
-#include "../geometry/Line.h"
 #include "../geometry/Ray.h"
 #include "../geometry/Segment.h"
 #include <QPainter>
 #include <cmath>
 
 #include "LinearObjectType.h"
+
+
+constexpr double DEFAULT_LINEAROBJECT_SNAPWIDTH = 8;
 
 GeoLinearObjectItem::GeoLinearObjectItem(LinearObject* linearObject,
                                          QGraphicsItem* parent)
@@ -16,48 +19,57 @@ GeoLinearObjectItem::GeoLinearObjectItem(LinearObject* linearObject,
     GeoLinearObjectItem::updateGeometry();
 }
 
-QRectF GeoLinearObjectItem::boundingRect() const {
-    double extra = m_pen.widthF() / 2.0 + 1.0;
+auto GeoLinearObjectItem::boundingRect() const -> QRectF {
+    double extra = (m_pen.widthF() / 2) + 1.0;
     return QRectF(m_line.p1(), m_line.p2())
         .normalized()
         .adjusted(-extra, -extra, extra, extra);
 }
 
 void GeoLinearObjectItem::paint(QPainter* painter,
-                                 const QStyleOptionGraphicsItem*,
-                                 QWidget*)
+                                 const QStyleOptionGraphicsItem* /*option*/,
+                                 QWidget* /*widget*/)
 {
-    if (!m_linearObject->isValid()) return;
-    if (m_highlighted)
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, 2.5));
-    else if (m_selected)
-        painter->setPen(QPen(AppSettings::instance().colors.selected, 2.5));
-    else
+    if (!m_linearObject->isValid()) {
+        return;
+    }
+    if (m_highlighted) {
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DEFAULT_LINEAROBJECT_PENWIDTH_THICK));
+    } else if (m_selected) {
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DEFAULT_CIRCLE_PENWIDTH_THICK));
+    } else {
         painter->setPen(m_pen);
+    }
     painter->drawLine(m_line);
 }
 
-bool GeoLinearObjectItem::contains(const QPointF &point) {
-    QPointF p1 = m_line.p1();
-    QPointF p2 = m_line.p2();
+auto GeoLinearObjectItem::contains(const QPointF &point) -> bool {
+    QPointF point1 = m_line.p1();
+    QPointF point2 = m_line.p2();
 
-    QPointF p1p2 = p2 - p1;
-    QPointF p1p = point - p1;
+    QPointF p1p2 = point2 - point1;
+    QPointF p1p = point - point1;
 
     double ab2 = QPointF::dotProduct(p1p2, p1p2);
-    if (ab2 == 0.0) return false;
-
-    double t = QPointF::dotProduct(p1p, p1p2) / ab2;
-
-    if (m_type == LinearObjectType::Segment) {
-        if (t < 0.0 || t > 1.0) return false;
-    } else if (m_type == LinearObjectType::Ray) {
-        if (t < 0.0) return false;
+    if (ab2 == 0.0) {
+        return false;
     }
 
-    QPointF proj = m_line.pointAt(t);
+    double param_t = QPointF::dotProduct(p1p, p1p2) / ab2;
+
+    if (m_type == LinearObjectType::Segment) {
+        if (param_t < 0.0 || param_t > 1.0) {
+            return false;
+        }
+    } else if (m_type == LinearObjectType::Ray) {
+        if (param_t < 0.0) {
+            return false;
+        }
+    }
+
+    QPointF proj = m_line.pointAt(param_t);
     double dist = QLineF(point, proj).length();
-    return dist <= 8;
+    return dist <= DEFAULT_LINEAROBJECT_SNAPWIDTH;
 
 }
 
@@ -66,35 +78,36 @@ void GeoLinearObjectItem::updateGeometry() {
     m_line = computeVisibleLine();
 }
 
-QLineF GeoLinearObjectItem::computeVisibleLine() {
-    double x1 = m_linearObject->p1()->x();
-    double y1 = m_linearObject->p1()->y();
-    double x2 = m_linearObject->p2()->x();
-    double y2 = m_linearObject->p2()->y();
+auto GeoLinearObjectItem::computeVisibleLine() -> QLineF {
+    double p1_x = m_linearObject->p1()->x();
+    double p1_y = m_linearObject->p1()->y();
+    double p2_x = m_linearObject->p2()->x();
+    double p2_y = m_linearObject->p2()->y();
 
-    double dx = x2 - x1;
-    double dy = y2 - y1;
-    double len = std::sqrt(dx*dx + dy*dy);
-    if (len < 1e-10) return QLineF(x1, y1, x2, y2);
+    double delta_x = p2_x - p1_x;
+    double delta_y = p2_y - p1_y;
+    double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
+    if (len < eps) {
+        return {p1_x, p1_y, p2_x, p2_y};
+    }
 
-    double ux = dx / len, uy = dy / len;
+    double dir_x = delta_x / len;
+    double dir_y = delta_y / len;
 
-    if (dynamic_cast<Segment*>(m_linearObject)) {
+    if (dynamic_cast<Segment*>(m_linearObject) != nullptr) {
         // Strecke: exakt von p1 nach p2
         m_type = LinearObjectType::Segment;
-        return QLineF(x1, y1, x2, y2);
+        return {p1_x, p1_y, p2_x, p2_y};
 
     }
-    if (dynamic_cast<Ray*>(m_linearObject)) {
+    if (dynamic_cast<Ray*>(m_linearObject) != nullptr) {
         // Halbgerade: von p1 in Richtung p2, weit genug
         m_type = LinearObjectType::Ray;
-        return QLineF(x1, y1,
-                      x1 + ux * m_extent,
-                      y1 + uy * m_extent);
-
+        return {p1_x, p1_y,
+            p1_x + (dir_x * m_extent), (dir_y * m_extent) + p1_y};
     }
     // Gerade (Line): in beide Richtungen
     m_type = LinearObjectType::Line;
-    return QLineF(x1 - ux * m_extent, y1 - uy * m_extent,
-                  x1 + ux * m_extent, y1 + uy * m_extent);
+    return {p1_x - (dir_x * m_extent), p1_y - (dir_y * m_extent),
+            p1_x + (dir_x * m_extent), (dir_y * m_extent) + p1_y};
 }

@@ -9,12 +9,12 @@
 class Scene {
 public:
     // Getter
-    [[nodiscard]] const std::vector<std::unique_ptr<GeoObject>>& objects() const { return m_objects; }
-    [[nodiscard]] size_t size() const { return m_objects.size(); };
+    [[nodiscard]] auto objects() const -> const std::vector<std::unique_ptr<GeoObject>>& { return m_objects; }
+    [[nodiscard]] auto size() const -> size_t { return m_objects.size(); };
 
     // Erzeugung beliebiger GeoObject-Instanzen
     template<typename T, typename... Args>
-    T* create(Args&&... args) {
+    auto create(Args&&... args) -> T* {
         auto obj = std::make_unique<T>(std::forward<Args>(args)...);
         T* ptr = obj.get();
         m_objects.push_back(std::move(obj));
@@ -27,7 +27,7 @@ public:
     void softRemove(GeoObject* target);
 
     // Existenz-Check
-    bool contains(GeoObject* obj) const;
+    auto contains(GeoObject* obj) const -> bool;
 
     // Aufräumen
     void clear();

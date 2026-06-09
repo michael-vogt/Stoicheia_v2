@@ -1,26 +1,32 @@
 #include "LineCircleIntersection.h"
+#include "Structs.h"
+#include <limits>
+#include <stdexcept>
+#include <cmath>
 
-#include <complex>
+constexpr double eps = std::numeric_limits<double>::epsilon();
 
 LineCircleIntersection::LineCircleIntersection(LinearObject *line, Circle *circle)
 : m_line(line), m_circle(circle)
 {
-    if (m_line == nullptr || m_circle == nullptr)
+    if (m_line == nullptr || m_circle == nullptr) {
         throw std::invalid_argument("null argument");
+    }
+
     m_line->addDependent(this);
     m_circle->addDependent(this);
     IntersectionSet::recompute();
 }
 
 void LineCircleIntersection::onSourceRemoved(GeoObject *src) {
-    if (src == static_cast<GeoObject*>(m_line)) m_line = nullptr;
-    if (src == static_cast<GeoObject*>(m_circle)) m_circle = nullptr;
+    if (src == static_cast<GeoObject*>(m_line)) { m_line = nullptr; }
+    if (src == static_cast<GeoObject*>(m_circle)) { m_circle = nullptr; }
     IntersectionSet::onSourceRemoved(src);
 }
 
-void LineCircleIntersection::replaceSource(GeoObject *oldSource, GeoObject *newSource) {
-    if (m_line == oldSource) m_line = static_cast<LinearObject*>(newSource);
-    if (m_circle == oldSource) m_circle = static_cast<Circle*>(newSource);
+void LineCircleIntersection::replaceSource(GeoObjectPair source) {
+    if (m_line == source.oldGeoObject) { m_line = static_cast<LinearObject*>(source.newGeoObject); }
+    if (m_circle == source.oldGeoObject) { m_circle = static_cast<Circle*>(source.newGeoObject); }
 }
 
 void LineCircleIntersection::compute() {
@@ -29,36 +35,40 @@ void LineCircleIntersection::compute() {
         return;
     }
 
-    const double mx = m_circle->center()->x();
-    const double my = m_circle->center()->y();
-    const double r = m_circle->radius();
+    const double center_x = m_circle->center()->x();
+    const double center_y = m_circle->center()->y();
+    const double radius = m_circle->radius();
 
-    const double x1 = m_line->p1()->x();
-    const double y1 = m_line->p1()->y();
-    const double x2 = m_line->p2()->x();
-    const double y2 = m_line->p2()->y();
+    const double point1_x = m_line->p1()->x();
+    const double point1_y = m_line->p1()->y();
+    const double point2_x = m_line->p2()->x();
+    const double point2_y = m_line->p2()->y();
 
-    const double dx = x2 - x1;
-    const double dy = y2 - y1;
+    const double delta_x = point2_x - point1_x;
+    const double delta_y = point2_y - point1_y;
 
-    const double a = dx*dx + dy*dy;
-    if (a < 1e-20) { // degenerated line
+    // Berechne die Koeffizienten der quadratischen Gleichung, die sich durch Einsetzen der Geraden- in die Kreisgleichung ergibt
+    const double coeff_a = (delta_x*delta_x) + (delta_y*delta_y);
+    if (coeff_a < eps*eps) { // degenerated line
         setResults(0);
         return;
     }
 
-    const double b = 2.0 * (dx * (x1 - mx) + dy * (y1 - my));
-    const double c = (x1 - mx) * (x1 - mx) + (y1 - my) * (y1 - my) - r * r;
+    const double coeff_b = 2.0 * ((delta_x * (point1_x - center_x)) + (delta_y * (point1_y - center_y)));
+    const double coeff_c = ((point1_x - center_x) * (point1_x - center_x)) + ((point1_y - center_y) * (point1_y - center_y)) - (radius * radius);
 
-    if (const double disc = b*b - 4*a*c; disc < -1e-10) { // no intersection
+    if (const double discriminant = (coeff_b*coeff_b) - (4*coeff_a*coeff_c); discriminant < -eps) { // no intersection
         setResults(0);
-    } else if (disc < 1e-10) {
-        const double t = -b / (2*a);
-        setResults(1, x1 + t*dx, y1 + t*dy);
+    } else if (discriminant < eps) {
+        // Gerade ist Tangente
+        const double param_t = -coeff_b / (2*coeff_a);
+        setResults(1, {.x=point1_x + (param_t*delta_x), .y=point1_y + (param_t*delta_y)});
     } else {
-        const double sqrtDisc = std::sqrt(disc);
-        const double t1 = (-b - sqrtDisc) / (2*a);
-        const double t2 = (-b + sqrtDisc) / (2*a);
-        setResults(2, x1 + t1*dx, y1 + t1*dy,x1 + t2*dx, y1 + t2*dy);
+        const double sqrtDiscriminant = sqrt(discriminant);
+        const double param_t1 = (-coeff_b - sqrtDiscriminant) / (2*coeff_a);
+        const double param_t2 = (-coeff_b + sqrtDiscriminant) / (2*coeff_a);
+        setResults(2, 
+            {.x=point1_x + (param_t1*delta_x), .y=point1_y + (param_t1*delta_y)},
+            {.x=point1_x + (param_t2*delta_x), .y=point1_y + (param_t2*delta_y)});
     }
 }

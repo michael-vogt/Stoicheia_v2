@@ -2,14 +2,17 @@
 
 #include "Exporter.h"
 
+constexpr double DEFAULT_PNG_DPI = 96.0;
+constexpr double DEFAULT_PNG_MARGIN = 20.0;
+
 class PngExporter : public Exporter {
     Q_OBJECT
-    int m_dpi = 96;
+    double m_dpi = DEFAULT_PNG_DPI;
 public:
-    void setResolution(int dpi) { m_dpi = dpi; }
-    bool exportToFile(QGraphicsScene* scene, const QString& filename) override;
+    void setResolution(double dpi) { m_dpi = dpi; }
+    auto exportToFile(QGraphicsScene* scene, const QString& filename) -> bool override;
 
-    QString formatName() const override { return "PNG"; }
-    QString fileExtension() const override { return "png"; }
-    QString fileFilter() const override { return tr("PNG-Dateien (*.png)"); }
+    auto formatName() const -> QString override { return "PNG"; }
+    auto fileExtension() const -> QString override { return "png"; }
+    auto fileFilter() const -> QString override { return tr("PNG-Dateien (*.png)"); }
 };

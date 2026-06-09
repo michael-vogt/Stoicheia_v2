@@ -16,7 +16,7 @@ public:
     void registerExporter(std::unique_ptr<Exporter> exporter);
 
     // Zeigt Dateidialog mit allen verfügbaren Formaten
-    bool exportWithDialog() const;
+    void exportWithDialog() const;
 
 private:
     QGraphicsScene* m_scene;

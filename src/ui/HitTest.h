@@ -7,21 +7,23 @@ class Point;
 class LinearObject;
 class Circle;
 
+constexpr double DEFAULT_HITTEST_TOLERANCE = 8;
+
 class HitTest {
 public:
-    explicit HitTest(QGraphicsScene* scene, double tolerance = 8.0);
+    explicit HitTest(QGraphicsScene* scene, double tolerance = DEFAULT_HITTEST_TOLERANCE);
 
     // nächster Punkt in Reichweite, oder nullptr
-    Point* pointAt(const QPointF& scenePos) const;
+    [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;
 
     // nächstes LinearObject in Reichweite, oder nullptr
-    LinearObject* linearObjectAt(const QPointF& scenePos) const;
+    [[nodiscard]] auto linearObjectAt(const QPointF& scenePos) const -> LinearObject*;
 
     // nächster Kreis in Reichweite, oder nullptr
-    Circle* circleAt(const QPointF& scenePos) const;
+    [[nodiscard]] auto circleAt(const QPointF& scenePos) const -> Circle*;
 
     // nächstes beliebiges GeoObject in Reichweite (Punkt hat Vorrang), oder nullptr
-    GeoObject* anyObjectAt(const QPointF& scenePos) const;
+    [[nodiscard]] auto anyObjectAt(const QPointF& scenePos) const -> GeoObject*;
 
     void setTolerance(const double tolerance) { m_tolerance = tolerance; }
 

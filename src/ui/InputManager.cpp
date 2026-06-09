@@ -1,11 +1,13 @@
 #include "InputManager.h"
 #include "DrawingBoard.h"
 #include "tools/Tool.h"
-#include "tools/CreatePointTool.h"
-#include "tools/CreatePerpendicularFootTool.h"
 #include "LinearObjectType.h"
 #include <QScrollBar>
 #include <QShortcut>
+#include <qnamespace.h>
+
+
+constexpr double DEFAULT_INPUTMANAGER_ZOOMFACTOR = 1.15;
 
 InputManager::InputManager(DrawingBoard* board, QObject* parent)
     : QObject(parent), m_board(board)
@@ -17,8 +19,9 @@ InputManager::InputManager(DrawingBoard* board, QObject* parent)
         // 1. Shortcut-Modus abbrechen
         if (m_shortcutMode != ShortcutMode::None) {
             setShortcutMode(ShortcutMode::None);
-            if (m_activeTool)
+            if (m_activeTool) {
                 m_activeTool->activate();
+            }
             return;
         }
         // 2. Tool fragen
@@ -26,7 +29,9 @@ InputManager::InputManager(DrawingBoard* board, QObject* parent)
             QKeyEvent escEvent(QEvent::KeyPress,
                                Qt::Key_Escape, Qt::NoModifier);
             m_activeTool->keyPressEvent(&escEvent);
-            if (escEvent.isAccepted()) return;
+            if (escEvent.isAccepted()) {
+                return;
+            }
         }
         // 3. Zum SelectTool wechseln
         emit escapePressed();
@@ -40,9 +45,11 @@ void InputManager::handleMousePress(QMouseEvent* event) {
         startPan(event);
         return;
     }
-    if (m_activeTool) {
+    if (m_activeTool != nullptr) {
         m_activeTool->mousePressEvent(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
     event->ignore();
 }
@@ -52,9 +59,11 @@ void InputManager::handleMouseMove(QMouseEvent* event) {
         updatePan(event);
         return;
     }
-    if (m_activeTool) {
+    if (m_activeTool != nullptr) {
         m_activeTool->mouseMoveEvent(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
     event->ignore();
 }
@@ -64,16 +73,18 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
         endPan(event);
         return;
     }
-    if (m_activeTool) {
+    if (m_activeTool != nullptr) {
         m_activeTool->mouseReleaseEvent(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
     event->ignore();
 }
 
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
-    double factor = event->angleDelta().y() > 0 ? 1.15 : 1.0 / 1.15;
+    double factor = event->angleDelta().y() > 0 ? DEFAULT_INPUTMANAGER_ZOOMFACTOR : 1.0 / DEFAULT_INPUTMANAGER_ZOOMFACTOR;
     m_board->scale(factor, factor);
     event->accept();
 }
@@ -84,13 +95,17 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
     // Aktiver Shortcut-Modus hat Vorrang
     if (m_shortcutMode != ShortcutMode::None) {
         handleShortcutKey(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
 
     // Tool zuerst
-    if (m_activeTool) {
+    if (m_activeTool != nullptr) {
         m_activeTool->keyPressEvent(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
 
     // Undo/Redo
@@ -106,10 +121,12 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
     }
 
     // Ctrl+C / Ctrl+V ans Tool weiterleiten
-    if (event->modifiers() & Qt::ControlModifier) {
-        if (m_activeTool) {
+    if ((event->modifiers() & Qt::ControlModifier) != 0) {
+        if (m_activeTool != nullptr) {
             m_activeTool->keyPressEvent(event);
-            if (event->isAccepted()) return;
+            if (event->isAccepted()) {
+                return;
+            }
         }
     }
 
@@ -129,7 +146,7 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
     }
 
     // Alt → Snapping
-    if (event->key() == Qt::Key_Alt || event->modifiers() & Qt::AltModifier) {
+    if (event->key() == Qt::Key_Alt || (event->modifiers() & Qt::AltModifier) != 0) {
         setSnapping(true);
         event->accept();
         return;
@@ -142,18 +159,21 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
 void InputManager::handleKeyRelease(QKeyEvent* event) {
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
         m_spacePressed = false;
-        if (!m_panning)
+        if (!m_panning) {
             m_board->viewport()->setCursor(
-                m_activeTool ? m_activeTool->cursor() : Qt::ArrowCursor);
+                (m_activeTool != nullptr) ? m_activeTool->cursor() : Qt::ArrowCursor);
+            }
         event->accept();
         return;
     }
-    if (m_activeTool) {
+    if (m_activeTool != nullptr) {
         m_activeTool->keyReleaseEvent(event);
-        if (event->isAccepted()) return;
+        if (event->isAccepted()) {
+            return;
+        }
     }
 
-    if (event->key() == Qt::Key_Alt || event->modifiers() & Qt::AltModifier) {
+    if (event->key() == Qt::Key_Alt || (event->modifiers() & Qt::AltModifier) != 0) {
         setSnapping(false);
         event->accept();
         return;
@@ -164,7 +184,7 @@ void InputManager::handleKeyRelease(QKeyEvent* event) {
 
 // ── Pan ──────────────────────────────────────────────────────────────────────
 
-bool InputManager::isPanTrigger(QMouseEvent* event) const {
+auto InputManager::isPanTrigger(QMouseEvent* event) const -> bool {
     return event->button() == Qt::MiddleButton ||
            (event->button() == Qt::LeftButton && m_spacePressed);
 }
@@ -201,15 +221,12 @@ void InputManager::endPan(QMouseEvent* event) {
 
 void InputManager::handleShortcutKey(QKeyEvent* event) {
     if (m_shortcutMode == ShortcutMode::None) {
-        switch (event->key()) {
-            case Qt::Key_G:
-                setShortcutMode(ShortcutMode::Geometry);
-                event->accept();
-                return;
-            case Qt::Key_K:
-                setShortcutMode(ShortcutMode::Construction);
-                event->accept();
-                return;
+        if (event->key() == Qt::Key_G) {
+            setShortcutMode(ShortcutMode::Geometry);
+            event->accept();
+        } else if (event->key() == Qt::Key_K) {
+            setShortcutMode(ShortcutMode::Construction);
+            event->accept();
         }
         return;
     }
@@ -248,7 +265,7 @@ void InputManager::handleShortcutKey(QKeyEvent* event) {
                 return;
         }
         setShortcutMode(ShortcutMode::None);
-        emit toolChangeRequested(toolType, subType);
+        emit toolChangeRequested({.toolType=toolType, .subType=subType});
         event->accept();
         return;
     }
@@ -276,7 +293,7 @@ void InputManager::handleShortcutKey(QKeyEvent* event) {
                 return;
         }
         setShortcutMode(ShortcutMode::None);
-        emit toolChangeRequested(toolType);
+        emit toolChangeRequested({.toolType=toolType,.subType=0});
         event->accept();
         return;
     }

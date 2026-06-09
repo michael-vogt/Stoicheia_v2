@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QTranslator>
+#include <qmessagebox.h>
 
 #include "dialogs/SettingsDialog.h"
 #include "io/PdfExporter.h"
@@ -31,7 +32,7 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     setWindowTitle(title);
 
     m_drawingBoard = new DrawingBoard(this);
-    auto layout = new QVBoxLayout(ui->drawingBoardContainer);
+    auto *layout = new QVBoxLayout(ui->drawingBoardContainer);
     layout->setContentsMargins(0,0,0,0);;
     layout->addWidget(m_drawingBoard);
 
@@ -68,43 +69,52 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     m_exportManager->registerExporter(std::make_unique<SvgExporter>());
 }
 
-bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+auto MainWindow::eventFilter(QObject *object, QEvent *event) -> bool {
     if (event->type() == QEvent::KeyPress) {
-        if (m_drawingBoard->inputManager())
+        if (m_drawingBoard->inputManager() != nullptr) {
             m_drawingBoard->inputManager()->handleKeyPress(static_cast<QKeyEvent *>(event));
-        if (event->isAccepted()) return true;
+        }
+        if (event->isAccepted()) {
+            return true;
+        }
     }
 
     if (event->type() == QEvent::KeyRelease) {
-        if (m_drawingBoard->inputManager())
+        if (m_drawingBoard->inputManager() != nullptr) {
             m_drawingBoard->inputManager()->handleKeyRelease(static_cast<QKeyEvent *>(event));
-        if (event->isAccepted()) return true;
+        }
+        if (event->isAccepted()) {
+            return true;
+        }
     }
 
     return QObject::eventFilter(object, event);
 }
 
 void MainWindow::setStatus(StatusBarPart sbp, const QString &text) const {
-    if (sbp == StatusBarPart::Left && m_statusLeft) {
+    if (sbp == StatusBarPart::Left && (m_statusLeft != nullptr)) {
         m_statusLeft->setText(text);
-    } else if (sbp == StatusBarPart::Right && m_statusRight) {
+    } else if (sbp == StatusBarPart::Right && (m_statusRight != nullptr)) {
         m_statusRight->setText(text);
     }
 }
 
 void MainWindow::switchLanguage() {
-    if (!m_translator)
+    if (m_translator == nullptr) {
         return;
+    }
     QString languageCode = AppSettings::instance().general.language;
     qApp->removeTranslator(m_translator);
-    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode)))
+    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode))) {
         qApp->installTranslator(m_translator);
+    }
     ui->retranslateUi(this);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (m_drawingBoard && m_drawingBoard->geoScene())
+    if ((m_drawingBoard != nullptr) && (m_drawingBoard->geoScene() != nullptr)) {
         m_drawingBoard->geoScene()->clearGraveyard();
+    }
     event->accept();
 }
 
@@ -129,28 +139,31 @@ void MainWindow::setupConnections() {
     connect(ui->actionNew, &QAction::triggered, m_fileManager, &FileManager::newFile);
 
     ui->actionOpen->setShortcut(QKeySequence::Open);
-    connect(ui->actionOpen, &QAction::triggered, [this]() {
-        if (m_fileManager->open())
+    connect(ui->actionOpen, &QAction::triggered, [this]() -> void {
+        if (m_fileManager->open()) {
             updateRecentFilesMenu();
+        }
     });
 
     ui->actionSave->setShortcut(QKeySequence::Save);
-    connect(ui->actionSave, &QAction::triggered, [this]() {
-        if (m_fileManager->save())
+    connect(ui->actionSave, &QAction::triggered, [this]() -> void {
+        if (m_fileManager->save()) {
             updateRecentFilesMenu();
+        }
     });
 
     ui->actionSaveAs->setShortcut(QKeySequence::SaveAs);
-    connect(ui->actionSaveAs, &QAction::triggered, [this]() {
-        if (m_fileManager->saveAs())
+    connect(ui->actionSaveAs, &QAction::triggered, [this]() -> void {
+        if (m_fileManager->saveAs()) {
             updateRecentFilesMenu();
+        }
     });
 
-    connect(ui->actionExport, &QAction::triggered, [this]() {
-       m_exportManager->exportWithDialog();
+    connect(ui->actionExport, &QAction::triggered, [this]() -> void {
+        m_exportManager->exportWithDialog();
     });
 
-    connect(ui->actionSettings, &QAction::triggered, [this]() {
+    connect(ui->actionSettings, &QAction::triggered, [this]() -> void {
         SettingsDialog dlg(AppSettings::instance(), this);
         connect(&dlg, &SettingsDialog::settingsChanged, m_drawingBoard, &DrawingBoard::applySettings);
         connect(&dlg, &SettingsDialog::settingsChanged, this, &MainWindow::switchLanguage);
@@ -204,9 +217,10 @@ void MainWindow::updateRecentFilesMenu() {
         QString label = QFileInfo(file).absoluteFilePath();
         auto* action = ui->menuRecent->addAction(label);
         action->setToolTip(file);
-        connect(action, &QAction::triggered, [this, file]() {
-            if (m_fileManager->openFile(file))
+        connect(action, &QAction::triggered, [this, file]() -> void {
+            if (m_fileManager->openFile(file)) {
                 updateRecentFilesMenu();
+            }
         });
     }
 
@@ -237,7 +251,11 @@ void MainWindow::onShortcutModeChanged(ShortcutMode mode) const {
 }
 
 void MainWindow::onToolChanged(const ToolType type) const {
-    auto check = [](QAction* a, const bool on) { if (a) a->setChecked(on); };
+    auto check = [](QAction* action, const bool isChecked) -> void { 
+        if (action != nullptr) {
+            action->setChecked(isChecked); 
+        }
+    };
 
     check(ui->actionSelect,           type == ToolType::Select);
     check(ui->actionPoint,            type == ToolType::CreatePoint);

@@ -5,6 +5,7 @@
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include "Enums.h"
+#include "Structs.h"
 
 class DrawingBoard;
 class Tool;
@@ -15,7 +16,7 @@ public:
     explicit InputManager(DrawingBoard* board, QObject* parent = nullptr);
 
     void setActiveTool(Tool* tool) { m_activeTool = tool; }
-    [[nodiscard]] Tool* activeTool() const { return m_activeTool; }
+    [[nodiscard]] auto activeTool() const -> Tool* { return m_activeTool; }
 
     // DrawingBoard delegiert alle Events hierher
     void handleMousePress  (QMouseEvent*  event);
@@ -26,19 +27,19 @@ public:
     void handleKeyRelease  (QKeyEvent*    event);
 
     // Shortcut-Modus
-    ShortcutMode shortcutMode() const { return m_shortcutMode; }
+    [[nodiscard]] auto shortcutMode() const -> ShortcutMode { return m_shortcutMode; }
 
 signals:
     void shortcutModeChanged(ShortcutMode mode);
     void statusMessage(int sbp, const QString& message);
     void escapePressed();
-    void toolChangeRequested(int toolType, int subType = 0);
+    void toolChangeRequested(ToolTypePair toolTypePair);
     void undoRequested();
     void redoRequested();
 
 private:
     // Pan
-    bool isPanTrigger(QMouseEvent* event) const;
+    auto isPanTrigger(QMouseEvent* event) const -> bool;
     void startPan   (QMouseEvent* event);
     void updatePan  (QMouseEvent* event);
     void endPan     (QMouseEvent* event);
@@ -50,7 +51,7 @@ private:
 
     // Snap
     void setSnapping(bool snapping);
-    bool snapping() const { return m_snapping; }
+    [[nodiscard]] auto snapping() const -> bool { return m_snapping; }
 
     DrawingBoard* m_board;
     Tool*         m_activeTool   = nullptr;

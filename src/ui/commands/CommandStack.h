@@ -20,10 +20,10 @@ public:
     // Undo/Redo
     void undo();
     void redo();
-    bool canUndo() const { return !m_undoStack.empty(); }
-    bool canRedo() const { return !m_redoStack.empty(); }
-    QString nextUndoDescription() const;
-    QString nextRedoDescription() const;
+    [[nodiscard]] auto canUndo() const -> bool { return !m_undoStack.empty(); }
+    [[nodiscard]] auto canRedo() const -> bool { return !m_redoStack.empty(); }
+    [[nodiscard]] auto nextUndoDescription() const -> QString;
+    [[nodiscard]] auto nextRedoDescription() const -> QString;
 
     void clear();
 

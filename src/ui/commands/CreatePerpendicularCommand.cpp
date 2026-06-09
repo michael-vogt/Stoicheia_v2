@@ -12,7 +12,7 @@ void CreatePerpendicularCommand::execute() {
 }
 
 void CreatePerpendicularCommand::undo() {
-    if (m_result) {
+    if (m_result != nullptr) {
         m_adapter->remove(m_result->line());
         m_result = nullptr;
     }

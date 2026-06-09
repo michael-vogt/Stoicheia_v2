@@ -14,12 +14,13 @@
 #include <QLabel>
 #include <QTimer>
 
-static QHash<QString, QString> buildLanguageMap(const QString& path) {
+static auto buildLanguageMap(const QString& path) -> QHash<QString, QString> {
     QHash<QString, QString> map;
 
     QDir dir(path);
-    if (!dir.exists())
+    if (!dir.exists()) {
         return map;
+    }
 
     const QStringList files = dir.entryList({"app_*.qm"}, QDir::Files);
 
@@ -31,11 +32,13 @@ static QHash<QString, QString> buildLanguageMap(const QString& path) {
         QLocale locale(code);
 
         QString name = locale.nativeLanguageName();
-        if (code == "en")
+        if (code == "en") {
             name = "English";
+        }
 
-        if (name.isEmpty())
+        if (name.isEmpty()) {
             name = QLocale::languageToString(locale.language());
+        }
 
         map.insert(code, name);
     }
@@ -52,7 +55,7 @@ m_snapshotGeneral(settings.general)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
-    setMinimumWidth(400);
+    setMinimumWidth(DEFAULT_SETTINGSDIALOG_MINWIDTH);
 
     fillLanguages();
 
@@ -110,7 +113,7 @@ void SettingsDialog::fillLanguages() const {
         list.append({it.key(), it.value()});
     }
 
-    std::ranges::sort(list, [](const auto& a, const auto& b) {return a.second < b.second;});
+    std::ranges::sort(list, [](const auto& entry_a, const auto& entry_b) -> auto {return entry_a.second < entry_b.second;});
 
     for (const auto& item : list) {
         ui->m_uiLanguage->addItem(item.second, item.first);
@@ -120,8 +123,9 @@ void SettingsDialog::fillLanguages() const {
 void SettingsDialog::readFromSettings() const {
     ui->m_uiRecentMaxCount->setValue(m_settings.general.recentFiles.maxCount);
     int index = ui->m_uiLanguage->findData(m_settings.general.language);
-    if (index != -1)
+    if (index != -1) {
         ui->m_uiLanguage->setCurrentIndex(index);
+    }
 
     ui->m_gridVisible->setChecked(m_settings.grid.visible);
     ui->m_gridSpacing->setValue(m_settings.grid.spacing);

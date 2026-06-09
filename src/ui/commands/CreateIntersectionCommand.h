@@ -14,7 +14,7 @@ public:
 
     void execute() override;
     void undo() override;
-    QString description() const override { return tr("Schnittpunkt erstellen"); }
+    [[nodiscard]] auto description() const -> QString override { return tr("Schnittpunkt erstellen"); }
 
 private:
     SceneAdapter* m_adapter;

@@ -4,6 +4,8 @@
 #include "../geometry/Line.h"
 #include "../geometry/LinearObject.h"
 #include "../geometry/Point.h"
+#include "Structs.h"
+#include <cstddef>
 
 
 class Parallel : public GeoObject {
@@ -11,22 +13,22 @@ public:
     Parallel(Point* origin, LinearObject* reference);
 
     // Getter
-    Point* origin() const           { return m_origin; }
-    LinearObject* reference() const { return m_reference; }
-    LinearObject* line()            { return &m_line; }
+    [[nodiscard]] auto origin() const -> Point* { return m_origin; }
+    [[nodiscard]] auto reference() const -> LinearObject* { return m_reference; }
+    auto line() -> LinearObject* { return m_line; }
 
     // Objekt aktualisieren
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 private:
     // Steigung der Referenzlinie
-    double dx() const;
-    double dy() const;
+    [[nodiscard]] auto dx() const -> double;
+    [[nodiscard]] auto dy() const -> double;
 
     Point* m_origin;
     Point m_phantom;
     LinearObject* m_reference;
-    Line m_line;
+    Line* m_line = nullptr;
 };

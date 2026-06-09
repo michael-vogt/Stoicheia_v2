@@ -9,8 +9,6 @@
 #include "Enums.h"
 #include "io/ExportManager.h"
 
-enum class ToolType;
-enum class ShortcutMode;
 
 namespace Ui { class MainWindow; }
 
@@ -20,12 +18,12 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(const QString& title = "Stoicheia", QTranslator* translator = nullptr, QWidget* parent = nullptr);
 
-    [[nodiscard]] DrawingBoard* drawingBoard() const { return m_drawingBoard; }
-    [[nodiscard]] FileManager* fileManager() const { return m_fileManager; }
+    [[nodiscard]] auto drawingBoard() const -> DrawingBoard* { return m_drawingBoard; }
+    [[nodiscard]] auto fileManager() const -> FileManager* { return m_fileManager; }
 
-    bool eventFilter(QObject* object, QEvent* event) override;
+    auto eventFilter(QObject* object, QEvent* event) -> bool override;
 
-public slots:
+public slots: // NOLINT
     void setStatus(StatusBarPart sbp, const QString& text) const;
     void switchLanguage();
 
@@ -59,7 +57,7 @@ private:
     ExportManager* m_exportManager = nullptr;
     QTranslator* m_translator = nullptr;
 
-private slots:
+private slots: // NOLINT
     void onShortcutModeChanged(ShortcutMode mode) const;
     void onToolChanged(ToolType type) const;
 };

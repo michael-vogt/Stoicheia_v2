@@ -1,7 +1,12 @@
+#include "constructions/CircleCircleIntersection.h"
+#include "constructions/LineCircleIntersection.h"
+#include "constructions/Midpoint.h"
+#include "geometry/Circle.h"
+#include "geometry/Line.h"
+#include "geometry/Point.h"
 #include <gtest/gtest.h>
 #include <cmath>
-#include "../src/constructions/constructions.h"
-#include "../src/geometry/geometry.h"
+
 
 static constexpr double EPS = 1e-9;
 
@@ -10,8 +15,9 @@ static constexpr double EPS = 1e-9;
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(CircleTest, RadiusFromPoints) {
-    Point center(0, 0), rp(3, 4);
-    Circle C(&center, &rp);
+    Point center(0, 0);
+    Point rp(3, 4);
+    Circle C({.center=&center, .radiusPoint=&rp});
     EXPECT_NEAR(C.radius(), 5.0, EPS);
 }
 
@@ -24,23 +30,26 @@ TEST(CircleTest, FixedRadius) {
 TEST(CircleTest, UpdatesWhenCenterMoves) {
     // Mit Radiuspunkt: Radius = geometrischer Abstand center→rp.
     // Bewegt sich center, ändert sich auch der Radius.
-    Point center(0, 0), rp(5, 0);
-    Circle C(&center, &rp); // r=5
+    Point center(0, 0);
+    Point rp(5, 0);
+    Circle C({.center=&center, .radiusPoint=&rp}); // r=5
     center.moveTo(2, 0);    // rp bleibt bei (5,0), Abstand = 3
     EXPECT_NEAR(C.radius(), 3.0, EPS);
     EXPECT_EQ(C.center(), &center);
 }
 
 TEST(CircleTest, UpdatesWhenRadiusPointMoves) {
-    Point center(0, 0), rp(1, 0);
-    Circle C(&center, &rp);
+    Point center(0, 0);
+    Point rp(1, 0);
+    Circle C({.center=&center, .radiusPoint=&rp});
     rp.moveTo(0, 6);
     EXPECT_NEAR(C.radius(), 6.0, EPS);
 }
 
 TEST(CircleTest, ZeroRadius) {
-    Point center(3, 3), rp(3, 3);
-    Circle C(&center, &rp);
+    Point center(3, 3);
+    Point rp(3, 3);
+    Circle C({.center=&center, .radiusPoint=&rp});
     EXPECT_NEAR(C.radius(), 0.0, EPS);
 }
 
@@ -50,10 +59,12 @@ TEST(CircleTest, ZeroRadius) {
 
 TEST(LineCircleTest, TwoIntersections) {
     // Einheitskreis, x-Achse → Schnittpunkte bei (-1,0) und (1,0)
-    Point center(0,0), rp(1,0);
-    Circle C(&center, &rp);
-    Point p1(-2, 0), p2(2, 0);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(1,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-2, 0);
+    Point p2(2, 0);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_TRUE(S.first()->isValid());
@@ -67,10 +78,12 @@ TEST(LineCircleTest, TwoIntersections) {
 
 TEST(LineCircleTest, Tangent) {
     // Linie y=1 tangiert Einheitskreis in (0,1)
-    Point center(0,0), rp(1,0);
-    Circle C(&center, &rp);
-    Point p1(-2, 1), p2(2, 1);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(1,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-2, 1);
+    Point p2(2, 1);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_TRUE(S.first()->isValid());
@@ -81,10 +94,12 @@ TEST(LineCircleTest, Tangent) {
 
 TEST(LineCircleTest, NoIntersection) {
     // Linie y=2 außerhalb des Einheitskreises
-    Point center(0,0), rp(1,0);
-    Circle C(&center, &rp);
-    Point p1(-2, 2), p2(2, 2);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(1,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-2, 2);
+    Point p2(2, 2);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_FALSE(S.first()->isValid());
@@ -93,10 +108,12 @@ TEST(LineCircleTest, NoIntersection) {
 
 TEST(LineCircleTest, UpdatesWhenCircleGrows) {
     // Linie y=2, Kreis wächst von r=1 auf r=3 → dann 2 Schnittpunkte
-    Point center(0,0), rp(1,0);
-    Circle C(&center, &rp);
-    Point p1(-5, 2), p2(5, 2);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(1,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-5, 2);
+    Point p2(5, 2);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_FALSE(S.first()->isValid()); // r=1, kein Schnitt
@@ -107,10 +124,12 @@ TEST(LineCircleTest, UpdatesWhenCircleGrows) {
 }
 
 TEST(LineCircleTest, UpdatesWhenLineMoves) {
-    Point center(0,0), rp(5,0);
-    Circle C(&center, &rp); // r=5
-    Point p1(-6, 3), p2(6, 3);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(5,0);
+    Circle C({.center=&center, .radiusPoint=&rp}); // r=5
+    Point p1(-6, 3);
+    Point p2(6, 3);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_TRUE(S.first()->isValid());
@@ -122,10 +141,12 @@ TEST(LineCircleTest, UpdatesWhenLineMoves) {
 
 TEST(LineCircleTest, StableOrderingAfterMove) {
     // first bleibt immer der linkere Punkt
-    Point center(0,0), rp(5,0);
-    Circle C(&center, &rp);
-    Point p1(-6, 0), p2(6, 0);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(5,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-6, 0);
+    Point p2(6, 0);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     double fx_before = S.first()->x(); // -5
@@ -138,10 +159,12 @@ TEST(LineCircleTest, StableOrderingAfterMove) {
 
 TEST(LineCircleTest, VerticalLine) {
     // x=0 schneidet Einheitskreis bei (0,-1) und (0,1)
-    Point center(0,0), rp(1,0);
-    Circle C(&center, &rp);
-    Point p1(0,-2), p2(0,2);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(1,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(0,-2);
+    Point p2(0,2);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     EXPECT_NEAR(S.first()->x(),  0.0, EPS);
@@ -157,9 +180,12 @@ TEST(LineCircleTest, VerticalLine) {
 TEST(CircleCircleTest, TwoIntersections) {
     // Zwei Einheitskreise bei (0,0) und (1,0)
     // Schnittpunkte bei (0.5, ±√3/2)
-    Point c1(0,0), r1(1,0);
-    Point c2(1,0), r2(2,0); // r=1
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(1,0);
+    Point c2(1,0);
+    Point r2(2,0); // r=1
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
 
     EXPECT_TRUE(S.first()->isValid());
@@ -172,9 +198,12 @@ TEST(CircleCircleTest, TwoIntersections) {
 }
 
 TEST(CircleCircleTest, ExternalNoIntersection) {
-    Point c1(0,0), r1(1,0);
-    Point c2(5,0), r2(6,0); // r=1, d=5 > r1+r2=2
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(1,0);
+    Point c2(5,0);
+    Point r2(6,0); // r=1, d=5 > r1+r2=2
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
 
     EXPECT_FALSE(S.first()->isValid());
@@ -183,9 +212,12 @@ TEST(CircleCircleTest, ExternalNoIntersection) {
 
 TEST(CircleCircleTest, InternalNoIntersection) {
     // Kleiner Kreis komplett im großen
-    Point c1(0,0), r1(5,0); // r=5
-    Point c2(1,0), r2(2,0); // r=1, d=1 < r1-r2=4
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(5,0); // r=5
+    Point c2(1,0);
+    Point r2(2,0); // r=1, d=1 < r1-r2=4
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
 
     EXPECT_FALSE(S.first()->isValid());
@@ -193,9 +225,12 @@ TEST(CircleCircleTest, InternalNoIntersection) {
 
 TEST(CircleCircleTest, ExternalTangent) {
     // Zwei Kreise berühren sich von außen: d = r1+r2
-    Point c1(0,0), r1(2,0); // r=2
-    Point c2(3,0), r2(4,0); // r=1, d=3 = r1+r2
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(2,0); // r=2
+    Point c2(3,0);
+    Point r2(4,0); // r=1, d=3 = r1+r2
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
 
     EXPECT_TRUE(S.first()->isValid());
@@ -205,9 +240,12 @@ TEST(CircleCircleTest, ExternalTangent) {
 }
 
 TEST(CircleCircleTest, UpdatesWhenCircleMoves) {
-    Point c1(0,0), r1(1,0);
-    Point c2(5,0), r2(6,0); // zu weit weg
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(1,0);
+    Point c2(5,0);
+    Point r2(6,0); // zu weit weg
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
     EXPECT_FALSE(S.first()->isValid());
 
@@ -223,9 +261,12 @@ TEST(CircleCircleTest, UpdatesWhenCircleMoves) {
 TEST(ChainedCircleTest, MidpointOfTwoIntersections) {
     // Mittelpunkt der beiden Schnittpunkte = Lotfuß der Verbindungslinie
     // zweier Kreiszentren → muss bei (0.5, 0) liegen
-    Point c1(0,0), r1(1,0);
-    Point c2(1,0), r2(2,0);
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(1,0);
+    Point c2(1,0);
+    Point r2(2,0);
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
 
     Midpoint M(S.first(), S.second());
@@ -234,9 +275,12 @@ TEST(ChainedCircleTest, MidpointOfTwoIntersections) {
 }
 
 TEST(ChainedCircleTest, MidpointUpdatesTransitively) {
-    Point c1(0,0), r1(1,0);
-    Point c2(1,0), r2(2,0);
-    Circle C1(&c1, &r1), C2(&c2, &r2);
+    Point c1(0,0);
+    Point r1(1,0);
+    Point c2(1,0);
+    Point r2(2,0);
+    Circle C1({.center=&c1, .radiusPoint=&r1});
+    Circle C2({.center=&c2, .radiusPoint=&r2});
     CircleCircleIntersection S(&C1, &C2);
     Midpoint M(S.first(), S.second());
 
@@ -248,14 +292,16 @@ TEST(ChainedCircleTest, MidpointUpdatesTransitively) {
 
 TEST(ChainedCircleTest, LineCircleIntersectionUsedAsPoint) {
     // Schnittpunkt Linie/Kreis als Endpunkt einer neuen Linie
-    Point center(0,0), rp(5,0);
-    Circle C(&center, &rp);
-    Point p1(-6, 0), p2(6, 0);
-    Line L(&p1, &p2);
+    Point center(0,0);
+    Point rp(5,0);
+    Circle C({.center=&center, .radiusPoint=&rp});
+    Point p1(-6, 0);
+    Point p2(6, 0);
+    Line L({.point1=&p1, .point2=&p2});
     LineCircleIntersection S(&L, &C);
 
     // Neue Linie von first() nach center
-    Line L2(S.first(), &center);
+    Line L2({.point1=S.first(), .point2=&center});
     EXPECT_NEAR(L2.length(), 5.0, EPS);
 
     // Kreis wächst → L2 wird länger

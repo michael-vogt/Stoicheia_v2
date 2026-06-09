@@ -1,12 +1,13 @@
 #pragma once
-#include <memory>
+
 #include <QRubberBand>
 
 #include "Tool.h"
 #include "geometry/Point.h"
+#include "ui/GeoGraphicsItem.h"
 #include "ui/ToolContext.h"
-#include "ui/commands/CreatePointCommand.h"
-#include "ui/commands/MovePointCommand.h"
+#include "ui/commands/MoveCommand.h"
+
 
 class SelectTool : public Tool {
 
@@ -24,13 +25,13 @@ public:
 
     void keyPressEvent(QKeyEvent* event) override;
 
-    QCursor cursor() const override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }
+    [[nodiscard]] auto cursor() const -> QCursor override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }
 
 private:
-    Point* pointAt(const QPointF& scenePos) const;
-    Point* nearbyPoint(const QPointF& scenePos, Point* exclude) const;
-    GeoGraphicsItem* itemAt(const QPointF& scenePos, const std::type_info& type) const;
-    bool isDraggable(Point* point) const { return typeid(*point) == typeid(Point); }
+    [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;
+    auto nearbyPoint(const QPointF& scenePos, Point* exclude) const -> Point*;
+    [[nodiscard]] auto itemAt(const QPointF& scenePos, const std::type_info& type) const -> GeoGraphicsItem*;
+    static auto isDraggable(Point* point) -> bool  { return typeid(*point) == typeid(Point); }
     void startMultiDrag(const QPointF& scenePos);
     void startRubberBand(const QPoint& viewPos);
     void updateRubberBand(const QPoint& viewPos);

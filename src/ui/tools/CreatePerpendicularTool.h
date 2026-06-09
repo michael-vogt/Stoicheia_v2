@@ -15,7 +15,7 @@ public:
 protected:
     void onActivate() override { showStatus(tr("Referenzgerade klicken")); }
     void onCancel() override { m_reference = nullptr; }
-    bool hasIntermediateState() const override { return m_reference != nullptr; }
+    [[nodiscard]] auto hasIntermediateState() const -> bool override { return m_reference != nullptr; }
 
 private:
     LinearObject* m_reference = nullptr;

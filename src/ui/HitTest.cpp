@@ -3,10 +3,14 @@
 #include "GeoCircleItem.h"
 #include "GeoLinearObjectItem.h"
 #include "GeoPointItem.h"
+#include <limits>
+
+
+constexpr double eps = std::numeric_limits<double>::epsilon();
 
 HitTest::HitTest(QGraphicsScene *scene, double tolerance) : m_scene(scene), m_tolerance(tolerance) {}
 
-Point *HitTest::pointAt(const QPointF &scenePos) const {
+auto HitTest::pointAt(const QPointF &scenePos) const -> Point * {
     Point* nearest = nullptr;
     double minDist = m_tolerance * m_tolerance;
 
@@ -15,14 +19,16 @@ Point *HitTest::pointAt(const QPointF &scenePos) const {
             QSizeF(m_tolerance * 2, m_tolerance * 2)));
 
     for (QGraphicsItem* item : items) {
-        if (const auto* pi = dynamic_cast<GeoPointItem*>(item)) {
-            if (!pi->point()->isValid()) continue;
-            const double dx = pi->point()->x() - scenePos.x();
-            const double dy = pi->point()->y() - scenePos.y();
-            const double d2 = dx*dx+dy*dy;
-            if (d2 < minDist) {
-                nearest = pi->point();
-                minDist = d2;
+        if (const auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+            if (!pointItem->point()->isValid()) {
+                continue;
+            }
+            const double delta_x = pointItem->point()->x() - scenePos.x();
+            const double delta_y = pointItem->point()->y() - scenePos.y();
+            const double dist2 = (delta_x*delta_x)+(delta_y*delta_y);
+            if (dist2 < minDist) {
+                nearest = pointItem->point();
+                minDist = dist2;
             }
         }
     }
@@ -30,7 +36,7 @@ Point *HitTest::pointAt(const QPointF &scenePos) const {
     return nearest;
 }
 
-LinearObject *HitTest::linearObjectAt(const QPointF &scenePos) const {
+auto HitTest::linearObjectAt(const QPointF &scenePos) const -> LinearObject * {
     LinearObject* nearest = nullptr;
     double minDist = m_tolerance;
 
@@ -39,32 +45,40 @@ LinearObject *HitTest::linearObjectAt(const QPointF &scenePos) const {
             QSizeF(m_tolerance * 2, m_tolerance * 2)));
 
     for (QGraphicsItem* item : items) {
-        const auto* li = dynamic_cast<GeoLinearObjectItem*>(item);
-        if (!li || !li->linearObject()->isValid()) continue;
+        const auto* linearObjectItem = dynamic_cast<GeoLinearObjectItem*>(item);
+        if ((linearObjectItem == nullptr) || !linearObjectItem->linearObject()->isValid()) {
+            continue;
+        }
 
-        LinearObject* lo = li->linearObject();
+        LinearObject* linearObject = linearObjectItem->linearObject();
 
         // Abstand von scenePos zur Trägergeraden
-        double dx = lo->dx(), dy = lo->dy();
-        double len = std::sqrt(dx*dx + dy*dy);
-        if (len < 1e-10) continue;
+        double delta_x = linearObject->dx();
+        double delta_y = linearObject->dy();
+        double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
+        if (len < eps) {
+            continue;
+        }
 
         // Normalenvektor (normiert)
-        double nx = -dy / len, ny = dx / len;
+        double normal_x = -delta_y / len;
+        double normal_y = delta_x / len;
 
         // Vektor von p1 zum Punkt
-        double vx = scenePos.x() - lo->p1()->x();
-        double vy = scenePos.y() - lo->p1()->y();
+        double vec_x = scenePos.x() - linearObject->p1()->x();
+        double vec_y = scenePos.y() - linearObject->p1()->y();
 
         // Abstand zur Trägergeraden = Projektion auf Normalenvektor
-        double dist = std::abs(vx * nx + vy * ny);
+        double dist = std::abs((vec_x * normal_x) + (vec_y * normal_y));
 
         // Für Ray und Segment: Parameter t prüfen
-        double t = (vx*dx + vy*dy) / (len*len);
-        if (!lo->containsParameter(t)) continue;
+        double param_t = ((vec_x*delta_x) + (vec_y*delta_y)) / (len*len);
+        if (!linearObject->containsParameter(param_t)) {
+            continue;
+        }
 
         if (dist < minDist) {
-            nearest = lo;
+            nearest = linearObject;
             minDist = dist;
         }
     }
@@ -72,7 +86,7 @@ LinearObject *HitTest::linearObjectAt(const QPointF &scenePos) const {
     return nearest;
 }
 
-Circle *HitTest::circleAt(const QPointF &scenePos) const {
+auto HitTest::circleAt(const QPointF &scenePos) const -> Circle * {
     Circle* nearest = nullptr;
     double minDist = m_tolerance;
 
@@ -81,17 +95,19 @@ Circle *HitTest::circleAt(const QPointF &scenePos) const {
             QSizeF(m_tolerance * 2, m_tolerance * 2)));
 
     for (QGraphicsItem* item : items) {
-        const auto* ci = dynamic_cast<GeoCircleItem*>(item);
-        if (!ci || !ci->circle()->isValid()) continue;;
+        const auto* circleItem = dynamic_cast<GeoCircleItem*>(item);
+        if ((circleItem == nullptr) || !circleItem->circle()->isValid()) {
+            continue;
+        }
 
-        Circle* c = ci->circle();
+        Circle* circle = circleItem->circle();
 
-        double dx = scenePos.x() - c->center()->x();
-        double dy = scenePos.y() - c->center()->y();
-        double dist = std::abs(std::sqrt(dx*dx + dy*dy) - c->radius());
+        double delta_x = scenePos.x() - circle->center()->x();
+        double delta_y = scenePos.y() - circle->center()->y();
+        double dist = std::abs(std::sqrt((delta_x*delta_x) + (delta_y*delta_y)) - circle->radius());
 
         if (dist < minDist) {
-            nearest = c;
+            nearest = circle;
             minDist = dist;
         }
     }
@@ -99,9 +115,15 @@ Circle *HitTest::circleAt(const QPointF &scenePos) const {
     return nearest;
 }
 
-GeoObject *HitTest::anyObjectAt(const QPointF &scenePos) const {
-    if (Point* p = pointAt(scenePos)) return p;
-    if (LinearObject* l = linearObjectAt(scenePos)) return l;
-    if (Circle* c = circleAt(scenePos)) return c;
+auto HitTest::anyObjectAt(const QPointF &scenePos) const -> GeoObject * {
+    if (Point* point = pointAt(scenePos)) {
+        return point;
+    }
+    if (LinearObject* linearObject = linearObjectAt(scenePos)) {
+        return linearObject;
+    }
+    if (Circle* circle = circleAt(scenePos)) {
+        return circle;
+    }
     return nullptr;
 }

@@ -1,7 +1,10 @@
+#include "constructions/LineLineIntersection.h"
+#include "constructions/Midpoint.h"
+#include "constructions/Parallel.h"
+#include "constructions/PerpendicularFoot.h"
+#include "geometry/Line.h"
+#include "geometry/Point.h"
 #include <gtest/gtest.h>
-#include <cmath>
-#include "../src/constructions/constructions.h"
-#include "../src/geometry/UpdateGuard.h"
 
 static constexpr double EPS = 1e-9;
 
@@ -11,10 +14,12 @@ static constexpr double EPS = 1e-9;
 
 TEST(IntersectionTest, BasicIntersection) {
     // x-Achse und y-Achse schneiden sich in (0,0)
-    Point p1(-1, 0), p2(1, 0);
-    Point p3(0, -1), p4(0, 1);
-    Line xAxis(&p1, &p2);
-    Line yAxis(&p3, &p4);
+    Point p1(-1, 0);
+    Point p2(1, 0);
+    Point p3(0, -1);
+    Point p4(0, 1);
+    Line xAxis({.point1=&p1, .point2=&p2});
+    Line yAxis({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&xAxis, &yAxis);
 
     EXPECT_TRUE(S.isValid());
@@ -24,10 +29,12 @@ TEST(IntersectionTest, BasicIntersection) {
 
 TEST(IntersectionTest, DiagonalLines) {
     // y=x und y=-x+2 → Schnittpunkt (1,1)
-    Point p1(0,0), p2(2,2);
-    Point p3(0,2), p4(2,0);
-    Line L1(&p1, &p2);
-    Line L2(&p3, &p4);
+    Point p1(0,0);
+    Point p2(2,2);
+    Point p3(0,2);
+    Point p4(2,0);
+    Line L1({.point1=&p1, .point2=&p2});
+    Line L2({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&L1, &L2);
 
     EXPECT_TRUE(S.isValid());
@@ -36,10 +43,12 @@ TEST(IntersectionTest, DiagonalLines) {
 }
 
 TEST(IntersectionTest, ParallelLinesAreInvalid) {
-    Point p1(0,0), p2(1,0);
-    Point p3(0,1), p4(1,1);
-    Line L1(&p1, &p2);
-    Line L2(&p3, &p4);
+    Point p1(0,0);
+    Point p2(1,0);
+    Point p3(0,1);
+    Point p4(1,1);
+    Line L1({.point1=&p1, .point2=&p2});
+    Line L2({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&L1, &L2);
 
     EXPECT_FALSE(S.isValid());
@@ -47,10 +56,12 @@ TEST(IntersectionTest, ParallelLinesAreInvalid) {
 
 TEST(IntersectionTest, UpdatesWhenLinesMoves) {
     // Horizontale und vertikale Linie, Schnittpunkt (2,0)
-    Point p1(0, 0), p2(4, 0);
-    Point p3(2,-1), p4(2, 1);
-    Line horiz(&p1, &p2);
-    Line vert (&p3, &p4);
+    Point p1(0, 0);
+    Point p2(4, 0);
+    Point p3(2,-1);
+    Point p4(2, 1);
+    Line horiz({.point1=&p1, .point2=&p2});
+    Line vert ({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&horiz, &vert);
 
     EXPECT_NEAR(S.first()->x(), 2.0, EPS);
@@ -62,10 +73,12 @@ TEST(IntersectionTest, UpdatesWhenLinesMoves) {
 }
 
 TEST(IntersectionTest, BecomesInvalidWhenLinesBecomesParallel) {
-    Point p1(0,0), p2(1,0);
-    Point p3(0,1), p4(1,2); // nicht parallel
-    Line L1(&p1, &p2);
-    Line L2(&p3, &p4);
+    Point p1(0,0);
+    Point p2(1,0);
+    Point p3(0,1);
+    Point p4(1,2); // nicht parallel
+    Line L1({.point1=&p1, .point2=&p2});
+    Line L2({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&L1, &L2);
     EXPECT_TRUE(S.isValid());
 
@@ -78,7 +91,8 @@ TEST(IntersectionTest, BecomesInvalidWhenLinesBecomesParallel) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(MidpointTest, BasicMidpoint) {
-    Point a(0, 0), b(4, 6);
+    Point a(0, 0);
+    Point b(4, 6);
     Midpoint M(&a, &b);
 
     EXPECT_NEAR(M.x(), 2.0, EPS);
@@ -86,8 +100,9 @@ TEST(MidpointTest, BasicMidpoint) {
 }
 
 TEST(MidpointTest, MidpointOfLine) {
-    Point p1(0, 0), p2(10, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(10, 0);
+    Line L({.point1=&p1, .point2=&p2});
     Midpoint M(&L);
 
     EXPECT_NEAR(M.x(), 5.0, EPS);
@@ -95,7 +110,8 @@ TEST(MidpointTest, MidpointOfLine) {
 }
 
 TEST(MidpointTest, UpdatesWhenPointMoves) {
-    Point a(0, 0), b(2, 0);
+    Point a(0, 0);
+    Point b(2, 0);
     Midpoint M(&a, &b);
     EXPECT_NEAR(M.x(), 1.0, EPS);
 
@@ -104,7 +120,8 @@ TEST(MidpointTest, UpdatesWhenPointMoves) {
 }
 
 TEST(MidpointTest, IdenticalPoints) {
-    Point a(3, 3), b(3, 3);
+    Point a(3, 3);
+    Point b(3, 3);
     Midpoint M(&a, &b);
     EXPECT_NEAR(M.x(), 3.0, EPS);
     EXPECT_NEAR(M.y(), 3.0, EPS);
@@ -116,8 +133,9 @@ TEST(MidpointTest, IdenticalPoints) {
 
 TEST(PerpendicularFootTest, PointAboveHorizontalLine) {
     // Linie entlang x-Achse, Punkt bei (3, 5) → Lotfuß bei (3, 0)
-    Point p1(0, 0), p2(10, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(10, 0);
+    Line L({.point1=&p1, .point2=&p2});
     Point P(3, 5);
     PerpendicularFoot F(&P, &L);
 
@@ -126,8 +144,9 @@ TEST(PerpendicularFootTest, PointAboveHorizontalLine) {
 }
 
 TEST(PerpendicularFootTest, PointOnLine) {
-    Point p1(0, 0), p2(10, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(10, 0);
+    Line L({.point1=&p1, .point2=&p2});
     Point P(4, 0); // liegt bereits auf der Linie
     PerpendicularFoot F(&P, &L);
 
@@ -137,8 +156,9 @@ TEST(PerpendicularFootTest, PointOnLine) {
 
 TEST(PerpendicularFootTest, DiagonalLine) {
     // Linie durch (0,0) und (1,1), Punkt bei (1,0) → Lot bei (0.5, 0.5)
-    Point p1(0, 0), p2(1, 1);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(1, 1);
+    Line L({.point1=&p1, .point2=&p2});
     Point P(1, 0);
     PerpendicularFoot F(&P, &L);
 
@@ -147,8 +167,9 @@ TEST(PerpendicularFootTest, DiagonalLine) {
 }
 
 TEST(PerpendicularFootTest, UpdatesWhenPointMoves) {
-    Point p1(0,0), p2(10, 0);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(10, 0);
+    Line L({.point1=&p1, .point2=&p2});
     Point P(3, 5);
     PerpendicularFoot F(&P, &L);
 
@@ -163,9 +184,12 @@ TEST(PerpendicularFootTest, UpdatesWhenPointMoves) {
 TEST(ChainedTest, MidpointOfIntersectionAndPoint) {
     // Schnittpunkt S zweier Linien, dann Mittelpunkt zwischen S und einem
     // weiteren Punkt – transitiv abhängig
-    Point p1(-1,0), p2(1,0);
-    Point p3(0,-1), p4(0,1);
-    Line L1(&p1, &p2), L2(&p3, &p4);
+    Point p1(-1,0);
+    Point p2(1,0);
+    Point p3(0,-1);
+    Point p4(0,1);
+    Line L1({.point1=&p1, .point2=&p2});
+    Line L2({.point1=&p3, .point2=&p4});
     LineLineIntersection S(&L1, &L2); // S = (0,0)
 
     Point Q(4, 0);
@@ -182,8 +206,9 @@ TEST(ChainedTest, MidpointOfIntersectionAndPoint) {
 
 TEST(ChainedTest, PerpendicularFootOnDerivedLine) {
     // Lotfuß auf eine Parallele – zwei Konstruktionen hintereinander
-    Point p1(0, 0), p2(4, 0);
-    Line base(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(4, 0);
+    Line base({.point1=&p1, .point2=&p2});
 
     Point origin(0, 2);
     Parallel para(&origin, &base); // Parallele y=2

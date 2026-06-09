@@ -16,6 +16,9 @@
 // Ist die zentrale Anlaufstelle um Objekte hinzuzufügen und zu entfernen –
 // beide Welten bleiben dadurch synchron.
 
+constexpr double DEFAULT_SCENEADAPTER_POINT_PENWIDTH = 1.5;
+constexpr double DEFAULT_SCENEADAPTER_INTERSECTIONPOINT_PENWIDTH = 1.5;
+
 class SceneAdapter : public QObject {
 
     Q_OBJECT
@@ -24,39 +27,39 @@ public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
 
     // Geometrie-Objekt + grafische Repräsentation hinzufügen
-    GeoPointItem*         addPoint(Point* point, const QPen& pen = QPen(AppSettings::instance().colors.point, 1.5));
-    GeoLinearObjectItem*  addLinearObject(LinearObject* linearObject);
-    GeoCircleItem*        addCircle(Circle* circle);
-    GeoIntersectionPointItem* addIntersectionPoint(IntersectionPoint* point, const QPen& pen = QPen(AppSettings::instance().colors.construction, 1.5));
-    std::pair<GeoPointItem*, GeoPointItem*> addIntersectionSet(IntersectionSet* intersectionSet);
+    auto addPoint(Point* point, const QPen& pen = QPen(AppSettings::instance().colors.point, DEFAULT_SCENEADAPTER_POINT_PENWIDTH)) -> GeoPointItem*;
+    auto addLinearObject(LinearObject* linearObject) -> GeoLinearObjectItem*;
+    auto addCircle(Circle* circle) -> GeoCircleItem*;
+    auto addIntersectionPoint(IntersectionPoint* point, const QPen& pen = QPen(AppSettings::instance().colors.construction, DEFAULT_SCENEADAPTER_INTERSECTIONPOINT_PENWIDTH)) -> GeoIntersectionPointItem*;
+    auto addIntersectionSet(IntersectionSet* intersectionSet) -> std::pair<GeoPointItem*, GeoPointItem*>;
 
     // Geometrie-Objekt und zugehöriges grafisches Objekt entfernen
     void remove(GeoObject* geoObject);
 
     // Zugriff auf das grafische Objekt zu einem Geometrie-Objekt
-    GeoGraphicsItem* itemFor(GeoObject* geoObject) const;
-    std::unordered_map<GeoObject*, GeoGraphicsItem*>& geoGraphicsItems() { return m_map; }
+    auto itemFor(GeoObject* geoObject) const -> GeoGraphicsItem*;
+    auto geoGraphicsItems() -> std::unordered_map<GeoObject*, GeoGraphicsItem*>& { return m_map; }
 
-    const std::unordered_set<IntersectionSet*>& intersectionSets() const { return m_intersectionSets; }
+    [[nodiscard]] auto intersectionSets() const -> const std::unordered_set<IntersectionSet*>& { return m_intersectionSets; }
 
-    Point* radiusPointFor(const Point* centerPoint) const;
+    auto radiusPointFor(const Point* centerPoint) const -> Point*;
 
-    Scene* geoScene() const { return m_geoScene; }
+    [[nodiscard]] auto geoScene() const -> Scene* { return m_geoScene; }
 
     void select(GeoObject* geoObject);
     void deselect(GeoObject* geoObject);
     void clearSelection();
-    const std::unordered_set<GeoObject*>& selection() const { return m_selection; }
+    [[nodiscard]] auto selection() const -> const std::unordered_set<GeoObject*>& { return m_selection; }
 
     void clear();
 
-    void highlight(GeoObject* obj, bool on);
+    void highlight(GeoObject* obj, bool isHighlighted);
     void hide(GeoObject* obj);
     void show(GeoObject* obj);
     void removeGraphicsOnly(GeoObject* obj);
 
     void copySelection();
-    std::unordered_set<GeoObject*> clipboard() const { return m_clipboard; };
+    [[nodiscard]] auto clipboard() const -> std::unordered_set<GeoObject*> { return m_clipboard; };
 
 signals:
     void selectionChanged();

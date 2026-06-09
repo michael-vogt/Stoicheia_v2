@@ -1,4 +1,5 @@
 #include "MergePointsCommand.h"
+#include "Structs.h"
 
 MergePointsCommand::MergePointsCommand(SceneAdapter *adapter, Point *survivor, Point *absorbed)
     : m_adapter(adapter), m_survivor(survivor), m_absorbed(absorbed)
@@ -14,7 +15,7 @@ void MergePointsCommand::execute() {
     for (GeoObject* dep : deps) {
         m_absorbed->removeDependent(dep);
         m_survivor->addDependent(dep);
-        dep->replaceSource(m_absorbed, m_survivor);
+        dep->replaceSource(GeoObjectPair{.oldGeoObject=m_absorbed, .newGeoObject=m_survivor});
         dep->recompute();
         m_rewired.push_back(dep);
     }
@@ -24,10 +25,12 @@ void MergePointsCommand::execute() {
 
 void MergePointsCommand::undo() {
     for (GeoObject* dep : m_rewired) {
-        if (!m_survivor->dependents().contains(dep)) continue;
+        if (!m_survivor->dependents().contains(dep)) {
+            continue;
+        }
         m_survivor->removeDependent(dep);
         m_absorbed->addDependent(dep);
-        dep->replaceSource(m_survivor, m_absorbed);
+        dep->replaceSource(GeoObjectPair{.oldGeoObject=m_survivor, .newGeoObject=m_absorbed});
         dep->recompute();
     }
 

@@ -1,7 +1,9 @@
 #include "MacroCommand.h"
 
-MacroCommand::MacroCommand(const QString &description)
-: m_description(description)
+#include <ranges>
+
+MacroCommand::MacroCommand(QString description)
+: m_description(std::move(description))
 {}
 
 void MacroCommand::add(std::unique_ptr<Command> cmd) {
@@ -9,12 +11,14 @@ void MacroCommand::add(std::unique_ptr<Command> cmd) {
 }
 
 void MacroCommand::execute() {
-    for (const auto& cmd: m_commands)
+    for (const auto& cmd: m_commands) {
         cmd->execute();
+    }
 }
 
 void MacroCommand::undo() {
-    for (auto it = m_commands.rbegin(); it != m_commands.rend(); ++it)
-        (*it)->undo();
+    for (auto & m_command : std::views::reverse(m_commands)) {
+        m_command->undo();
+    }
 }
 

@@ -5,7 +5,7 @@
 
 void Scene::remove(GeoObject* target) {
     target->detach();
-    std::erase_if(m_objects, [target](const auto& ptr) {
+    std::erase_if(m_objects, [target](const auto& ptr) -> auto {
         return ptr.get() == target;
     });
 }
@@ -21,27 +21,30 @@ void Scene::removeCascade(GeoObject* target) {
     collect(target);
     toDelete.push_back(target);
 
-    for (GeoObject* obj : toDelete) obj->detach();
-    std::erase_if(m_objects, [&](const auto& ptr) {
+    for (GeoObject* obj : toDelete) {
+        obj->detach();
+    }
+    std::erase_if(m_objects, [&](const auto& ptr) -> auto {
         return std::ranges::contains(toDelete, ptr.get());
     });
 }
 
 void Scene::softRemove(GeoObject *target) {
-    auto it = std::find_if(m_objects.begin(), m_objects.end(), [target](const auto& p) { return p.get() == target; });
-    if (it != m_objects.end()) {
-        (*it)->detach();
-        m_graveyard.push_back(std::move(*it));
-        m_objects.erase(it);
+    auto iter = std::ranges::find_if(m_objects, [target](const auto& pointer) -> auto { return pointer.get() == target; });
+    if (iter != m_objects.end()) {
+        (*iter)->detach();
+        m_graveyard.push_back(std::move(*iter));
+        m_objects.erase(iter);
     }
 }
 
-bool Scene::contains(GeoObject *obj) const {
-    return std::ranges::any_of(m_objects, [obj](const auto& ptr) { return ptr.get() == obj; });
+auto Scene::contains(GeoObject *obj) const -> bool {
+    return std::ranges::any_of(m_objects, [obj](const auto& ptr) -> auto { return ptr.get() == obj; });
 }
 
 void Scene::clear() {
-    for (auto& obj : m_objects)
+    for (auto& obj : m_objects) {
         obj->detach();
+    }
     m_objects.clear();
 }

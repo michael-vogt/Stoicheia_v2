@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../geometry/geometry.h"
+#include "geometry/Point.h"
 
 class IntersectionSet;
 

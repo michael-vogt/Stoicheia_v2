@@ -13,7 +13,9 @@ class ColorButton;
 
 namespace Ui { class SettingsDialog; }
 
-static QHash<QString, QString> buildLanguageMap(const QString& path);
+static auto buildLanguageMap(const QString& path) -> QHash<QString, QString>;
+
+constexpr int DEFAULT_SETTINGSDIALOG_MINWIDTH = 400;
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
@@ -23,7 +25,7 @@ class SettingsDialog : public QDialog {
 public:
     explicit SettingsDialog(AppSettings& settings, QWidget* parent = nullptr);
 
-public slots:
+public slots: // NOLINT
     void reject() override;
 
 signals:
@@ -36,7 +38,7 @@ private slots:
     void apply();
     void resetToDefaults() const;
 
-private:
+private: // NOLINT
     void fillLanguages() const;
 
     void readFromSettings() const;

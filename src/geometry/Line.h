@@ -7,6 +7,6 @@ public:
     using LinearObject::LinearObject;
 
 protected:
-    bool containsT(double) const override { return true; };
+    [[nodiscard]] auto containsT(double param_t) const -> bool override { return true; };
 
 };

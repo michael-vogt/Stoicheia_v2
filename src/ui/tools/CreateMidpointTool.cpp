@@ -1,7 +1,7 @@
 #include "CreateMidpointTool.h"
 #include "../DrawingBoard.h"
 #include "../commands/CreateMidpointCommand.h"
-#include <cmath>
+#include "Structs.h"
 
 CreateMidpointTool::CreateMidpointTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
@@ -13,9 +13,11 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     Point*  hit      = m_ctx.hitTest->pointAt(scenePos);
 
-    if (!hit) { event->accept(); return; }
+    if (hit == nullptr) { 
+        event->accept(); return; 
+    }
 
-    if (!m_firstPoint) {
+    if (m_firstPoint == nullptr) {
         m_firstPoint = hit;
         highlightObject(m_firstPoint, true);
         showStatus(tr("Zweiten Punkt klicken"));
@@ -23,7 +25,7 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
         if (hit != m_firstPoint) {
             m_ctx.commandStack->execute(
                 std::make_unique<CreateMidpointCommand>(
-                    m_ctx.adapter, m_firstPoint, hit));
+                    m_ctx.adapter, PointPairForLinearObject{.point1=m_firstPoint, .point2=hit}));
         }
         removePreview();
         m_firstPoint = nullptr;
@@ -33,7 +35,10 @@ void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
 }
 
 void CreateMidpointTool::mouseMoveEvent(QMouseEvent* event) {
-    if (!m_firstPoint) { event->ignore(); return; }
+    if (m_firstPoint == nullptr) { 
+        event->ignore();
+        return; 
+    }
 
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     setPreviewLine(QLineF(m_firstPoint->x(), m_firstPoint->y(),

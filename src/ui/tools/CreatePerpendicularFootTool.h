@@ -14,7 +14,7 @@ public:
 protected:
     void onActivate() override { showStatus(tr("Punkt klicken")); }
     void onCancel() override { m_point = nullptr; }
-    bool hasIntermediateState() const override { return m_point != nullptr; }
+    [[nodiscard]] auto hasIntermediateState() const -> bool override { return m_point != nullptr; }
 
 private:
     Point* m_point = nullptr;

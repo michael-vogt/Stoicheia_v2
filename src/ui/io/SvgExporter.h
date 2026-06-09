@@ -2,12 +2,14 @@
 
 #include "Exporter.h"
 
+constexpr double DEFAULT_SVG_MARGIN = 20.0;
+
 class SvgExporter : public Exporter {
     Q_OBJECT
 public:
-    bool exportToFile(QGraphicsScene* scene, const QString& filename) override;
+    auto exportToFile(QGraphicsScene* scene, const QString& filename) -> bool override;
 
-    QString formatName() const override { return "SVG"; }
-    QString fileExtension() const override { return "svg"; }
-    QString fileFilter() const override { return tr("SVG-Dateien (*.svg)"); }
+    auto formatName() const -> QString override { return "SVG"; }
+    auto fileExtension() const -> QString override { return "svg"; }
+    auto fileFilter() const -> QString override { return tr("SVG-Dateien (*.svg)"); }
 };

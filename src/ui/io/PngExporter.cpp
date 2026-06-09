@@ -2,17 +2,16 @@
 
 #include <QPainter>
 
-bool PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) {
+auto PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -> bool {
     QRectF rect = scene->itemsBoundingRect();
     if (rect.isEmpty()) {
         m_lastError = tr("Keine sichtbaren Objekte");
         return false;
     }
 
-    constexpr double margin = 20.0;
-    rect.adjust(-margin, -margin, margin, margin);
+    rect.adjust(-DEFAULT_PNG_MARGIN, -DEFAULT_PNG_MARGIN, DEFAULT_PNG_MARGIN, DEFAULT_PNG_MARGIN);
 
-    double scale = m_dpi / 96.0;
+    double scale = m_dpi / DEFAULT_PNG_DPI;
     QImage image((rect.size() * scale).toSize(),
                   QImage::Format_ARGB32);
     image.fill(Qt::white);

@@ -9,6 +9,6 @@ public:
     virtual void execute() = 0;
     virtual void undo() = 0;
 
-    virtual QString description() const = 0;
+    [[nodiscard]] virtual auto description() const -> QString = 0;
 
 };

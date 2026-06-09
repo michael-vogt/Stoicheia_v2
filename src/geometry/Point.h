@@ -5,14 +5,14 @@
 
 class Point : public GeoObject {
 public:
-    Point(double x, double y);
+    Point(double pos_x, double pos_y);
 
     // Getter
-    double x() const { return m_x; }
-    double y() const { return m_y; }
+    [[nodiscard]] auto x() const -> double { return m_x; }
+    [[nodiscard]] auto y() const -> double { return m_y; }
 
     // Objekt aktualisieren
-    void moveTo(double nx, double ny);
+    void moveTo(double new_x, double new_y);
     void recompute() override {}
 
 private:

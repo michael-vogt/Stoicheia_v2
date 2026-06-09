@@ -1,7 +1,7 @@
 #include "CreatePointCommand.h"
 
-CreatePointCommand::CreatePointCommand(SceneAdapter *adapter, double x, double y)
-: m_adapter(adapter), m_x(x), m_y(y)
+CreatePointCommand::CreatePointCommand(SceneAdapter *adapter, double pos_x, double pos_y)
+: m_adapter(adapter), m_x(pos_x), m_y(pos_y)
 {}
 
 void CreatePointCommand::execute() {

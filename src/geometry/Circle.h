@@ -4,20 +4,21 @@
 
 #include "GeoObject.h"
 #include "Point.h"
+#include "Structs.h"
 
 
 class Circle : public GeoObject {
 public:
-    Circle(Point* center, Point* radiusPoint);
+    Circle(PointPairForCircle points);
     Circle(Point* center, double radius);
 
-    Point* center() const { return m_center; };
-    Point* radiusPoint() const { return m_radiusPoint; };
-    double radius() const { return m_radius; };
+    [[nodiscard]] auto center() const -> Point* { return m_center; };
+    [[nodiscard]] auto radiusPoint() const -> Point* { return m_radiusPoint; };
+    [[nodiscard]] auto radius() const -> double { return m_radius; };
 
     void onSourceRemoved(GeoObject *src) override;
     void recompute() override;
-    void replaceSource(GeoObject *oldSource, GeoObject *newSource) override;
+    void replaceSource(GeoObjectPair source) override;
 
 private:
     Point* m_center = nullptr;

@@ -10,31 +10,36 @@
 // - Ray:     von p1 durch p2 bis zum Rand der Szene
 // - Line:    durch p1 und p2 bis zu beiden Rändern der Szene
 
+
+constexpr double DEFAULT_LINEAROBJECT_PENWIDTH_NORMAL = 1.5;
+constexpr double DEFAULT_LINEAROBJECT_PENWIDTH_THICK = 2.5;
+constexpr double DEFAULT_LINEAROBJECT_EXTENT = 10000;
+
 class GeoLinearObjectItem : public GeoGraphicsItem {
 public:
     explicit GeoLinearObjectItem(LinearObject* linearObject,
                                   QGraphicsItem* parent = nullptr);
 
-    QRectF boundingRect() const override;
+    [[nodiscard]] auto boundingRect() const -> QRectF override;
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
 
-    LinearObject* linearObject() const { return m_linearObject; }
+    [[nodiscard]] auto linearObject() const -> LinearObject* { return m_linearObject; }
 
     void setPen(const QPen& pen) { m_pen = pen; update(); }
     void setExtent(double extent) { m_extent = extent; update(); }
-    bool contains(const QPointF &point) override;
+    auto contains(const QPointF &point) -> bool override;
 
 protected:
     void updateGeometry() override;
 
 private:
-    QLineF computeVisibleLine();
+    auto computeVisibleLine() -> QLineF;
 
     LinearObject* m_linearObject;
-    QPen          m_pen    = QPen(Qt::black, 1.5);
-    double        m_extent = 10000.0; // weit genug für Line und Ray
+    QPen          m_pen    = QPen(Qt::black, DEFAULT_LINEAROBJECT_PENWIDTH_NORMAL);
+    double        m_extent = DEFAULT_LINEAROBJECT_EXTENT; // weit genug für Line und Ray
     QLineF        m_line;             // aktuell zu zeichnende Linie
     LinearObjectType m_type;
 };

@@ -2,8 +2,7 @@
 #include "LinearObjectType.h"
 #include "Tool.h"
 #include "geometry/Point.h"
-#include "ui/GeoGraphicsItem.h"
-#include "ui/commands/CreatePointCommand.h"
+
 
 class CreateLineTool : public Tool {
 
@@ -22,9 +21,9 @@ public:
     QCursor cursor() const override { return Qt::CrossCursor; }
 
 private:
-    Point* pointAt(const QPointF& scenePos) const;
-    void setType(const LinearObjectType type);
-    QLineF computePreviewLine(const QPointF& endPos) const;
+    [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;
+    void setType(LinearObjectType type);
+    [[nodiscard]] auto computePreviewLine(const QPointF& endPos) const -> QLineF;
     void removePreview();
 
     LinearObjectType m_type;

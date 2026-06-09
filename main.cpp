@@ -3,24 +3,22 @@
 #include <qevent.h>
 #include <QTranslator>
 
-#include "geometry/geometry.h"
-#include "constructions/constructions.h"
 #include "ui/MainWindow.h"
 #include "ui/dialogs/AppSettings.h"
 
-int main(int argc, char *argv[]) {
+auto main(int argc, char *argv[]) -> int {
     QApplication app(argc, argv);
     AppSettings::instance().load();
     QString languageCode = AppSettings::instance().general.language;
 
     QTranslator translator;
     if (translator.load(QString(":/i18n/app_%1.qm").arg(languageCode))) {
-        app.installTranslator(&translator);
+        QApplication::installTranslator(&translator);
     } else {
-        std::cerr << "Error loading translator" << std::endl;
+        std::cerr << "Error loading translator\n";
     }
 
-    app.setWindowIcon(QIcon(":/resources/icon.ico"));
+    QApplication::setWindowIcon(QIcon(":/resources/icon.ico"));
     MainWindow window("Stoicheia (Στοιχεῖα)", &translator);
     window.drawingBoard()->applySettings();
 

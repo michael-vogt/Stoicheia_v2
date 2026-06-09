@@ -1,16 +1,21 @@
-#include <math.h>
-
+#include "constructions/LineCircleIntersection.h"
+#include "constructions/LineLineIntersection.h"
+#include "geometry/Circle.h"
+#include "geometry/Line.h"
+#include "geometry/Point.h"
 #include "gtest/gtest.h"
+#include <qmath.h>
 
-#include "../src/geometry/geometry.h"
-#include "../src/constructions/constructions.h"
 
 static constexpr double EPS = 1e-9;
 
 TEST(ExtendedTest, MultipleObjectsMoving) {
-    Point P1(0,0), P2(1,1);
-    Point P3(0,0), P4(-1,1);
-    Line L1(&P1, &P2), L2(&P3, &P4); // L1 = x, L2 = -x
+    Point P1(0,0);
+    Point P2(1,1);
+    Point P3(0,0);
+    Point P4(-1,1);
+    Line L1({.point1=&P1, .point2=&P2});
+    Line L2({.point1=&P3, .point2=&P4}); // L1 = x, L2 = -x
 
     LineLineIntersection IL1L2(&L1, &L2);
     Circle C(IL1L2.first(), 2.0);

@@ -4,5 +4,5 @@
 
 class MoveCommand : public Command {
 public:
-    virtual void setTarget(double x, double y) = 0;
+    virtual void setTarget(double new_x, double new_y) = 0;
 };

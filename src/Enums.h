@@ -1,17 +1,19 @@
 #pragma once
 
-enum class ShortcutMode {
+#include <cstdint>
+
+enum class ShortcutMode : std::uint8_t {
     None,
     Geometry,
     Construction
 };
 
-enum class StatusBarPart {
+enum class StatusBarPart : std::uint8_t {
     Left,
     Right
 };
 
-enum class ToolType {
+enum class ToolType : std::uint8_t {
     Select,
     CreatePoint,
     CreateLine,
