@@ -9,10 +9,10 @@
 #include "ui/commands/CreatePointCommand.h"
 #include "ui/commands/MacroCommand.h"
 #include <limits>
+#include "Constants.h"
 
 
 constexpr double eps = std::numeric_limits<double>::epsilon();
-constexpr double DEFAULT_LINE_EXTEND = 10000;
 
 CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : Tool(ctx), m_type(type) {}
 
@@ -193,9 +193,9 @@ auto CreateLineTool::computePreviewLine(const QPointF &endPos) const -> QLineF {
         case LinearObjectType::Segment:
             return {point1, point2};
         case LinearObjectType::Ray:
-            return {point1, point1 + dir * DEFAULT_LINE_EXTEND};
+            return {point1, point1 + dir * Constants::Geometry::LINE_EXTENT};
         case LinearObjectType::Line:
-            return {point1 - dir * DEFAULT_LINE_EXTEND, point1 + dir * DEFAULT_LINE_EXTEND};
+            return {point1 - dir * Constants::Geometry::LINE_EXTENT, point1 + dir * Constants::Geometry::LINE_EXTENT};
     }
     return {point1, point2};
 }

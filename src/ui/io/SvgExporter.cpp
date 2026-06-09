@@ -1,7 +1,10 @@
 #include "SvgExporter.h"
+#include "../../Constants.h"
 
 #include <QPainter>
 #include <QSvgGenerator>
+
+using namespace Constants::Export;
 
 auto SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -> bool {
     QRectF rect = scene->itemsBoundingRect();
@@ -10,7 +13,7 @@ auto SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -
         return false;
     }
 
-    rect.adjust(-DEFAULT_SVG_MARGIN, -DEFAULT_SVG_MARGIN, DEFAULT_SVG_MARGIN, DEFAULT_SVG_MARGIN);
+    rect.adjust(-SVG::MARGIN, -SVG::MARGIN, SVG::MARGIN, SVG::MARGIN);
 
     QSvgGenerator generator;
     generator.setFileName(filename);

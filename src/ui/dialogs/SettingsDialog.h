@@ -3,8 +3,8 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <qspinbox.h>
-
 #include "AppSettings.h"
+
 
 class QTabWidget;
 class QDoubleSpinBox;
@@ -14,8 +14,6 @@ class ColorButton;
 namespace Ui { class SettingsDialog; }
 
 static auto buildLanguageMap(const QString& path) -> QHash<QString, QString>;
-
-constexpr int DEFAULT_SETTINGSDIALOG_MINWIDTH = 400;
 
 class SettingsDialog : public QDialog {
     Q_OBJECT

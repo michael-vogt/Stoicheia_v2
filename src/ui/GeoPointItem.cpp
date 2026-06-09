@@ -1,4 +1,5 @@
 #include "GeoPointItem.h"
+#include "Constants.h"
 #include "dialogs/AppSettings.h"
 #include <QPainter>
 
@@ -21,9 +22,9 @@ void GeoPointItem::paint(QPainter* painter,
         return;
     }
     if (m_highlighted) {
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DEFAULT_POINTITEM_PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, Constants::DrawingConstants::PENWIDTH_THICK));
     } else if (m_selected) {
-        painter->setPen(QPen(AppSettings::instance().colors.selected, DEFAULT_POINTITEM_PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, Constants::DrawingConstants::PENWIDTH_THICK));
     } else {
         painter->setPen(m_pen);
     }

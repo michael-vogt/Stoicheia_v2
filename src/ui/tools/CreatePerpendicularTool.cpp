@@ -3,9 +3,10 @@
 #include "../commands/CreatePerpendicularCommand.h"
 #include <cmath>
 #include <limits>
+#include "Constants.h"
+
 
 constexpr double eps = std::numeric_limits<double>::epsilon();
-constexpr double DEFAULT_PERPENDICULAR_EXTENT = 10000;
 
 CreatePerpendicularTool::CreatePerpendicularTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
@@ -48,10 +49,10 @@ void CreatePerpendicularTool::mouseMoveEvent(QMouseEvent* event) {
         delta_x /= len;
         delta_y /= len;
         setPreviewLine(
-            QLineF(pos.x() - (delta_x * DEFAULT_PERPENDICULAR_EXTENT),
-                   pos.y() - (DEFAULT_PERPENDICULAR_EXTENT * delta_y),
-                   pos.x() + (delta_x * DEFAULT_PERPENDICULAR_EXTENT),
-                   pos.y() + (delta_y * DEFAULT_PERPENDICULAR_EXTENT)));
+            QLineF(pos.x() - (delta_x * Constants::Geometry::PERPENDICULAR_EXTENT),
+                   pos.y() - (delta_y * Constants::Geometry::PERPENDICULAR_EXTENT),
+                   pos.x() + (delta_x * Constants::Geometry::PERPENDICULAR_EXTENT),
+                   pos.y() + (delta_y * Constants::Geometry::PERPENDICULAR_EXTENT)));
     }
     event->accept();
 }

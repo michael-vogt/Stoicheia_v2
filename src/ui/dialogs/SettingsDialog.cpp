@@ -1,4 +1,5 @@
 #include "SettingsDialog.h"
+#include "Constants.h"
 #include "ui_settingsdialog.h"
 #include "ColorButton.h"
 #include <QTabWidget>
@@ -55,7 +56,7 @@ m_snapshotGeneral(settings.general)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
-    setMinimumWidth(DEFAULT_SETTINGSDIALOG_MINWIDTH);
+    setMinimumWidth(Constants::LayoutConstants::SETTINGSDIALOG_MINWIDTH);
 
     fillLanguages();
 

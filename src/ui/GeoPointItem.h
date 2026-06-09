@@ -3,11 +3,7 @@
 #include "../geometry/Point.h"
 #include <QPen>
 #include <QBrush>
-
-
-constexpr double DEFAULT_POINTITEM_PENWIDTH_NORMAL = 1.5;
-constexpr double DEFAULT_POINTITEM_PENWIDTH_THICK = 2.5;
-constexpr double DEFAULT_POINTITEM_RADIUS = 4;
+#include "../Constants.h"
 
 class GeoPointItem : public GeoGraphicsItem {
 public:
@@ -28,9 +24,9 @@ public:
 protected:
     void updateGeometry() override;
 
-    QPen    m_pen     = QPen(Qt::black, DEFAULT_POINTITEM_PENWIDTH_NORMAL);
+    QPen    m_pen     = QPen(Qt::black, Constants::DrawingConstants::PENWIDTH_NORMAL);
     QBrush  m_brush   = QBrush(Qt::white);
-    double  m_radius  = DEFAULT_POINTITEM_RADIUS;
+    double  m_radius  = Constants::DrawingConstants::POINT_RADIUS;
 
 private:
     Point*  m_point = nullptr;

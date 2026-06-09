@@ -10,9 +10,8 @@
 #include "ui/commands/MergePointsCommand.h"
 #include "geometry/UpdateGuard.h"
 #include "ui/commands/MovePointCommand.h"
+#include "Constants.h"
 
-
-constexpr double DEFAULT_SELECT_COPYDELTA = 50;
 
 SelectTool::SelectTool(const ToolContext &ctx)
 : Tool(ctx)
@@ -167,7 +166,7 @@ void SelectTool::keyPressEvent(QKeyEvent *event) { // NOLINT
                 std::make_unique<CopyCommand>(
                     m_ctx.adapter,
                     clipboard,
-                    QPointF(DEFAULT_SELECT_COPYDELTA, -DEFAULT_SELECT_COPYDELTA)));
+                    QPointF(Constants::UiMetrics::PASTE_OFFSET, -Constants::UiMetrics::PASTE_OFFSET)));
         }
         event->accept();
         return;
