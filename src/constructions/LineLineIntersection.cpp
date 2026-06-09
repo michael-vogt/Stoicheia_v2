@@ -40,13 +40,13 @@ void LineLineIntersection::compute() {
     DoublePair dir2 = {.x = line2_p2->x() - line2_p1->x(), .y = line2_p2->y() - line2_p1->y()};
 
     double det = (dir1.x * dir2.y) - (dir1.y * dir2.x);
-    if (det < eps) {
+    if (std::abs(det) < eps) {
         setResults(0);
         return;
     }
 
-    DoublePair p1p2 = {.x=line1_p1->x() - line2_p1->x(), .y=line1_p1->y() - line2_p1->y()};
-    double param_t = (p1p2.x*dir2.y) - (p1p2.y*dir2.x);
+    DoublePair p1p2 = {.x=line2_p1->x() - line1_p1->x(), .y=line2_p1->y() - line1_p1->y()};
+    double param_t = ((p1p2.x*dir2.y) - (p1p2.y*dir2.x)) / det;
 
-    setResults(1, {.x=line1_p1->x() + (param_t*dir1.x), .y=line1_p1->x() + (param_t*dir1.y)});
+    setResults(1, {.x=line1_p1->x() + (param_t*dir1.x), .y=line1_p1->y() + (param_t*dir1.y)});
 }

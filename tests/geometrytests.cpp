@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
-#include <cmath>
-#include "../src/geometry/geometry.h"
+#include "Structs.h"
+#include "geometry/Line.h"
+#include "geometry/Point.h"
+#include "geometry/Scene.h"
+#include "geometry/UpdateGuard.h"
 
 static constexpr double EPS = 1e-9;
 
@@ -37,32 +40,37 @@ TEST(PointTest, NegativeCoordinates) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(LineTest, LengthOnCreation) {
-    Point p1(0, 0), p2(3, 4);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(3, 4);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 TEST(LineTest, LengthHorizontal) {
-    Point p1(0, 0), p2(10, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(10, 0);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 10.0, EPS);
 }
 
 TEST(LineTest, LengthVertical) {
-    Point p1(0, 0), p2(0, 7);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(0, 7);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 7.0, EPS);
 }
 
 TEST(LineTest, LengthZero) {
-    Point p1(3, 3), p2(3, 3);
-    Line L(&p1, &p2);
+    Point p1(3, 3);
+    Point p2(3, 3);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 0.0, EPS);
 }
 
 TEST(LineTest, LengthDiagonal) {
-    Point p1(1, 1), p2(4, 5);
-    Line L(&p1, &p2);
+    Point p1(1, 1);
+    Point p2(4, 5);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
@@ -71,24 +79,27 @@ TEST(LineTest, LengthDiagonal) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(PropagationTest, LineUpdatesWhenP2Moves) {
-    Point p1(0, 0), p2(3, 4);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(3, 4);
+    Line L({.point1=&p1, .point2=&p2});
 
     p2.moveTo(6, 8);
     EXPECT_NEAR(L.length(), 10.0, EPS);
 }
 
 TEST(PropagationTest, LineUpdatesWhenP1Moves) {
-    Point p1(0, 0), p2(5, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(5, 0);
+    Line L({.point1=&p1, .point2=&p2});
 
     p1.moveTo(2, 0);
     EXPECT_NEAR(L.length(), 3.0, EPS);
 }
 
 TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
-    Point p1(0, 0), p2(1, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(1, 0);
+    Line L({.point1=&p1, .point2=&p2});
 
     for (int i = 1; i <= 5; ++i) {
         p2.moveTo(i * 2.0, 0);
@@ -97,9 +108,11 @@ TEST(PropagationTest, LineUpdatesOnMultipleMoves) {
 }
 
 TEST(PropagationTest, TwoLinesSharePoint) {
-    Point p1(0,0), p2(3,4), p3(6,0);
-    Line L1(&p1, &p2);
-    Line L2(&p2, &p3);
+    Point p1(0,0);
+    Point p2(3,4);
+    Point p3(6,0);
+    Line L1({.point1=&p1, .point2=&p2});
+    Line L2({.point1=&p2, .point2=&p3});
 
     p2.moveTo(0, 0);
     EXPECT_NEAR(L1.length(), 0.0, EPS);
@@ -111,8 +124,9 @@ TEST(PropagationTest, TwoLinesSharePoint) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(BatchUpdateTest, LineRecomputedOnlyOnce) {
-    Point p1(0,0), p2(3,4);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(3,4);
+    Line L({.point1=&p1, .point2=&p2});
     int before = L.recomputeCount;
 
     {
@@ -126,8 +140,9 @@ TEST(BatchUpdateTest, LineRecomputedOnlyOnce) {
 }
 
 TEST(BatchUpdateTest, ResultCorrectAfterBatch) {
-    Point p1(0,0), p2(0,0);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(0,0);
+    Line L({.point1=&p1, .point2=&p2});
 
     {
         UpdateGuard guard;
@@ -139,8 +154,9 @@ TEST(BatchUpdateTest, ResultCorrectAfterBatch) {
 }
 
 TEST(BatchUpdateTest, NestedGuardsFlushOnce) {
-    Point p1(0,0), p2(3,4);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(3,4);
+    Line L({.point1=&p1, .point2=&p2});
     int before = L.recomputeCount;
 
     {
@@ -172,7 +188,7 @@ TEST(SceneTest, RemovePoint_LineBecomesInvalid) {
     Scene scene;
     auto* p1 = scene.create<Point>(0.0, 0.0);
     auto* p2 = scene.create<Point>(3.0, 4.0);
-    auto* L  = scene.create<Line>(p1, p2);
+    auto* L  = scene.create<Line>(PointPairForLinearObject{.point1=p1, .point2=p2});
 
     EXPECT_TRUE(L->isValid());
     scene.remove(p2);
@@ -193,7 +209,7 @@ TEST(SceneTest, RemoveLine_PointsUnaffected) {
     Scene scene;
     auto* p1 = scene.create<Point>(0.0, 0.0);
     auto* p2 = scene.create<Point>(3.0, 4.0);
-    auto* L  = scene.create<Line>(p1, p2);
+    auto* L  = scene.create<Line>(PointPairForLinearObject{.point1=p1, .point2=p2});
 
     scene.remove(L);
     EXPECT_TRUE(p1->isValid());
@@ -206,8 +222,8 @@ TEST(SceneTest, AfterRemove_RemainingObjectsStillUpdate) {
     auto* p1 = scene.create<Point>(0.0, 0.0);
     auto* p2 = scene.create<Point>(0.0, 0.0);
     auto* p3 = scene.create<Point>(3.0, 4.0);
-    scene.create<Line>(p1, p2);   // L1 hängt an p1 und p2
-    auto* L2 = scene.create<Line>(p2, p3); // L2 hängt an p2 und p3
+    scene.create<Line>(PointPairForLinearObject{.point1=p1, .point2=p2});   // L1 hängt an p1 und p2
+    auto* L2 = scene.create<Line>(PointPairForLinearObject{.point1=p2, .point2=p3}); // L2 hängt an p2 und p3
 
     scene.remove(p1); // L1 invalid, L2 unberührt
 
@@ -225,8 +241,9 @@ TEST(SceneTest, AfterRemove_RemainingObjectsStillUpdate) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(DetachTest, DetachStopsUpdates) {
-    Point p1(0,0), p2(3,4);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(3,4);
+    Line L({.point1=&p1, .point2=&p2});
 
     L.detach();
     int countBefore = L.recomputeCount;
@@ -236,8 +253,9 @@ TEST(DetachTest, DetachStopsUpdates) {
 }
 
 TEST(DetachTest, DetachClearsSourcesAndDependents) {
-    Point p1(0,0), p2(3,4);
-    Line L(&p1, &p2);
+    Point p1(0,0);
+    Point p2(3,4);
+    Line L({.point1=&p1, .point2=&p2});
 
     L.detach();
     EXPECT_TRUE(L.dependents().empty());
@@ -248,8 +266,9 @@ TEST(DetachTest, DetachClearsSourcesAndDependents) {
 // ════════════════════════════════════════════════════════════════════════════
 
 TEST(EdgeCaseTest, PointMoveToSamePosition) {
-    Point p1(3,4), p2(0,0);
-    Line L(&p1, &p2);
+    Point p1(3,4);
+    Point p2(0,0);
+    Line L({.point1=&p1, .point2=&p2});
     double before = L.length();
 
     p1.moveTo(3, 4); // keine echte Änderung
@@ -257,24 +276,28 @@ TEST(EdgeCaseTest, PointMoveToSamePosition) {
 }
 
 TEST(EdgeCaseTest, LargeCoordinates) {
-    Point p1(0, 0), p2(1e9, 0);
-    Line L(&p1, &p2);
+    Point p1(0, 0);
+    Point p2(1e9, 0);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 1e9, 1.0);
 }
 
 TEST(EdgeCaseTest, NegativeCoordinates) {
-    Point p1(-3, -4), p2(0, 0);
-    Line L(&p1, &p2);
+    Point p1(-3, -4);
+    Point p2(0, 0);
+    Line L({.point1=&p1, .point2=&p2});
     EXPECT_NEAR(L.length(), 5.0, EPS);
 }
 
 TEST(EdgeCaseTest, MultiplePointsOnSameLine) {
     Point origin(0, 0);
-    Point a(1, 0), b(2, 0), c(3, 0);
+    Point a(1, 0);
+    Point b(2, 0);
+    Point c(3, 0);
 
-    Line L1(&origin, &a);
-    Line L2(&origin, &b);
-    Line L3(&origin, &c);
+    Line L1({.point1=&origin, .point2=&a});
+    Line L2({.point1=&origin, .point2=&b});
+    Line L3({.point1=&origin, .point2=&c});
 
     origin.moveTo(1, 0);
 
