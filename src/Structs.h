@@ -35,3 +35,13 @@ struct DoublePair {
     double x;
     double y;
 };
+
+struct IntPair {
+    int width;
+    int height;
+};
+
+struct ToolTypePair {
+    int toolType;
+    int subType;
+};

@@ -1,9 +1,9 @@
 #include "DrawingBoard.h"
 
-#include <iostream>
 #include <QScrollBar>
 #include <QTimer>
 
+#include "Structs.h"
 #include "commands/CopyCommand.h"
 #include "dialogs/AppSettings.h"
 #include "tools/CreatePointTool.h"
@@ -16,17 +16,24 @@
 #include "tools/CreatePerpendicularFootTool.h"
 #include "tools/SelectTool.h"
 
+
+constexpr double DEFAULT_DRAWINGBOARD_SCENERECT = 10000;
+constexpr double DEFAULT_DRAWINGBOARD_COPYDELTA = 50;
+constexpr double DEFAULT_DRAWINGBOARD_WATERMARK_OPACITY = 0.1;
+
 DrawingBoard::DrawingBoard(QWidget *parent)
 : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene)
 {
-    AppSettings& s = AppSettings::instance();
+    AppSettings& settings = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
     setRenderHint(QPainter::SmoothPixmapTransform);
-    setBackgroundBrush(s.colors.background);
+    setBackgroundBrush(settings.colors.background);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setSceneRect(-10000, -10000, 20000, 20000);
+    setSceneRect(
+        -DEFAULT_DRAWINGBOARD_SCENERECT, -DEFAULT_DRAWINGBOARD_SCENERECT,
+        2 * DEFAULT_DRAWINGBOARD_SCENERECT, DEFAULT_DRAWINGBOARD_SCENERECT * 2);
 
     QTransform transform;
     transform.scale(1.0, -1.0);
@@ -67,9 +74,9 @@ void DrawingBoard::setGridSpacing(const double spacing) {
 
 void DrawingBoard::resetView() {
     setTransformationAnchor(QGraphicsView::NoAnchor);
-    QTransform t = transform();
-    double scaleX = t.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
-    double scaleY = t.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
+    QTransform trans = transform();
+    double scaleX = trans.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
+    double scaleY = trans.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
     centerOn(0, 0);
     scale(1.0 / scaleX, -1.0 / scaleY);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -86,27 +93,28 @@ void DrawingBoard::pasteSelection() {
                 std::make_unique<CopyCommand>(
                     &m_adapter,
                     clipboard,
-                    QPointF(50, -50)));
+                    QPointF(DEFAULT_DRAWINGBOARD_COPYDELTA, -DEFAULT_DRAWINGBOARD_COPYDELTA)));
     }
 }
 
 void DrawingBoard::applySettings() {
-    const auto& s = AppSettings::instance();
-    setBackgroundBrush(s.colors.background);
-    m_grid.setVisible(s.grid.visible);
-    m_grid.setSpacing(s.grid.spacing);
-    m_grid.setSnapEnabled(s.grid.snapEnabled);
-    m_grid.setAxisColor(s.grid.axisColor);
-    m_grid.setGridColor(s.grid.gridColor);
-    m_grid.setLabelColor(s.grid.labelColor);
+    const auto& settings = AppSettings::instance();
+    setBackgroundBrush(settings.colors.background);
+    m_grid.setVisible(settings.grid.visible);
+    m_grid.setSpacing(settings.grid.spacing);
+    m_grid.setSnapEnabled(settings.grid.snapEnabled);
+    m_grid.setAxisColor(settings.grid.axisColor);
+    m_grid.setGridColor(settings.grid.gridColor);
+    m_grid.setLabelColor(settings.grid.labelColor);
     viewport()->update();
     scene()->update();
-    if (m_activeTool)
+    if (m_activeTool) {
         m_activeTool->activate();
+    }
 }
 
-void DrawingBoard::onToolChangeRequested(int toolType, int subType) {
-    switch (static_cast<ToolType>(toolType)) {
+void DrawingBoard::onToolChangeRequested(ToolTypePair toolTypePair) {
+    switch (static_cast<ToolType>(toolTypePair.toolType)) {
         case ToolType::Select:
             setTool<SelectTool>(ToolType::Select);
             break;
@@ -115,15 +123,15 @@ void DrawingBoard::onToolChangeRequested(int toolType, int subType) {
             break;
         case ToolType::CreateLine:
             setTool<CreateLineTool>(ToolType::CreateLine,
-                static_cast<LinearObjectType>(subType));
+                static_cast<LinearObjectType>(toolTypePair.subType));
             break;
         case ToolType::CreateRay:
             setTool<CreateLineTool>(ToolType::CreateRay,
-                static_cast<LinearObjectType>(subType));
+                static_cast<LinearObjectType>(toolTypePair.subType));
             break;
         case ToolType::CreateSegment:
             setTool<CreateLineTool>(ToolType::CreateSegment,
-                static_cast<LinearObjectType>(subType));
+                static_cast<LinearObjectType>(toolTypePair.subType));
             break;
         case ToolType::CreateCircle:
             setTool<CreateCircleTool>(ToolType::CreateCircle);
@@ -159,16 +167,18 @@ void DrawingBoard::drawBackground(QPainter *painter, const QRectF &rect) {
 
 void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
     QGraphicsView::drawForeground(painter, rect);
-    if (!m_grid.isVisible()) return;
+    if (!m_grid.isVisible()) {
+        return;
+    }
 
     painter->save();
     painter->setTransform(QTransform());
 
-    auto toViewport = [this](QPointF p) -> QPointF {
-        return viewport()->mapFrom(this, mapFromScene(p));
+    auto toViewport = [this](QPointF point) -> QPointF {
+        return viewport()->mapFrom(this, mapFromScene(point));
     };
 
-    m_grid.drawLabels(painter, toViewport, viewport()->width(), viewport()->height());
+    m_grid.drawLabels(painter, toViewport, {.width=viewport()->width(), .height=viewport()->height()});
     painter->restore();
 }
 
@@ -199,17 +209,10 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     painter->save();
     painter->setTransform(QTransform());
 
-    /*QFont font = painter->font();
-    font.setPointSize(72);
-    font.setBold(true);
-    painter->setFont(font);
-    painter->setPen(AppSettings::instance().colors.watermark);
-
-    painter->drawText(viewport()->rect(), Qt::AlignCenter, "Στοιχεῖα");*/
     const QImage image(":/resources/logo.png");
-    painter->setOpacity(0.1);
-    QPoint vc = viewport()->rect().center();
+    painter->setOpacity(DEFAULT_DRAWINGBOARD_WATERMARK_OPACITY);
+    QPoint viewport_center = viewport()->rect().center();
     QSize size = image.size();
-    painter->drawImage(vc.x() - size.width() / 2, vc.y() - size.height() / 2, image);
+    painter->drawImage(viewport_center.x() - (size.width() / 2), viewport_center.y() - (size.height() / 2), image);
     painter->restore();
 }

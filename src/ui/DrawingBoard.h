@@ -4,15 +4,18 @@
 
 #include "HitTest.h"
 #include "SceneAdapter.h"
+#include "Structs.h"
 #include "ToolContext.h"
 #include "commands/CommandStack.h"
 #include "geometry/Scene.h"
 #include "tools/Tool.h"
 #include "Grid.h"
-//#include "MainWindow.h"
 #include "Enums.h"
 #include "InputManager.h"
 
+
+constexpr double DEFAULT_DRAWINGBOARD_HITTEST_TOLERANCE = 8;
+constexpr double DEFAULT_DRAWINGBOARD_GRID_SPACING = 50;
 
 class DrawingBoard : public QGraphicsView {
 
@@ -24,7 +27,9 @@ public:
     // Tool setzen - übernimmt Ownership
     template<typename T, typename... Args>
     void setTool(ToolType type, Args&&... args) {
-        if (m_activeTool) m_activeTool->deactivate();
+        if (m_activeTool) { 
+            m_activeTool->deactivate();
+        }
         m_activeTool = std::make_unique<T>(makeContext(), std::forward<Args>(args)...);
         m_activeToolType = type;
         m_inputManager->setActiveTool(m_activeTool.get());
@@ -32,9 +37,9 @@ public:
         emit toolChanged(type);
     }
 
-    Tool* activeTool() const { return m_activeTool.get(); }
-    ToolType activeToolType() const { return m_activeToolType; }
-    InputManager* inputManager() const { return m_inputManager; }
+    [[nodiscard]] auto activeTool() const -> Tool* { return m_activeTool.get(); }
+    [[nodiscard]] auto activeToolType() const -> ToolType { return m_activeToolType; }
+    [[nodiscard]] auto inputManager() const -> InputManager* { return m_inputManager; }
     void showStatusLeft(const QString& text) { emit statusBarTextChanged(StatusBarPart::Left, text); }
     void showStatusRight(const QString& text) { emit statusBarTextChanged(StatusBarPart::Right, text); }
     void updateToolType(ToolType type);
@@ -43,21 +48,21 @@ public:
     void setGridVisible(bool visible);
     void setGridSpacing(double spacing);
     void resetView();
-    Grid* grid() { return &m_grid; }
+    auto grid() -> Grid* { return &m_grid; }
 
     // Geometrie und Adapter
-    Scene* geoScene() { return &m_geoScene; }
-    QGraphicsScene* qtScene() { return &m_qtScene; }
-    SceneAdapter* adapter() { return &m_adapter; }
-    CommandStack* commandStack() { return &m_commandStack; }
+    auto geoScene() -> Scene* { return &m_geoScene; }
+    auto qtScene() -> QGraphicsScene* { return &m_qtScene; }
+    auto adapter() -> SceneAdapter* { return &m_adapter; }
+    auto commandStack() -> CommandStack* { return &m_commandStack; }
 
     // Copy and paste
     void copySelection();
     void pasteSelection();
 
-public slots:
+public slots: // NOLINT
     void applySettings();
-    void onToolChangeRequested(int type, int subType);
+    void onToolChangeRequested(ToolTypePair toolTypePair);
     void statusMessage(int sbp, const QString& text);
 
 signals:
@@ -81,20 +86,20 @@ protected:
 
 private:
     void drawWatermark(QPainter *painter) const;
-    ToolContext makeContext() { return ToolContext{ this, &m_adapter, &m_commandStack, &m_snapHelper, &m_hitTest }; }
+    auto makeContext() -> ToolContext { return ToolContext{ .drawingBoard=this, .adapter=&m_adapter, .commandStack=&m_commandStack, .snapHelper=&m_snapHelper, .hitTest=&m_hitTest }; }
 
     // Geometrie (Reihenfolge wichtig für Initialisierung!)
     Scene m_geoScene;
     QGraphicsScene m_qtScene;
     SceneAdapter m_adapter;
     CommandStack m_commandStack;
-    HitTest m_hitTest{&m_qtScene, 8.0};
+    HitTest m_hitTest{&m_qtScene, DEFAULT_DRAWINGBOARD_HITTEST_TOLERANCE};
     InputManager* m_inputManager = nullptr;
 
     // Raster
     Grid m_grid;
     bool m_gridVisible = true;
-    double m_gridSpacing = 50.0;
+    double m_gridSpacing = DEFAULT_DRAWINGBOARD_GRID_SPACING;
 
     // Zentrierung
     int m_resizeCount = 0;

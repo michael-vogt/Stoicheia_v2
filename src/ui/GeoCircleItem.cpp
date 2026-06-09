@@ -2,6 +2,9 @@
 #include "dialogs/AppSettings.h"
 #include <QPainter>
 
+
+constexpr double DEFAULT_CIRCLE_SNAPRADIUS = 8;
+
 GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
     : GeoGraphicsItem(circle, parent), m_circle(circle)
 {
@@ -9,40 +12,45 @@ GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
     GeoCircleItem::updateGeometry();
 }
 
-QRectF GeoCircleItem::boundingRect() const {
-    double r = m_circle->radius();
-    double extra = m_pen.widthF() / 2.0 + 1.0;
-    return QRectF(-r - extra, -r - extra,
-                   (r + extra) * 2, (r + extra) * 2);
+auto GeoCircleItem::boundingRect() const -> QRectF {
+    double radius = m_circle->radius();
+    double extra = (m_pen.widthF() / 2) + 1.0;
+    return QRectF(-radius - extra, -radius - extra,
+                   (radius + extra) * 2, (radius + extra) * 2);
 }
 
 void GeoCircleItem::paint(QPainter* painter,
-                           const QStyleOptionGraphicsItem*,
-                           QWidget*)
+                           const QStyleOptionGraphicsItem* /*option*/,
+                           QWidget* /*widget*/)
 {
-    if (!m_circle->isValid()) return;
-    if (m_highlighted)
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, 2.5));
-    else if (m_selected)
-        painter->setPen(QPen(AppSettings::instance().colors.selected, 2.5));
-    else
+    if (!m_circle->isValid()) {
+        return;
+    }
+    if (m_highlighted) {
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DEFAULT_CIRCLE_PENWIDTH_THICK));
+    } else if (m_selected) {
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DEFAULT_CIRCLE_PENWIDTH_THICK));
+    } else {
         painter->setPen(m_pen);
+    }
 
-    const double r = m_circle->radius();
-    painter->drawEllipse(QPointF(0, 0), r, r);
+    const double radius = m_circle->radius();
+    painter->drawEllipse(QPointF(0, 0), radius, radius);
 }
 
-bool GeoCircleItem::contains(const QPointF &point) {
-    if (!m_circle) return false;
+auto GeoCircleItem::contains(const QPointF &point) -> bool {
+    if (m_circle == nullptr) { 
+        return false;
+    }
 
-    const QPointF p(m_circle->center()->x(), m_circle->center()->y());
-    const double r = m_circle->radius();
+    const QPointF center(m_circle->center()->x(), m_circle->center()->y());
+    const double radius = m_circle->radius();
 
-    const double dx = point.x() - p.x();
-    const double dy = point.y() - p.y();
+    const double delta_x = point.x() - center.x();
+    const double delta_y = point.y() - center.y();
 
-    const double delta = std::abs(std::sqrt(dx * dx + dy * dy) - r);
-    return delta <= 8;
+    const double delta = std::abs(std::sqrt((delta_x * delta_x) + (delta_y * delta_y)) - radius);
+    return delta <= DEFAULT_CIRCLE_SNAPRADIUS;
 }
 
 void GeoCircleItem::updateGeometry() {

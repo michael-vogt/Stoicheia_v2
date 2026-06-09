@@ -9,20 +9,21 @@ SnapHelper::SnapHelper(QGraphicsScene *scene, const Grid* grid)
 
 QPointF SnapHelper::snap(const QPointF &scenePos, bool snapActive) const {
     // Punkt-Snap hat Vorrang vor Grid-Snap
-    if (Point* p = snapToPoint(scenePos))
-        return QPointF(p->x(), p->y());
+    if (Point* point = snapToPoint(scenePos)) {
+        return {point->x(), point->y()};
+    }
 
     //return snapToGrid(scenePos);
     return m_grid->snap(scenePos, snapActive);
 }
 
-QPointF SnapHelper::snapToGrid(const QPointF &scenePos) const {
-    double x = std::round(scenePos.x() / m_gridSpacing) * m_gridSpacing;
-    double y = std::round(scenePos.y() / m_gridSpacing) * m_gridSpacing;
-    return QPointF(x, y);
+auto SnapHelper::snapToGrid(const QPointF &scenePos) const -> QPointF {
+    double pos_x = std::round(scenePos.x() / m_gridSpacing) * m_gridSpacing;
+    double pos_y = std::round(scenePos.y() / m_gridSpacing) * m_gridSpacing;
+    return {pos_x, pos_y};
 }
 
-Point *SnapHelper::snapToPoint(const QPointF &scenePos) const {
+auto SnapHelper::snapToPoint(const QPointF &scenePos) const -> Point * {
     Point* nearest = nullptr;
     double minDist = m_snapRadius * m_snapRadius;
 
@@ -31,14 +32,14 @@ Point *SnapHelper::snapToPoint(const QPointF &scenePos) const {
             QSizeF(m_snapRadius * 2, m_snapRadius * 2)));
 
     for (QGraphicsItem* item : items) {
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
-            Point* p = pi->point();
-            double dx = p->x() - scenePos.x();
-            double dy = p->y() - scenePos.y();
-            double d2 = dx*dx + dy*dy;
-            if (d2 < minDist) {
-                minDist = d2;
-                nearest = p;
+        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+            Point* point = pointItem->point();
+            double delta_x = point->x() - scenePos.x();
+            double delta_y = point->y() - scenePos.y();
+            double dist2 = (delta_x*delta_x) + (delta_y*delta_y);
+            if (dist2 < minDist) {
+                minDist = dist2;
+                nearest = point;
             }
         }
     }
