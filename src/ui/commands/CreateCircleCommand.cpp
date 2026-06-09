@@ -5,7 +5,7 @@ CreateCircleCommand::CreateCircleCommand(SceneAdapter *adapter, PointPairForCirc
 : m_adapter(adapter), m_center(points.center), m_radiusPoint(points.radiusPoint)
 {}
 
-CreateCircleCommand::CreateCircleCommand(SceneAdapter *adapter, CreatePointCommandPair cmds, PointPairForCircle points)
+CreateCircleCommand::CreateCircleCommand(SceneAdapter *adapter, CreatePointCommandPairForCircle cmds, PointPairForCircle points)
     : m_adapter(adapter), m_p1Cmd(cmds.centerPointCmd), m_p2Cmd(cmds.radiusPointCmd), m_center(points.center), m_radiusPoint(points.radiusPoint)
 {}
 

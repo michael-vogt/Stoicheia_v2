@@ -16,12 +16,11 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-    QCursor cursor() const override { return Qt::CrossCursor; }
+    [[nodiscard]] auto cursor() const -> QCursor override { return Qt::CrossCursor; }
 
 private:
     void updatePreview(const QPointF& scenePos);
     void removePreview();
 
     QGraphicsEllipseItem* m_preview = nullptr;
-    static constexpr double RADIUS = 4.0;
 };

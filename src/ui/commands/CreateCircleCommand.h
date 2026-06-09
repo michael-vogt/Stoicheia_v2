@@ -10,7 +10,7 @@ class CreateCircleCommand : public Command {
 
 public:
     explicit CreateCircleCommand(SceneAdapter* adapter, PointPairForCircle points);
-    explicit CreateCircleCommand(SceneAdapter* adapter, CreatePointCommandPair cmds, PointPairForCircle points);
+    explicit CreateCircleCommand(SceneAdapter* adapter, CreatePointCommandPairForCircle cmds, PointPairForCircle points);
 
     void execute() override;
     void undo() override;

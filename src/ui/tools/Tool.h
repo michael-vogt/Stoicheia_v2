@@ -20,7 +20,7 @@ public:
     virtual void keyPressEvent(QKeyEvent* event) { event->ignore(); }
     virtual void keyReleaseEvent(QKeyEvent* event) { event->ignore(); }
 
-    virtual QCursor cursor() const { return Qt::ArrowCursor; }
+    [[nodiscard]] virtual auto cursor() const -> QCursor { return Qt::ArrowCursor; }
 
 protected:
     ToolContext m_ctx;

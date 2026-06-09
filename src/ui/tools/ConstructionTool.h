@@ -10,7 +10,7 @@ public:
     void deactivate() override;
 
     void keyPressEvent(QKeyEvent* event) override;
-    QCursor cursor() const override { return Qt::CrossCursor; }
+    [[nodiscard]] auto cursor() const -> QCursor override { return Qt::CrossCursor; }
 
 protected:
     // Unterklassen implementieren diese Methoden
@@ -25,9 +25,9 @@ protected:
     void setPreviewEllipse(const QRectF& rect);
     void removePreview();
 
-    void highlightObject(GeoObject* obj, bool on);
+    void highlightObject(GeoObject* obj, bool isHighlighted);
     void clearHighlights();
-    virtual bool hasIntermediateState() const = 0;
+    [[nodiscard]] virtual auto hasIntermediateState() const -> bool = 0;
 
 private:
     QGraphicsLineItem* m_previewLine = nullptr;

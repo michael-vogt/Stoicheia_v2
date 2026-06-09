@@ -7,8 +7,8 @@
 CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, PointPairForLinearObject points, LinearObjectType type) 
 : m_adapter(adapter), m_point1(points.point1), m_point2(points.point2), m_type(type) {}
 
-CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommandPair cmds, PointPairForLinearObject points, LinearObjectType type)
-    : m_adapter(adapter), m_p1Cmd(cmds.centerPointCmd), m_p2Cmd(cmds.radiusPointCmd), m_point1(points.point1), m_point2(points.point2), m_type(type)
+CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommandPairForLinearObject cmds, PointPairForLinearObject points, LinearObjectType type)
+    : m_adapter(adapter), m_p1Cmd(cmds.firstPoint), m_p2Cmd(cmds.secondPoint), m_point1(points.point1), m_point2(points.point2), m_type(type)
 {}
 
 void CreateLineCommand::execute() {

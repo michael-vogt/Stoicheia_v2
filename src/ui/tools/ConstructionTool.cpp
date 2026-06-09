@@ -42,7 +42,7 @@ void ConstructionTool::showStatus(const QString& msg) const {
 }
 
 void ConstructionTool::setPreviewLine(const QLineF& line) {
-    if (!m_previewLine) {
+    if (m_previewLine == nullptr) {
         m_previewLine = new QGraphicsLineItem();
         m_previewLine->setPen(QPen(Qt::gray, 1, Qt::DashLine));
         m_ctx.drawingBoard->scene()->addItem(m_previewLine);
@@ -51,7 +51,7 @@ void ConstructionTool::setPreviewLine(const QLineF& line) {
 }
 
 void ConstructionTool::setPreviewEllipse(const QRectF& rect) {
-    if (!m_previewEllipse) {
+    if (m_previewEllipse == nullptr) {
         m_previewEllipse = new QGraphicsEllipseItem();
         m_previewEllipse->setPen(QPen(Qt::gray, 1, Qt::DashLine));
         m_previewEllipse->setBrush(Qt::NoBrush);
@@ -62,26 +62,28 @@ void ConstructionTool::setPreviewEllipse(const QRectF& rect) {
 
 void ConstructionTool::removePreview() {
     clearHighlights();
-    if (m_previewLine) {
+    if (m_previewLine != nullptr) {
         m_ctx.drawingBoard->scene()->removeItem(m_previewLine);
         delete m_previewLine;
         m_previewLine = nullptr;
     }
-    if (m_previewEllipse) {
+    if (m_previewEllipse != nullptr) {
         m_ctx.drawingBoard->scene()->removeItem(m_previewEllipse);
         delete m_previewEllipse;
         m_previewEllipse = nullptr;
     }
 }
 
-void ConstructionTool::highlightObject(GeoObject *obj, bool on) {
-    m_ctx.adapter->highlight(obj, on);
-    if (on)
+void ConstructionTool::highlightObject(GeoObject *obj, bool isHighlighted) {
+    m_ctx.adapter->highlight(obj, isHighlighted);
+    if (isHighlighted) {
         m_highlighted.push_back(obj);
+    }
 }
 
 void ConstructionTool::clearHighlights() {
-    for (GeoObject* obj : m_highlighted)
+    for (GeoObject* obj : m_highlighted) {
         m_ctx.adapter->highlight(obj, false);
+    }
     m_highlighted.clear();
 }

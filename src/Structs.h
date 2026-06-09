@@ -2,9 +2,14 @@
 
 class CreatePointCommand;
 
-struct CreatePointCommandPair {
+struct CreatePointCommandPairForCircle {
     CreatePointCommand* centerPointCmd;
     CreatePointCommand* radiusPointCmd;
+};
+
+struct CreatePointCommandPairForLinearObject {
+    CreatePointCommand* firstPoint;
+    CreatePointCommand* secondPoint;
 };
 
 class Point;

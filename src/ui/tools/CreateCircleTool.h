@@ -15,11 +15,11 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
-    QCursor cursor() const override { return Qt::CrossCursor; }
+    [[nodiscard]] auto cursor() const -> QCursor override { return Qt::CrossCursor; }
 
 private:
-    QRectF computePreviewCircle(const QPointF& scenePos) const;
-    Point* pointAt(const QPointF& scenePos) const;
+    [[nodiscard]] auto computePreviewCircle(const QPointF& scenePos) const -> QRectF;
+    [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;
     void removePreview();
 
     Point* m_centerPoint = nullptr;

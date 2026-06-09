@@ -13,12 +13,17 @@ void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
 
     // Nur LinearObject oder Circle akzeptieren
     GeoObject* hit = nullptr;
-    if (auto* l = m_ctx.hitTest->linearObjectAt(scenePos)) hit = l;
-    else if (auto* c = m_ctx.hitTest->circleAt(scenePos))  hit = c;
+    if (auto* linearObject = m_ctx.hitTest->linearObjectAt(scenePos)) {
+        hit = linearObject;
+    } else if (auto* circle = m_ctx.hitTest->circleAt(scenePos)) {
+        hit = circle;
+    }
 
-    if (!hit) { event->accept(); return; }
+    if (hit == nullptr) {
+        event->accept(); return; 
+    }
 
-    if (!m_firstObject) {
+    if (m_firstObject == nullptr) {
         m_firstObject = hit;
         highlightObject(m_firstObject, true);
         showStatus(tr("Zweites Objekt klicken (Gerade oder Kreis)"));

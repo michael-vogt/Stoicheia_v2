@@ -1,6 +1,10 @@
 #include "CreateParallelTool.h"
 #include "../DrawingBoard.h"
 #include "../commands/CreateParallelCommand.h"
+#include <limits>
+
+constexpr double eps = std::numeric_limits<double>::epsilon();
+constexpr double DEFAULT_PARALLEL_EXTENT = 10000;
 
 CreateParallelTool::CreateParallelTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
@@ -11,15 +15,15 @@ void CreateParallelTool::mousePressEvent(QMouseEvent* event) {
 
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
 
-    if (!m_reference) {
+    if (m_reference == nullptr) {
         m_reference = m_ctx.hitTest->linearObjectAt(scenePos);
-        if (m_reference) {
+        if (m_reference != nullptr) {
             highlightObject(m_reference, true);
             showStatus(tr("Punkt klicken durch den die Parallele läuft"));
         }
     } else {
         Point* origin = m_ctx.hitTest->pointAt(scenePos);
-        if (origin) {
+        if (origin != nullptr) {
             m_ctx.commandStack->execute(
                 std::make_unique<CreateParallelCommand>(
                     m_ctx.adapter, origin, m_reference));
@@ -32,17 +36,22 @@ void CreateParallelTool::mousePressEvent(QMouseEvent* event) {
 }
 
 void CreateParallelTool::mouseMoveEvent(QMouseEvent* event) {
-    if (!m_reference) { event->ignore(); return; }
+    if (m_reference == nullptr) {
+        event->ignore();
+        return; 
+    }
 
     // Vorschau: Parallele durch aktuelle Mausposition
     QPointF pos = m_ctx.drawingBoard->mapToScene(event->pos());
-    double dx = m_reference->dx(), dy = m_reference->dy();
-    const double ext = 10000.0;
-    double len = std::sqrt(dx*dx + dy*dy);
-    if (len > 1e-10) {
-        dx /= len; dy /= len;
-        setPreviewLine(QLineF(pos.x() - dx*ext, pos.y() - dy*ext,
-                              pos.x() + dx*ext, pos.y() + dy*ext));
+    double delta_x = m_reference->dx();
+    double delta_y = m_reference->dy();
+    double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
+
+    if (len > eps) {
+        delta_x /= len;
+        delta_y /= len;
+        setPreviewLine(QLineF(pos.x() - (delta_x*DEFAULT_PARALLEL_EXTENT), pos.y() - (delta_y*DEFAULT_PARALLEL_EXTENT),
+                              pos.x() + (delta_x*DEFAULT_PARALLEL_EXTENT), pos.y() + (delta_y*DEFAULT_PARALLEL_EXTENT)));
     }
     event->accept();
 }

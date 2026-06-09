@@ -11,15 +11,15 @@ void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
 
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
 
-    if (!m_point) {
+    if (m_point == nullptr) {
         m_point = m_ctx.hitTest->pointAt(scenePos);
-        if (m_point) {
+        if (m_point != nullptr) {
             highlightObject(m_point, true);
             showStatus(tr("Gerade klicken"));
         }
     } else {
         LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
-        if (line) {
+        if (line != nullptr) {
             m_ctx.commandStack->execute(
                 std::make_unique<CreatePerpendicularFootCommand>(
                     m_ctx.adapter, m_point, line));

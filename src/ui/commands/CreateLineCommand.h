@@ -11,7 +11,7 @@ class CreateLineCommand : public Command {
 
 public:
     CreateLineCommand(SceneAdapter* adapter, PointPairForLinearObject points, LinearObjectType type);
-    CreateLineCommand(SceneAdapter* adapter, CreatePointCommandPair cmds, PointPairForLinearObject points, LinearObjectType type);
+    CreateLineCommand(SceneAdapter* adapter, CreatePointCommandPairForLinearObject cmds, PointPairForLinearObject points, LinearObjectType type);
 
     // Getter
     [[nodiscard]] auto linear() const -> LinearObject* { return m_linear; }
