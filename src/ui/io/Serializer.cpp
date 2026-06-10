@@ -28,7 +28,8 @@
 static constexpr int FILE_VERSION = 1;
 //constexpr double eps = std::numeric_limits<double>::epsilon();
 
-using namespace Constants::Export;
+using namespace Constants::ExportConstants;
+
 
 Serializer::Serializer(Scene* scene, SceneAdapter* adapter)
     : m_scene(scene), m_adapter(adapter)

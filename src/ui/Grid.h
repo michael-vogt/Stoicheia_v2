@@ -6,7 +6,11 @@
 #include <QPointF>
 #include "Structs.h"
 #include "../Constants.h"
+#include "../GuiConstants.h"
 
+
+using namespace Constants;
+using namespace GuiConstants;
 
 class Grid {
 public:
@@ -33,10 +37,10 @@ public:
 
 private:
     bool m_visible = true;
-    double m_spacing = Constants::Grid::SPACING;
+    double m_spacing = GridConstants::SPACING;
     bool m_snapEnabled = false;
 
-    QColor m_axisColor = Constants::ColorScheme::AXISCOLOR;
-    QColor m_gridColor = Constants::ColorScheme::GRIDCOLOR;
-    QColor m_labelColor = Constants::ColorScheme::LABELCOLOR;
+    QColor m_axisColor = Colors::AXISCOLOR;
+    QColor m_gridColor = Colors::GRIDCOLOR;
+    QColor m_labelColor = Colors::LABELCOLOR;
 };

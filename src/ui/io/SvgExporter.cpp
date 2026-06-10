@@ -4,7 +4,8 @@
 #include <QPainter>
 #include <QSvgGenerator>
 
-using namespace Constants::Export;
+
+using namespace Constants::ExportConstants;
 
 auto SvgExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -> bool {
     QRectF rect = scene->itemsBoundingRect();

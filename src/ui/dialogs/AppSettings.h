@@ -3,37 +3,39 @@
 #include <QSettings>
 #include <qcolor.h>
 #include "../../Constants.h"
+#include "GuiConstants.h"
 
 
-
+using namespace Constants;
+using namespace GuiConstants;
 
 struct GridSettings {
     bool   visible     = true;
-    double spacing     = Constants::Grid::SPACING;
+    double spacing     = GridConstants::SPACING;
     bool   snapEnabled = false;
-    QColor axisColor   = Constants::ColorScheme::AXISCOLOR;
-    QColor gridColor   = Constants::ColorScheme::GRIDCOLOR;
-    QColor labelColor  = Constants::ColorScheme::LABELCOLOR;
+    QColor axisColor   = Colors::AXISCOLOR;
+    QColor gridColor   = Colors::GRIDCOLOR;
+    QColor labelColor  = Colors::LABELCOLOR;
 };
 
 
 
 struct ColorScheme {
-    QColor background   = Constants::ColorScheme::BACKGROUND;
-    QColor point        = Constants::ColorScheme::POINT;
-    QColor pointFill    = Constants::ColorScheme::POINTFILL;
-    QColor line         = Constants::ColorScheme::LINE;
-    QColor circle       = Constants::ColorScheme::CIRCLE;
-    QColor selected     = Constants::ColorScheme::SELECT;
-    QColor highlighted  = Constants::ColorScheme::HIGHLIGHT;
-    QColor construction = Constants::ColorScheme::CONSTRUCTION;
-    QColor watermark    = Constants::ColorScheme::WATRMARK;
+    QColor background   = Colors::BACKGROUND;
+    QColor point        = Colors::POINT;
+    QColor pointFill    = Colors::POINTFILL;
+    QColor line         = Colors::LINE;
+    QColor circle       = Colors::CIRCLE;
+    QColor selected     = Colors::SELECT;
+    QColor highlighted  = Colors::HIGHLIGHT;
+    QColor construction = Colors::CONSTRUCTION;
+    QColor watermark    = Colors::WATRMARK;
 };
 
 struct General {
     struct RecentFiles {
         QStringList files;
-        int maxCount = Constants::General::RECENT_MAXCOUNT;
+        int maxCount = GeneralConstants::RECENT_MAXCOUNT;
     } recentFiles;
     QString language = "en";
 };

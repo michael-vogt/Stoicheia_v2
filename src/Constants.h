@@ -1,6 +1,11 @@
 #pragma once
 
-#include <qcolor.h>
+#include <limits>
+
+namespace Constants::NumericConstants {
+    constexpr double DOUBLE_EPS = std::numeric_limits<double>::epsilon();
+    constexpr double DOUBLE_EPS_SQ = DOUBLE_EPS * DOUBLE_EPS;
+}
 
 namespace Constants::DrawingConstants {
     constexpr double FONT_SIZE = 8;
@@ -10,7 +15,7 @@ namespace Constants::DrawingConstants {
     constexpr double POINT_RADIUS = 4;
 }
 
-namespace Constants::Export {
+namespace Constants::ExportConstants {
     namespace PNG {
         constexpr double DPI = 96;
         constexpr double MARGIN = 20;
@@ -24,11 +29,11 @@ namespace Constants::Export {
     }
 }
 
-namespace Constants::General {
+namespace Constants::GeneralConstants {
     constexpr int RECENT_MAXCOUNT = 5;
 }
 
-namespace Constants::UiMetrics {
+namespace Constants::UiMetricsConstants {
     constexpr double SCENERECT_UNIT = 10000;
     constexpr double PASTE_OFFSET = 50;
     constexpr double HIT_TOLERANCE = 8;
@@ -43,31 +48,13 @@ namespace Constants::LayoutConstants {
     constexpr int SETTINGSDIALOG_MINWIDTH = 400;
 }
 
-namespace Constants::Geometry {
+namespace Constants::GeometryConstants {
     constexpr double LINE_EXTENT = 10000;
     constexpr double PARALLEL_EXTENT = 10000;
     constexpr double PERPENDICULAR_EXTENT = 10000;
 }
 
-namespace Constants::ColorScheme {
-    constexpr QColor BACKGROUND(245, 245, 245);
-    constexpr QColor POINT(0, 0, 0);
-    constexpr QColor LINE(0, 0, 0);
-    constexpr QColor CIRCLE(0, 0, 0);
-    constexpr QColor POINTFILL(255, 255, 255);
-    constexpr QColor SELECT(0,0,255);
-    constexpr QColor HIGHLIGHT(255, 140, 0);
-    constexpr QColor CONSTRUCTION(100, 100, 200);
-    constexpr QColor WATRMARK(0, 0, 0, 20);
-
-    constexpr QColor AXISCOLOR(160, 160, 160);
-    constexpr QColor GRIDCOLOR(220, 220, 220);
-    constexpr QColor LABELCOLOR(120, 120, 120);
-
-    constexpr double WATERMARK_OPACITY = 0.1;
-}
-
-namespace Constants::Grid {
+namespace Constants::GridConstants {
     constexpr double EXTENT = 10000;
     constexpr double RASTER_START = 0.1;
     constexpr double SPACING = 50;

@@ -5,6 +5,9 @@
 #include <QBrush>
 #include "../Constants.h"
 
+
+using namespace Constants;
+
 class GeoPointItem : public GeoGraphicsItem {
 public:
     explicit GeoPointItem(Point* point, QGraphicsItem* parent = nullptr);
@@ -24,9 +27,9 @@ public:
 protected:
     void updateGeometry() override;
 
-    QPen    m_pen     = QPen(Qt::black, Constants::DrawingConstants::PENWIDTH_NORMAL);
+    QPen    m_pen     = QPen(Qt::black, DrawingConstants::PENWIDTH_NORMAL);
     QBrush  m_brush   = QBrush(Qt::white);
-    double  m_radius  = Constants::DrawingConstants::POINT_RADIUS;
+    double  m_radius  = DrawingConstants::POINT_RADIUS;
 
 private:
     Point*  m_point = nullptr;

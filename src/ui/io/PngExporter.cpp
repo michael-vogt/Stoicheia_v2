@@ -1,9 +1,10 @@
 #include "PngExporter.h"
-#include "Constants.h"
+#include "../../Constants.h"
 
 #include <QPainter>
 
-using namespace Constants::Export;
+
+using namespace Constants::ExportConstants;
 
 auto PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -> bool {
     QRectF rect = scene->itemsBoundingRect();

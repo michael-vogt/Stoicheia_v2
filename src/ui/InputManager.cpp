@@ -8,6 +8,8 @@
 #include <qnamespace.h>
 
 
+using namespace Constants;
+
 InputManager::InputManager(DrawingBoard* board, QObject* parent)
     : QObject(parent), m_board(board)
 {
@@ -83,7 +85,7 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
 
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
-    double factor = event->angleDelta().y() > 0 ? Constants::UiMetrics::ZOOM_FACTOR : Constants::UiMetrics::ZOOM_FACTOR_INV;
+    double factor = event->angleDelta().y() > 0 ? UiMetricsConstants::ZOOM_FACTOR : UiMetricsConstants::ZOOM_FACTOR_INV;
     m_board->scale(factor, factor);
     event->accept();
 }

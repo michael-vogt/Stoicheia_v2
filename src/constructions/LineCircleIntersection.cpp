@@ -1,10 +1,11 @@
 #include "LineCircleIntersection.h"
+#include "../Constants.h"
 #include "Structs.h"
-#include <limits>
 #include <stdexcept>
 #include <cmath>
 
-constexpr double eps = std::numeric_limits<double>::epsilon();
+
+using namespace Constants;
 
 LineCircleIntersection::LineCircleIntersection(LinearObject *line, Circle *circle)
 : m_line(line), m_circle(circle)
@@ -49,7 +50,7 @@ void LineCircleIntersection::compute() {
 
     // Berechne die Koeffizienten der quadratischen Gleichung, die sich durch Einsetzen der Geraden- in die Kreisgleichung ergibt
     const double coeff_a = (delta_x*delta_x) + (delta_y*delta_y);
-    if (coeff_a < eps*eps) { // degenerated line
+    if (coeff_a < NumericConstants::DOUBLE_EPS_SQ) { // degenerated line
         setResults(0);
         return;
     }
@@ -57,9 +58,9 @@ void LineCircleIntersection::compute() {
     const double coeff_b = 2.0 * ((delta_x * (point1_x - center_x)) + (delta_y * (point1_y - center_y)));
     const double coeff_c = ((point1_x - center_x) * (point1_x - center_x)) + ((point1_y - center_y) * (point1_y - center_y)) - (radius * radius);
 
-    if (const double discriminant = (coeff_b*coeff_b) - (4*coeff_a*coeff_c); discriminant < -eps) { // no intersection
+    if (const double discriminant = (coeff_b*coeff_b) - (4*coeff_a*coeff_c); discriminant < -NumericConstants::DOUBLE_EPS) { // no intersection
         setResults(0);
-    } else if (discriminant < eps) {
+    } else if (discriminant < NumericConstants::DOUBLE_EPS) {
         // Gerade ist Tangente
         const double param_t = -coeff_b / (2*coeff_a);
         setResults(1, {.x=point1_x + (param_t*delta_x), .y=point1_y + (param_t*delta_y)});

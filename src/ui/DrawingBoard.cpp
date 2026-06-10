@@ -3,7 +3,8 @@
 #include <QScrollBar>
 #include <QTimer>
 
-#include "Constants.h"
+#include "../Constants.h"
+#include "../GuiConstants.h"
 #include "Structs.h"
 #include "commands/CopyCommand.h"
 #include "dialogs/AppSettings.h"
@@ -18,6 +19,9 @@
 #include "tools/SelectTool.h"
 
 
+using namespace Constants;
+using namespace GuiConstants;
+
 DrawingBoard::DrawingBoard(QWidget *parent)
 : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene)
 {
@@ -29,8 +33,8 @@ DrawingBoard::DrawingBoard(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(
-        -Constants::UiMetrics::SCENERECT_UNIT, -Constants::UiMetrics::SCENERECT_UNIT,
-        2 * Constants::UiMetrics::SCENERECT_UNIT, Constants::UiMetrics::SCENERECT_UNIT * 2);
+        -UiMetricsConstants::SCENERECT_UNIT, -UiMetricsConstants::SCENERECT_UNIT,
+        2 * UiMetricsConstants::SCENERECT_UNIT, UiMetricsConstants::SCENERECT_UNIT * 2);
 
     QTransform transform;
     transform.scale(1.0, -1.0);
@@ -90,7 +94,7 @@ void DrawingBoard::pasteSelection() {
                 std::make_unique<CopyCommand>(
                     &m_adapter,
                     clipboard,
-                    QPointF(Constants::UiMetrics::PASTE_OFFSET, -Constants::UiMetrics::PASTE_OFFSET)));
+                    QPointF(UiMetricsConstants::PASTE_OFFSET, -UiMetricsConstants::PASTE_OFFSET)));
     }
 }
 
@@ -207,7 +211,7 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     painter->setTransform(QTransform());
 
     const QImage image(":/resources/logo.png");
-    painter->setOpacity(Constants::ColorScheme::WATERMARK_OPACITY);
+    painter->setOpacity(Colors::WATERMARK_OPACITY);
     QPoint viewport_center = viewport()->rect().center();
     QSize size = image.size();
     painter->drawImage(viewport_center.x() - (size.width() / 2), viewport_center.y() - (size.height() / 2), image);

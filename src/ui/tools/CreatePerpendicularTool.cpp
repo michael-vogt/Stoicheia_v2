@@ -2,11 +2,10 @@
 #include "../DrawingBoard.h"
 #include "../commands/CreatePerpendicularCommand.h"
 #include <cmath>
-#include <limits>
-#include "Constants.h"
+#include "../../Constants.h"
 
 
-constexpr double eps = std::numeric_limits<double>::epsilon();
+using namespace Constants;
 
 CreatePerpendicularTool::CreatePerpendicularTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
@@ -45,14 +44,14 @@ void CreatePerpendicularTool::mouseMoveEvent(QMouseEvent* event) {
     double delta_x = -m_reference->dy();
     double delta_y = m_reference->dx(); // senkrecht
     double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
-    if (len > eps) {
+    if (len > NumericConstants::DOUBLE_EPS) {
         delta_x /= len;
         delta_y /= len;
         setPreviewLine(
-            QLineF(pos.x() - (delta_x * Constants::Geometry::PERPENDICULAR_EXTENT),
-                   pos.y() - (delta_y * Constants::Geometry::PERPENDICULAR_EXTENT),
-                   pos.x() + (delta_x * Constants::Geometry::PERPENDICULAR_EXTENT),
-                   pos.y() + (delta_y * Constants::Geometry::PERPENDICULAR_EXTENT)));
+            QLineF(pos.x() - (delta_x * GeometryConstants::PERPENDICULAR_EXTENT),
+                   pos.y() - (delta_y * GeometryConstants::PERPENDICULAR_EXTENT),
+                   pos.x() + (delta_x * GeometryConstants::PERPENDICULAR_EXTENT),
+                   pos.y() + (delta_y * GeometryConstants::PERPENDICULAR_EXTENT)));
     }
     event->accept();
 }

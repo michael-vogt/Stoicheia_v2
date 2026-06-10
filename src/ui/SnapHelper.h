@@ -6,6 +6,8 @@
 #include "../Constants.h"
 
 
+using namespace Constants;
+
 class SnapHelper {
 public:
     explicit SnapHelper(QGraphicsScene* scene, const Grid* grid);
@@ -20,6 +22,6 @@ public:
 private:
     QGraphicsScene* m_scene;
     const Grid* m_grid;
-    double m_gridSpacing = Constants::Grid::SPACING;
-    double m_snapRadius = Constants::UiMetrics::SNAP_TOLERANCE;
+    double m_gridSpacing = GridConstants::SPACING;
+    double m_snapRadius = UiMetricsConstants::SNAP_TOLERANCE;
 };

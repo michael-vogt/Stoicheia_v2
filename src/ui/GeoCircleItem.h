@@ -6,6 +6,8 @@
 #include "Constants.h"
 
 
+using namespace Constants;
+
 class GeoCircleItem : public GeoGraphicsItem {
 public:
     explicit GeoCircleItem(Circle* circle, QGraphicsItem* parent = nullptr);
@@ -27,6 +29,6 @@ protected:
 
 private:
     Circle* m_circle;
-    QPen    m_pen   = QPen(Qt::black, Constants::DrawingConstants::PENWIDTH_NORMAL);
+    QPen    m_pen   = QPen(Qt::black, DrawingConstants::PENWIDTH_NORMAL);
     QBrush  m_brush = QBrush(Qt::NoBrush);
 };

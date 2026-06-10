@@ -6,12 +6,13 @@
 #include "LinearObjectType.h"
 #include "../Constants.h"
 
+
+using namespace Constants;
+
 // Zeichnet Line, Ray oder Segment – der Typ bestimmt die Ausdehnung.
 // - Segment: von p1 nach p2
 // - Ray:     von p1 durch p2 bis zum Rand der Szene
 // - Line:    durch p1 und p2 bis zu beiden Rändern der Szene
-
-
 class GeoLinearObjectItem : public GeoGraphicsItem {
 public:
     explicit GeoLinearObjectItem(LinearObject* linearObject,
@@ -35,8 +36,8 @@ private:
     auto computeVisibleLine() -> QLineF;
 
     LinearObject* m_linearObject;
-    QPen          m_pen    = QPen(Qt::black, Constants::DrawingConstants::PENWIDTH_NORMAL);
-    double        m_extent = Constants::Geometry::LINE_EXTENT; // weit genug für Line und Ray
+    QPen          m_pen    = QPen(Qt::black,DrawingConstants::PENWIDTH_NORMAL);
+    double        m_extent = GeometryConstants::LINE_EXTENT; // weit genug für Line und Ray
     QLineF        m_line;             // aktuell zu zeichnende Linie
     LinearObjectType m_type;
 };

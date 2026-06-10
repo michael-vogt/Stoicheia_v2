@@ -9,6 +9,8 @@
 #include "LinearObjectType.h"
 
 
+using namespace Constants;
+
 GeoLinearObjectItem::GeoLinearObjectItem(LinearObject* linearObject,
                                          QGraphicsItem* parent)
     : GeoGraphicsItem(linearObject, parent), m_linearObject(linearObject)
@@ -32,9 +34,9 @@ void GeoLinearObjectItem::paint(QPainter* painter,
         return;
     }
     if (m_highlighted) {
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DrawingConstants::PENWIDTH_THICK));
     } else if (m_selected) {
-        painter->setPen(QPen(AppSettings::instance().colors.selected, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DrawingConstants::PENWIDTH_THICK));
     } else {
         painter->setPen(m_pen);
     }
@@ -67,7 +69,7 @@ auto GeoLinearObjectItem::contains(const QPointF &point) -> bool {
 
     QPointF proj = m_line.pointAt(param_t);
     double dist = QLineF(point, proj).length();
-    return dist <= Constants::UiMetrics::HIT_TOLERANCE;
+    return dist <= UiMetricsConstants::HIT_TOLERANCE;
 
 }
 

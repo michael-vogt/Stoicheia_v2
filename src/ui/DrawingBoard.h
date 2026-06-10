@@ -15,6 +15,8 @@
 #include "Constants.h"
 
 
+using namespace Constants;
+
 class DrawingBoard : public QGraphicsView {
 
     Q_OBJECT
@@ -91,13 +93,13 @@ private:
     QGraphicsScene m_qtScene;
     SceneAdapter m_adapter;
     CommandStack m_commandStack;
-    HitTest m_hitTest{&m_qtScene, Constants::UiMetrics::HIT_TOLERANCE};
+    HitTest m_hitTest{&m_qtScene, UiMetricsConstants::HIT_TOLERANCE};
     InputManager* m_inputManager = nullptr;
 
     // Raster
     Grid m_grid;
     bool m_gridVisible = true;
-    double m_gridSpacing = Constants::Grid::SPACING;
+    double m_gridSpacing = GridConstants::SPACING;
 
     // Zentrierung
     int m_resizeCount = 0;

@@ -4,13 +4,16 @@
 #include "geometry/GeoObject.h"
 #include "../Constants.h"
 
+
+using namespace Constants;
+
 class Point;
 class LinearObject;
 class Circle;
 
 class HitTest {
 public:
-    explicit HitTest(QGraphicsScene* scene, double tolerance = Constants::UiMetrics::HIT_TOLERANCE);
+    explicit HitTest(QGraphicsScene* scene, double tolerance = UiMetricsConstants::HIT_TOLERANCE);
 
     // nächster Punkt in Reichweite, oder nullptr
     [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;

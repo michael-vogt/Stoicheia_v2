@@ -1,10 +1,11 @@
 #include "CircleCircleIntersection.h"
+#include "../Constants.h"
 #include "Structs.h"
 #include <cmath>
-#include <limits>
 #include <stdexcept>
 
-constexpr double eps = std::numeric_limits<double>::epsilon();
+
+using namespace Constants;
 
 CircleCircleIntersection::CircleCircleIntersection(Circle *circle1, Circle *circle2)
 : m_circle1(circle1), m_circle2(circle2)
@@ -41,11 +42,11 @@ void CircleCircleIntersection::compute()  {
     double delta = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
 
     // Keine Schnittpunkte: zu weit auseinander oder einer im anderen
-    if (delta > circle1_r + circle2_r + eps || delta < std::abs(circle1_r - circle2_r) - eps) {
+    if (delta > circle1_r + circle2_r + NumericConstants::DOUBLE_EPS || delta < std::abs(circle1_r - circle2_r) - NumericConstants::DOUBLE_EPS) {
         setResults(0); return;
     }
     // Identische Kreise
-    if (delta < eps && std::abs(circle1_r - circle2_r) < eps) {
+    if (delta < NumericConstants::DOUBLE_EPS && std::abs(circle1_r - circle2_r) < NumericConstants::DOUBLE_EPS) {
         setResults(0); return; // unendlich viele – nicht darstellbar
     }
 
@@ -59,7 +60,7 @@ void CircleCircleIntersection::compute()  {
 
     
     // Abstand der Schnittpunkte = 2 * dist1_y
-    if (4 * dist1_y_sq < (eps * eps)) {
+    if (4 * dist1_y_sq < NumericConstants::DOUBLE_EPS_SQ) {
         // Tangente: ein Schnittpunkt
         setResults(1, {.x=proj_x, .y=proj_y});
     } else {

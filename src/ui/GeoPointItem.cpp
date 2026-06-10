@@ -3,6 +3,9 @@
 #include "dialogs/AppSettings.h"
 #include <QPainter>
 
+
+using namespace Constants;
+
 GeoPointItem::GeoPointItem(Point* point, QGraphicsItem* parent)
     : GeoGraphicsItem(point, parent), m_point(point)
 {
@@ -22,9 +25,9 @@ void GeoPointItem::paint(QPainter* painter,
         return;
     }
     if (m_highlighted) {
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DrawingConstants::PENWIDTH_THICK));
     } else if (m_selected) {
-        painter->setPen(QPen(AppSettings::instance().colors.selected, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DrawingConstants::PENWIDTH_THICK));
     } else {
         painter->setPen(m_pen);
     }

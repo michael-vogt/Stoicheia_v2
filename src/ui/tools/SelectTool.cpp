@@ -10,8 +10,10 @@
 #include "ui/commands/MergePointsCommand.h"
 #include "geometry/UpdateGuard.h"
 #include "ui/commands/MovePointCommand.h"
-#include "Constants.h"
+#include "../../Constants.h"
 
+
+using namespace Constants;
 
 SelectTool::SelectTool(const ToolContext &ctx)
 : Tool(ctx)
@@ -166,7 +168,7 @@ void SelectTool::keyPressEvent(QKeyEvent *event) { // NOLINT
                 std::make_unique<CopyCommand>(
                     m_ctx.adapter,
                     clipboard,
-                    QPointF(Constants::UiMetrics::PASTE_OFFSET, -Constants::UiMetrics::PASTE_OFFSET)));
+                    QPointF(UiMetricsConstants::PASTE_OFFSET, -UiMetricsConstants::PASTE_OFFSET)));
         }
         event->accept();
         return;
@@ -177,7 +179,7 @@ void SelectTool::keyPressEvent(QKeyEvent *event) { // NOLINT
         if (!selection.empty()) {
             std::vector<GeoObject*> toDelete;
             std::vector<GeoObject*> toDeleteUpward;
-            std::function<void(GeoObject*)> collect = [&](GeoObject* obj) {
+            std::function<void(GeoObject*)> collect = [&](GeoObject* obj) -> void {
                 if (std::ranges::contains(toDelete, obj)) { 
                     return;
                 }

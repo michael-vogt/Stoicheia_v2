@@ -4,6 +4,8 @@
 #include <QPainter>
 
 
+using namespace Constants;
+
 GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
     : GeoGraphicsItem(circle, parent), m_circle(circle)
 {
@@ -26,9 +28,9 @@ void GeoCircleItem::paint(QPainter* painter,
         return;
     }
     if (m_highlighted) {
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DrawingConstants::PENWIDTH_THICK));
     } else if (m_selected) {
-        painter->setPen(QPen(AppSettings::instance().colors.selected, Constants::DrawingConstants::PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DrawingConstants::PENWIDTH_THICK));
     } else {
         painter->setPen(m_pen);
     }
@@ -49,7 +51,7 @@ auto GeoCircleItem::contains(const QPointF &point) -> bool {
     const double delta_y = point.y() - center.y();
 
     const double delta = std::abs(std::sqrt((delta_x * delta_x) + (delta_y * delta_y)) - radius);
-    return delta <= Constants::UiMetrics::HIT_TOLERANCE;
+    return delta <= UiMetricsConstants::HIT_TOLERANCE;
 }
 
 void GeoCircleItem::updateGeometry() {

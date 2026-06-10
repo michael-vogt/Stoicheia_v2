@@ -1,6 +1,9 @@
 #include "AppSettings.h"
 #include "Constants.h"
 
+
+using namespace Constants;
+
 AppSettings::AppSettings()
     : m_settings("Stoicheia", "Stoicheia")
 {}
@@ -23,7 +26,7 @@ void AppSettings::load() {
     m_settings.beginGroup("General");
     m_settings.beginGroup("recentFiles");
     general.recentFiles.files = m_settings.value("files", QStringList()).toStringList();
-    general.recentFiles.maxCount = m_settings.value("maxCount",  Constants::General::RECENT_MAXCOUNT).toInt();
+    general.recentFiles.maxCount = m_settings.value("maxCount",  GeneralConstants::RECENT_MAXCOUNT).toInt();
     m_settings.endGroup();
     general.language = m_settings.value("language", general.language).toString();
     m_settings.endGroup();
