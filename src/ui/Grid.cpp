@@ -14,12 +14,12 @@ void Grid::drawBackground(QPainter* painter, const QRectF& rect) const {
     }
 
     // Achsen
-    painter->setPen(QPen(m_axisColor, DrawingConstants::PENWIDTH_THICK));
+    painter->setPen(QPen(m_axisColor, DrawingConstants::PENWIDTH_NORMAL));
     painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
     painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
 
     // Rasterlinien
-    painter->setPen(QPen(m_gridColor, DrawingConstants::PENWIDTH_NORMAL));
+    painter->setPen(QPen(m_gridColor, DrawingConstants::PENWIDTH_THIN));
     double left = std::floor(rect.left() / m_spacing) * m_spacing;
     double top = std::floor(rect.top() / m_spacing) * m_spacing;
 
