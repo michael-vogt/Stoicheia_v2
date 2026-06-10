@@ -3,10 +3,10 @@
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/CreatePointCommand.h"
+#include "../../Constants.h"
 
 
-constexpr double DEFAULT_POINT_RADIUS = 4;
-constexpr double DEFAULT_POINT_PENWIDTH = 1.5;
+using namespace Constants;
 
 CreatePointTool::CreatePointTool(const ToolContext &ctx) : Tool(ctx) {}
 
@@ -48,16 +48,16 @@ void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
 void CreatePointTool::updatePreview(const QPointF& scenePos) {
     if (m_preview == nullptr) {
         m_preview = new QGraphicsEllipseItem();
-        m_preview->setPen(QPen(Qt::gray, DEFAULT_POINT_PENWIDTH));
+        m_preview->setPen(QPen(Qt::gray, DrawingConstants::PENWIDTH_NORMAL));
         m_preview->setBrush(QBrush(Qt::white));
         // Preview nicht durch HitTest treffbar
         m_preview->setFlag(QGraphicsItem::ItemIsSelectable, false);
         m_ctx.drawingBoard->scene()->addItem(m_preview);
     }
 
-    m_preview->setRect(scenePos.x() - DEFAULT_POINT_RADIUS,
-                       scenePos.y() - DEFAULT_POINT_RADIUS,
-                       DEFAULT_POINT_RADIUS * 2, 2 * DEFAULT_POINT_RADIUS);
+    m_preview->setRect(scenePos.x() - DrawingConstants::POINT_RADIUS,
+                       scenePos.y() - DrawingConstants::POINT_RADIUS,
+                       DrawingConstants::POINT_RADIUS * 2, 2 * DrawingConstants::POINT_RADIUS);
 }
 
 void CreatePointTool::removePreview() {

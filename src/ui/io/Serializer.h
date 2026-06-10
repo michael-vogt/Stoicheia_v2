@@ -7,14 +7,11 @@
 #include <unordered_set>
 #include <vector>
 
+
 class Scene;
 class SceneAdapter;
 class GeoObject;
 
-constexpr double DEFAULT_SVG_BB_SIZE = 1e10;
-constexpr double DEFAULT_SVG_MARGIN = 50;
-constexpr double DEFAULT_SVG_MINSIZE = 100;
-constexpr double DEFAULT_SVG_LINEEXTEND = 10000;
 
 class Serializer {
 public:

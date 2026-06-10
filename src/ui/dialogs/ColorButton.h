@@ -2,8 +2,6 @@
 #include <QPushButton>
 #include <QColor>
 
-constexpr int DEFAULT_BUTTON_WIDTH = 40;
-constexpr int DEFAULT_BUTTON_HEIGHT = 24;
 
 class ColorButton : public QPushButton {
     Q_OBJECT

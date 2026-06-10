@@ -1,13 +1,12 @@
 #include "Grid.h"
+#include "Constants.h"
 #include "Structs.h"
 #include <cmath>
 #include <QFont>
 #include <QPen>
 
 
-constexpr double DEFAULT_GRID_RASTERSTART = 0.1;
-constexpr double DEFAULT_GRID_EXTENT = 10000;
-constexpr int DEFAULT_GRID_FONTSIZE = 8;
+using namespace Constants;
 
 void Grid::drawBackground(QPainter* painter, const QRectF& rect) const {
     if (!m_visible) {
@@ -15,23 +14,23 @@ void Grid::drawBackground(QPainter* painter, const QRectF& rect) const {
     }
 
     // Achsen
-    painter->setPen(QPen(m_axisColor, DEFAULT_GRID_PENWIDTH_NORMAL));
+    painter->setPen(QPen(m_axisColor, DrawingConstants::PENWIDTH_THICK));
     painter->drawLine(QPointF(rect.left(), 0), QPointF(rect.right(), 0));
     painter->drawLine(QPointF(0, rect.top()), QPointF(0, rect.bottom()));
 
     // Rasterlinien
-    painter->setPen(QPen(m_gridColor, DEFAULT_GRID_PENWIDTH_THIN));
+    painter->setPen(QPen(m_gridColor, DrawingConstants::PENWIDTH_NORMAL));
     double left = std::floor(rect.left() / m_spacing) * m_spacing;
     double top = std::floor(rect.top() / m_spacing) * m_spacing;
 
     for (double pos_x = left; pos_x <= rect.right(); pos_x += m_spacing) {
-        if (std::abs(pos_x) > DEFAULT_GRID_RASTERSTART) {
+        if (std::abs(pos_x) > GridConstants::RASTER_START) {
             painter->drawLine(QPointF(pos_x, rect.top()), QPointF(pos_x, rect.bottom()));
         }
     }
 
     for (double pos_y = top; pos_y <= rect.bottom(); pos_y += m_spacing) {
-        if (std::abs(pos_y) > DEFAULT_GRID_RASTERSTART) {
+        if (std::abs(pos_y) > GridConstants::RASTER_START) {
             painter->drawLine(QPointF(rect.left(), pos_y), QPointF(rect.right(), pos_y));
         }
     }
@@ -43,7 +42,7 @@ void Grid::drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& 
     }
 
     QFont font = painter->font();
-    font.setPointSize(DEFAULT_GRID_FONTSIZE);
+    font.setPointSize(Constants::DrawingConstants::FONT_SIZE);
     painter->setFont(font);
     painter->setPen(m_labelColor);
 
@@ -62,8 +61,8 @@ void Grid::drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& 
 
     // sichtbaren Bereich in Szenenkoordinaten approximieren
     // (wird von DrawingBoard als rect übergeben)
-    for (double pos_x = -DEFAULT_GRID_EXTENT; pos_x <= DEFAULT_GRID_EXTENT; pos_x += m_spacing) {
-        if (std::abs(pos_x) < DEFAULT_GRID_RASTERSTART) { 
+    for (double pos_x = -GridConstants::EXTENT; pos_x <= GridConstants::EXTENT; pos_x += m_spacing) {
+        if (std::abs(pos_x) < GridConstants::RASTER_START) { 
             continue;
         }
         QPointF viewportPoint = toViewport(QPointF(pos_x, 0));
@@ -83,8 +82,8 @@ void Grid::drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& 
         static_cast<double>(margin),
         static_cast<double>(viewSize.width - 40 - margin)));
 
-    for (double pos_y = -DEFAULT_GRID_EXTENT; pos_y <= DEFAULT_GRID_EXTENT; pos_y += m_spacing) {
-        if (std::abs(pos_y) < DEFAULT_GRID_RASTERSTART) {
+    for (double pos_y = -GridConstants::EXTENT; pos_y <= GridConstants::EXTENT; pos_y += m_spacing) {
+        if (std::abs(pos_y) < GridConstants::RASTER_START) {
             continue;
         }
         QPointF viewportPoint = toViewport(QPointF(0, pos_y));

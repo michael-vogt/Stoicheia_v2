@@ -9,16 +9,16 @@
 #include "GeoIntersectionPointItem.h"
 #include "constructions/IntersectionSet.h"
 #include "dialogs/AppSettings.h"
+#include "../Constants.h"
+
+
+using namespace Constants;
 
 // Verwaltet die Zuordnung zwischen geometrischen Objekten (Scene)
 // und grafischen Objekten (QGraphicsScene).
 //
 // Ist die zentrale Anlaufstelle um Objekte hinzuzufügen und zu entfernen –
 // beide Welten bleiben dadurch synchron.
-
-constexpr double DEFAULT_SCENEADAPTER_POINT_PENWIDTH = 1.5;
-constexpr double DEFAULT_SCENEADAPTER_INTERSECTIONPOINT_PENWIDTH = 1.5;
-
 class SceneAdapter : public QObject {
 
     Q_OBJECT
@@ -27,10 +27,10 @@ public:
     SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene);
 
     // Geometrie-Objekt + grafische Repräsentation hinzufügen
-    auto addPoint(Point* point, const QPen& pen = QPen(AppSettings::instance().colors.point, DEFAULT_SCENEADAPTER_POINT_PENWIDTH)) -> GeoPointItem*;
+    auto addPoint(Point* point, const QPen& pen = QPen(AppSettings::instance().colors.point, DrawingConstants::PENWIDTH_NORMAL)) -> GeoPointItem*;
     auto addLinearObject(LinearObject* linearObject) -> GeoLinearObjectItem*;
     auto addCircle(Circle* circle) -> GeoCircleItem*;
-    auto addIntersectionPoint(IntersectionPoint* point, const QPen& pen = QPen(AppSettings::instance().colors.construction, DEFAULT_SCENEADAPTER_INTERSECTIONPOINT_PENWIDTH)) -> GeoIntersectionPointItem*;
+    auto addIntersectionPoint(IntersectionPoint* point, const QPen& pen = QPen(AppSettings::instance().colors.construction, DrawingConstants::PENWIDTH_NORMAL)) -> GeoIntersectionPointItem*;
     auto addIntersectionSet(IntersectionSet* intersectionSet) -> std::pair<GeoPointItem*, GeoPointItem*>;
 
     // Geometrie-Objekt und zugehöriges grafisches Objekt entfernen

@@ -14,6 +14,7 @@
 #include "../../constructions/CircleCircleIntersection.h"
 #include "Structs.h"
 #include "geometry/GeoObject.h"
+#include "../../Constants.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -26,6 +27,9 @@
 
 static constexpr int FILE_VERSION = 1;
 //constexpr double eps = std::numeric_limits<double>::epsilon();
+
+using namespace Constants::ExportConstants;
+
 
 Serializer::Serializer(Scene* scene, SceneAdapter* adapter)
     : m_scene(scene), m_adapter(adapter)
@@ -358,10 +362,10 @@ auto Serializer::exportSVG(const QString& filename) const -> bool {
 
 auto Serializer::buildSVG() const -> QString {
     // Bounding box aus allen Objekten bestimmen
-    double minX =  DEFAULT_SVG_BB_SIZE;
-    double minY =  DEFAULT_SVG_BB_SIZE;
-    double maxX = -DEFAULT_SVG_BB_SIZE;
-    double maxY = -DEFAULT_SVG_BB_SIZE;
+    double minX =  SVG::BOUNDINGBOX_WIDTH;
+    double minY =  SVG::BOUNDINGBOX_WIDTH;
+    double maxX = -SVG::BOUNDINGBOX_WIDTH;
+    double maxY = -SVG::BOUNDINGBOX_WIDTH;
 
     const auto& items = m_adapter->geoGraphicsItems();
 
@@ -380,15 +384,15 @@ auto Serializer::buildSVG() const -> QString {
     }
 
     if (minX > maxX) { 
-        minX = -DEFAULT_SVG_MINSIZE;
-        maxX = DEFAULT_SVG_MINSIZE;
-        minY = -DEFAULT_SVG_MINSIZE;
-        maxY = DEFAULT_SVG_MINSIZE; 
+        minX = -SVG::MINSIZE;
+        maxX = SVG::MINSIZE;
+        minY = -SVG::MINSIZE;
+        maxY = SVG::MINSIZE; 
     }
-    minX -= DEFAULT_SVG_MARGIN;
-    minY -= DEFAULT_SVG_MARGIN;
-    maxX += DEFAULT_SVG_MARGIN;
-    maxY += DEFAULT_SVG_MARGIN;
+    minX -= SVG::MARGIN;
+    minY -= SVG::MARGIN;
+    maxX += SVG::MARGIN;
+    maxY += SVG::MARGIN;
 
     double width = maxX - minX;
     double height = maxY - minY;
@@ -425,13 +429,13 @@ auto Serializer::buildSVG() const -> QString {
             double p2_x = linearObject->p2()->x();
             double p2_y = linearObject->p2()->y();
             if (dynamic_cast<Ray*>(linearObject) != nullptr) {
-                p2_x += (dir_x*DEFAULT_SVG_LINEEXTEND);
-                p2_y += (dir_y*DEFAULT_SVG_LINEEXTEND);
+                p2_x += (dir_x*SVG::LINE_EXTENT);
+                p2_y += (dir_y*SVG::LINE_EXTENT);
             } else if (dynamic_cast<Line*>(linearObject) != nullptr) {
-                p1_x -= (dir_x*DEFAULT_SVG_LINEEXTEND);
-                p1_y -= (dir_y*DEFAULT_SVG_LINEEXTEND);
-                p2_x += (dir_x*DEFAULT_SVG_LINEEXTEND);
-                p2_y += (dir_y*DEFAULT_SVG_LINEEXTEND);
+                p1_x -= (dir_x*SVG::LINE_EXTENT);
+                p1_y -= (dir_y*SVG::LINE_EXTENT);
+                p2_x += (dir_x*SVG::LINE_EXTENT);
+                p2_y += (dir_y*SVG::LINE_EXTENT);
             }
 
             svg += QString(R"(  <line x1="%1" y1="%2" x2="%3" y2="%4"

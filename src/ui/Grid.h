@@ -4,11 +4,13 @@
 #include <QPainter>
 #include <QRectF>
 #include <QPointF>
-#include "./dialogs/AppSettings.h"
 #include "Structs.h"
+#include "../Constants.h"
+#include "../GuiConstants.h"
 
-constexpr double DEFAULT_GRID_PENWIDTH_NORMAL = 1.5;
-constexpr double DEFAULT_GRID_PENWIDTH_THIN = 0.5;
+
+using namespace Constants;
+using namespace GuiConstants;
 
 class Grid {
 public:
@@ -35,10 +37,10 @@ public:
 
 private:
     bool m_visible = true;
-    double m_spacing = DEFAULT_GRID_SPACING;
+    double m_spacing = GridConstants::SPACING;
     bool m_snapEnabled = false;
 
-    QColor m_axisColor = DEFAULT_GRID_AXISCOLOR;
-    QColor m_gridColor = DEFAULT_GRID_GRIDCOLOR;
-    QColor m_labelColor = DEFAULT_GRID_LABELCOLOR;
+    QColor m_axisColor = Colors::AXISCOLOR;
+    QColor m_gridColor = Colors::GRIDCOLOR;
+    QColor m_labelColor = Colors::LABELCOLOR;
 };

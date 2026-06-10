@@ -1,4 +1,5 @@
 #include "SettingsDialog.h"
+#include "../../Constants.h"
 #include "ui_settingsdialog.h"
 #include "ColorButton.h"
 #include <QTabWidget>
@@ -13,6 +14,9 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QTimer>
+
+
+using namespace Constants;
 
 static auto buildLanguageMap(const QString& path) -> QHash<QString, QString> {
     QHash<QString, QString> map;
@@ -55,7 +59,7 @@ m_snapshotGeneral(settings.general)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Einstellungen"));
-    setMinimumWidth(DEFAULT_SETTINGSDIALOG_MINWIDTH);
+    setMinimumWidth(LayoutConstants::SETTINGSDIALOG_MINWIDTH);
 
     fillLanguages();
 

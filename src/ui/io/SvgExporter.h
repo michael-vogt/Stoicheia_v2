@@ -2,7 +2,6 @@
 
 #include "Exporter.h"
 
-constexpr double DEFAULT_SVG_MARGIN = 20.0;
 
 class SvgExporter : public Exporter {
     Q_OBJECT

@@ -3,10 +3,10 @@
 #include "../geometry/Circle.h"
 #include <QPen>
 #include <QBrush>
+#include "Constants.h"
 
 
-constexpr double DEFAULT_CIRCLE_PENWIDTH_NORMAL = 1.5;
-constexpr double DEFAULT_CIRCLE_PENWIDTH_THICK = 2.5;
+using namespace Constants;
 
 class GeoCircleItem : public GeoGraphicsItem {
 public:
@@ -29,6 +29,6 @@ protected:
 
 private:
     Circle* m_circle;
-    QPen    m_pen   = QPen(Qt::black, DEFAULT_CIRCLE_PENWIDTH_NORMAL);
+    QPen    m_pen   = QPen(Qt::black, DrawingConstants::PENWIDTH_NORMAL);
     QBrush  m_brush = QBrush(Qt::NoBrush);
 };

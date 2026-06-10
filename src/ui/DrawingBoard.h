@@ -12,10 +12,10 @@
 #include "Grid.h"
 #include "Enums.h"
 #include "InputManager.h"
+#include "Constants.h"
 
 
-constexpr double DEFAULT_DRAWINGBOARD_HITTEST_TOLERANCE = 8;
-constexpr double DEFAULT_DRAWINGBOARD_GRID_SPACING = 50;
+using namespace Constants;
 
 class DrawingBoard : public QGraphicsView {
 
@@ -93,13 +93,13 @@ private:
     QGraphicsScene m_qtScene;
     SceneAdapter m_adapter;
     CommandStack m_commandStack;
-    HitTest m_hitTest{&m_qtScene, DEFAULT_DRAWINGBOARD_HITTEST_TOLERANCE};
+    HitTest m_hitTest{&m_qtScene, UiMetricsConstants::HIT_TOLERANCE};
     InputManager* m_inputManager = nullptr;
 
     // Raster
     Grid m_grid;
     bool m_gridVisible = true;
-    double m_gridSpacing = DEFAULT_DRAWINGBOARD_GRID_SPACING;
+    double m_gridSpacing = GridConstants::SPACING;
 
     // Zentrierung
     int m_resizeCount = 0;

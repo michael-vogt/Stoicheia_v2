@@ -1,10 +1,10 @@
 #include "CreateParallelTool.h"
 #include "../DrawingBoard.h"
 #include "../commands/CreateParallelCommand.h"
-#include <limits>
+#include "../../Constants.h"
 
-constexpr double eps = std::numeric_limits<double>::epsilon();
-constexpr double DEFAULT_PARALLEL_EXTENT = 10000;
+
+using namespace Constants;
 
 CreateParallelTool::CreateParallelTool(const ToolContext& ctx)
     : ConstructionTool(ctx)
@@ -47,11 +47,11 @@ void CreateParallelTool::mouseMoveEvent(QMouseEvent* event) {
     double delta_y = m_reference->dy();
     double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
 
-    if (len > eps) {
+    if (len > NumericConstants::DOUBLE_EPS) {
         delta_x /= len;
         delta_y /= len;
-        setPreviewLine(QLineF(pos.x() - (delta_x*DEFAULT_PARALLEL_EXTENT), pos.y() - (delta_y*DEFAULT_PARALLEL_EXTENT),
-                              pos.x() + (delta_x*DEFAULT_PARALLEL_EXTENT), pos.y() + (delta_y*DEFAULT_PARALLEL_EXTENT)));
+        setPreviewLine(QLineF(pos.x() - (delta_x*GeometryConstants::PARALLEL_EXTENT), pos.y() - (delta_y*GeometryConstants::PARALLEL_EXTENT),
+                              pos.x() + (delta_x*GeometryConstants::PARALLEL_EXTENT), pos.y() + (delta_y*GeometryConstants::PARALLEL_EXTENT)));
     }
     event->accept();
 }

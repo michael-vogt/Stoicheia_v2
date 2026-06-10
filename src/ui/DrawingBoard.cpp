@@ -3,6 +3,8 @@
 #include <QScrollBar>
 #include <QTimer>
 
+#include "../Constants.h"
+#include "../GuiConstants.h"
 #include "Structs.h"
 #include "commands/CopyCommand.h"
 #include "dialogs/AppSettings.h"
@@ -17,9 +19,8 @@
 #include "tools/SelectTool.h"
 
 
-constexpr double DEFAULT_DRAWINGBOARD_SCENERECT = 10000;
-constexpr double DEFAULT_DRAWINGBOARD_COPYDELTA = 50;
-constexpr double DEFAULT_DRAWINGBOARD_WATERMARK_OPACITY = 0.1;
+using namespace Constants;
+using namespace GuiConstants;
 
 DrawingBoard::DrawingBoard(QWidget *parent)
 : QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene)
@@ -32,8 +33,8 @@ DrawingBoard::DrawingBoard(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setSceneRect(
-        -DEFAULT_DRAWINGBOARD_SCENERECT, -DEFAULT_DRAWINGBOARD_SCENERECT,
-        2 * DEFAULT_DRAWINGBOARD_SCENERECT, DEFAULT_DRAWINGBOARD_SCENERECT * 2);
+        -UiMetricsConstants::SCENERECT_UNIT, -UiMetricsConstants::SCENERECT_UNIT,
+        2 * UiMetricsConstants::SCENERECT_UNIT, UiMetricsConstants::SCENERECT_UNIT * 2);
 
     QTransform transform;
     transform.scale(1.0, -1.0);
@@ -93,7 +94,7 @@ void DrawingBoard::pasteSelection() {
                 std::make_unique<CopyCommand>(
                     &m_adapter,
                     clipboard,
-                    QPointF(DEFAULT_DRAWINGBOARD_COPYDELTA, -DEFAULT_DRAWINGBOARD_COPYDELTA)));
+                    QPointF(UiMetricsConstants::PASTE_OFFSET, -UiMetricsConstants::PASTE_OFFSET)));
     }
 }
 
@@ -210,7 +211,7 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
     painter->setTransform(QTransform());
 
     const QImage image(":/resources/logo.png");
-    painter->setOpacity(DEFAULT_DRAWINGBOARD_WATERMARK_OPACITY);
+    painter->setOpacity(Colors::WATERMARK_OPACITY);
     QPoint viewport_center = viewport()->rect().center();
     QSize size = image.size();
     painter->drawImage(viewport_center.x() - (size.width() / 2), viewport_center.y() - (size.height() / 2), image);

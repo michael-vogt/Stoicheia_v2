@@ -1,6 +1,10 @@
 #include "PngExporter.h"
+#include "../../Constants.h"
 
 #include <QPainter>
+
+
+using namespace Constants::ExportConstants;
 
 auto PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -> bool {
     QRectF rect = scene->itemsBoundingRect();
@@ -9,9 +13,9 @@ auto PngExporter::exportToFile(QGraphicsScene *scene, const QString &filename) -
         return false;
     }
 
-    rect.adjust(-DEFAULT_PNG_MARGIN, -DEFAULT_PNG_MARGIN, DEFAULT_PNG_MARGIN, DEFAULT_PNG_MARGIN);
+    rect.adjust(-PNG::MARGIN, -PNG::MARGIN, PNG::MARGIN, PNG::MARGIN);
 
-    double scale = m_dpi / DEFAULT_PNG_DPI;
+    double scale = m_dpi / PNG::DPI;
     QImage image((rect.size() * scale).toSize(),
                   QImage::Format_ARGB32);
     image.fill(Qt::white);

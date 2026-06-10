@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include "Constants.h"
 #include "DrawingBoard.h"
 #include "tools/Tool.h"
 #include "LinearObjectType.h"
@@ -7,7 +8,7 @@
 #include <qnamespace.h>
 
 
-constexpr double DEFAULT_INPUTMANAGER_ZOOMFACTOR = 1.15;
+using namespace Constants;
 
 InputManager::InputManager(DrawingBoard* board, QObject* parent)
     : QObject(parent), m_board(board)
@@ -84,7 +85,7 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
 
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
-    double factor = event->angleDelta().y() > 0 ? DEFAULT_INPUTMANAGER_ZOOMFACTOR : 1.0 / DEFAULT_INPUTMANAGER_ZOOMFACTOR;
+    double factor = event->angleDelta().y() > 0 ? UiMetricsConstants::ZOOM_FACTOR : UiMetricsConstants::ZOOM_FACTOR_INV;
     m_board->scale(factor, factor);
     event->accept();
 }

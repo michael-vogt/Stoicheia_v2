@@ -1,15 +1,15 @@
 #include "GeoLinearObjectItem.h"
+#include "Constants.h"
 #include "GeoCircleItem.h"
 #include "dialogs/AppSettings.h"
 #include "../geometry/Ray.h"
 #include "../geometry/Segment.h"
 #include <QPainter>
 #include <cmath>
-
 #include "LinearObjectType.h"
 
 
-constexpr double DEFAULT_LINEAROBJECT_SNAPWIDTH = 8;
+using namespace Constants;
 
 GeoLinearObjectItem::GeoLinearObjectItem(LinearObject* linearObject,
                                          QGraphicsItem* parent)
@@ -34,9 +34,9 @@ void GeoLinearObjectItem::paint(QPainter* painter,
         return;
     }
     if (m_highlighted) {
-        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DEFAULT_LINEAROBJECT_PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.highlighted, DrawingConstants::PENWIDTH_THICK));
     } else if (m_selected) {
-        painter->setPen(QPen(AppSettings::instance().colors.selected, DEFAULT_CIRCLE_PENWIDTH_THICK));
+        painter->setPen(QPen(AppSettings::instance().colors.selected, DrawingConstants::PENWIDTH_THICK));
     } else {
         painter->setPen(m_pen);
     }
@@ -69,7 +69,7 @@ auto GeoLinearObjectItem::contains(const QPointF &point) -> bool {
 
     QPointF proj = m_line.pointAt(param_t);
     double dist = QLineF(point, proj).length();
-    return dist <= DEFAULT_LINEAROBJECT_SNAPWIDTH;
+    return dist <= UiMetricsConstants::HIT_TOLERANCE;
 
 }
 

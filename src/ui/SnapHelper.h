@@ -3,10 +3,10 @@
 
 #include "geometry/Point.h"
 #include "Grid.h"
-#include "./dialogs/AppSettings.h"
+#include "../Constants.h"
 
 
-constexpr double DEFAULT_SNAPHELPER_SNAPRADIUS = 15;
+using namespace Constants;
 
 class SnapHelper {
 public:
@@ -22,6 +22,6 @@ public:
 private:
     QGraphicsScene* m_scene;
     const Grid* m_grid;
-    double m_gridSpacing = DEFAULT_GRID_SPACING;
-    double m_snapRadius = DEFAULT_SNAPHELPER_SNAPRADIUS;
+    double m_gridSpacing = GridConstants::SPACING;
+    double m_snapRadius = UiMetricsConstants::SNAP_TOLERANCE;
 };

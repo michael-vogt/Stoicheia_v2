@@ -8,11 +8,10 @@
 #include "ui/commands/CreateLineCommand.h"
 #include "ui/commands/CreatePointCommand.h"
 #include "ui/commands/MacroCommand.h"
-#include <limits>
+#include "../../Constants.h"
 
 
-constexpr double eps = std::numeric_limits<double>::epsilon();
-constexpr double DEFAULT_LINE_EXTEND = 10000;
+using namespace Constants;
 
 CreateLineTool::CreateLineTool(const ToolContext &ctx, LinearObjectType type) : Tool(ctx), m_type(type) {}
 
@@ -183,7 +182,7 @@ auto CreateLineTool::computePreviewLine(const QPointF &endPos) const -> QLineF {
     double delta_x = point2.x() - point1.x();
     double delta_y = point2.y() - point1.y();
     double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
-    if (len < eps) { 
+    if (len < NumericConstants::DOUBLE_EPS) { 
         return {point1, point2};
     }
 
@@ -193,9 +192,9 @@ auto CreateLineTool::computePreviewLine(const QPointF &endPos) const -> QLineF {
         case LinearObjectType::Segment:
             return {point1, point2};
         case LinearObjectType::Ray:
-            return {point1, point1 + dir * DEFAULT_LINE_EXTEND};
+            return {point1, point1 + dir * GeometryConstants::LINE_EXTENT};
         case LinearObjectType::Line:
-            return {point1 - dir * DEFAULT_LINE_EXTEND, point1 + dir * DEFAULT_LINE_EXTEND};
+            return {point1 - dir * GeometryConstants::LINE_EXTENT, point1 + dir * GeometryConstants::LINE_EXTENT};
     }
     return {point1, point2};
 }

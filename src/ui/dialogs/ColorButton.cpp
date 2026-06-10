@@ -1,14 +1,18 @@
 #include "ColorButton.h"
 #include <QColorDialog>
+#include "../../Constants.h"
+
+
+using namespace Constants;
 
 ColorButton::ColorButton(QWidget* parent) : ColorButton(Qt::white, parent) {}
 
 ColorButton::ColorButton(const QColor& color, QWidget* parent)
     : QPushButton(parent), m_color(color)
 {
-    setFixedSize(DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT);
+    setFixedSize(LayoutConstants::COLORBUTTON_WIDTH, LayoutConstants::COLORBUTTON_HEIGHT);
     updateAppearance();
-    connect(this, &QPushButton::clicked, [this]() {
+    connect(this, &QPushButton::clicked, [this]() -> void {
         QColor color = QColorDialog::getColor(
             m_color, this, tr("Farbe wählen"),
             QColorDialog::ShowAlphaChannel);

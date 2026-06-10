@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Exporter.h"
+#include "../../Constants.h"
 
-constexpr double DEFAULT_PNG_DPI = 96.0;
-constexpr double DEFAULT_PNG_MARGIN = 20.0;
+
+using namespace Constants::ExportConstants;
 
 class PngExporter : public Exporter {
     Q_OBJECT
-    double m_dpi = DEFAULT_PNG_DPI;
+    double m_dpi = PNG::DPI;
 public:
     void setResolution(double dpi) { m_dpi = dpi; }
     auto exportToFile(QGraphicsScene* scene, const QString& filename) -> bool override;
