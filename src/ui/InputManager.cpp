@@ -86,7 +86,17 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
     double factor = event->angleDelta().y() > 0 ? UiMetricsConstants::ZOOM_FACTOR : UiMetricsConstants::ZOOM_FACTOR_INV;
+
+    // Mausposition in Scene-Koordinaten vor dem Zoom merken
+    QPointF mouseScenePos = m_board->mapToScene(event->position().toPoint());
+
     m_board->scale(factor, factor);
+
+    // Mausposition nach dem Zoom erneut berechnen und Differenz ausgleichen
+    QPointF mouseScenePosAfter = m_board->mapToScene(event->position().toPoint());
+    QPointF delta = mouseScenePosAfter - mouseScenePos;
+    m_board->translate(delta.x(), delta.y());
+
     event->accept();
 }
 
