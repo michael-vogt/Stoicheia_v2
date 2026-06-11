@@ -79,10 +79,10 @@ void GeoLinearObjectItem::updateGeometry() {
 }
 
 auto GeoLinearObjectItem::computeVisibleLine() -> QLineF {
-    double p1_x = m_linearObject->p1()->x();
-    double p1_y = m_linearObject->p1()->y();
-    double p2_x = m_linearObject->p2()->x();
-    double p2_y = m_linearObject->p2()->y();
+    double p1_x = m_linearObject->point1()->x();
+    double p1_y = m_linearObject->point1()->y();
+    double p2_x = m_linearObject->point2()->x();
+    double p2_y = m_linearObject->point2()->y();
 
     double delta_x = p2_x - p1_x;
     double delta_y = p2_y - p1_y;

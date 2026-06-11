@@ -15,7 +15,7 @@ Midpoint::Midpoint(Point *point1, Point *point2)
 }
 
 Midpoint::Midpoint(const LinearObject *line)
-: Midpoint(line->p1(), line->p2())
+: Midpoint(line->point1(), line->point2())
 {
 }
 

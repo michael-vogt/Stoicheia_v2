@@ -40,10 +40,10 @@ void LineCircleIntersection::compute() {
     const double center_y = m_circle->center()->y();
     const double radius = m_circle->radius();
 
-    const double point1_x = m_line->p1()->x();
-    const double point1_y = m_line->p1()->y();
-    const double point2_x = m_line->p2()->x();
-    const double point2_y = m_line->p2()->y();
+    const double point1_x = m_line->point1()->x();
+    const double point1_y = m_line->point1()->y();
+    const double point2_x = m_line->point2()->x();
+    const double point2_y = m_line->point2()->y();
 
     const double delta_x = point2_x - point1_x;
     const double delta_y = point2_y - point1_y;

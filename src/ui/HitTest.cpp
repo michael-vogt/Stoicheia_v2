@@ -65,8 +65,8 @@ auto HitTest::linearObjectAt(const QPointF &scenePos) const -> LinearObject * {
         double normal_y = delta_x / len;
 
         // Vektor von p1 zum Punkt
-        double vec_x = scenePos.x() - linearObject->p1()->x();
-        double vec_y = scenePos.y() - linearObject->p1()->y();
+        double vec_x = scenePos.x() - linearObject->point1()->x();
+        double vec_y = scenePos.y() - linearObject->point1()->y();
 
         // Abstand zur Trägergeraden = Projektion auf Normalenvektor
         double dist = std::abs((vec_x * normal_x) + (vec_y * normal_y));

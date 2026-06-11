@@ -10,8 +10,8 @@ CreateCircleCommand::CreateCircleCommand(SceneAdapter *adapter, CreatePointComma
 {}
 
 void CreateCircleCommand::execute() {
-    Point* point1 = resolveP1();
-    Point* point2 = resolveP2();
+    Point* point1 = resolvePoint1();
+    Point* point2 = resolvePoint2();
 
     m_circle = m_adapter->geoScene()->create<Circle>(PointPairForCircle{.center=point1, .radiusPoint=point2});
     m_adapter->addCircle(m_circle);

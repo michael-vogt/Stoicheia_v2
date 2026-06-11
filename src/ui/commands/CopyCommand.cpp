@@ -76,22 +76,22 @@ void CopyCommand::createCopies() {
             copy = new_point;
         } else if (auto* line = dynamic_cast<Line*>(orig)) {
             PointPairForLinearObject points{
-                .point1=resolvePoint(line->p1()),
-                .point2=resolvePoint(line->p2())};
+                .point1=resolvePoint(line->point1()),
+                .point2=resolvePoint(line->point2())};
             auto* new_line = m_adapter->geoScene()->create<Line>(points);
             m_adapter->addLinearObject(new_line);
             copy = new_line;
         } else if (auto* ray = dynamic_cast<Ray*>(orig)) {
             PointPairForLinearObject points{
-                .point1=resolvePoint(line->p1()),
-                .point2=resolvePoint(line->p2())};
+                .point1=resolvePoint(line->point1()),
+                .point2=resolvePoint(line->point2())};
             auto* new_ray = m_adapter->geoScene()->create<Ray>(points);
             m_adapter->addLinearObject(new_ray);
             copy = new_ray;
         } else if (auto* segment = dynamic_cast<Segment*>(orig)) {
             PointPairForLinearObject points{
-                .point1=resolvePoint(line->p1()),
-                .point2=resolvePoint(line->p2())};
+                .point1=resolvePoint(line->point1()),
+                .point2=resolvePoint(line->point2())};
             auto* new_segment = m_adapter->geoScene()->create<Segment>(points);
             m_adapter->addLinearObject(new_segment);
             copy = new_segment;
@@ -129,8 +129,8 @@ void CopyCommand::createCopies() {
             copy = new_perp_foot;
         } else if (auto* lli = dynamic_cast<LineLineIntersection*>(orig)) {
             auto* new_lli = m_adapter->geoScene()->create<LineLineIntersection>(
-                resolveLinearObject(lli->L1()),
-                resolveLinearObject(lli->L2()));
+                resolveLinearObject(lli->line1()),
+                resolveLinearObject(lli->line2()));
             m_adapter->addIntersectionSet(new_lli);
             copy = new_lli;
         } else if (auto* lci = dynamic_cast<LineCircleIntersection*>(orig)) {
