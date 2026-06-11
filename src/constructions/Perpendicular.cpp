@@ -44,9 +44,9 @@ void Perpendicular::replaceSource(GeoObjectPair source) {
 }
 
 auto Perpendicular::px() const -> double {
-    return -(m_reference->p2()->y() - m_reference->p1()->y());
+    return -(m_reference->point2()->y() - m_reference->point1()->y());
 }
 
 auto Perpendicular::py() const -> double {
-    return  (m_reference->p2()->x() - m_reference->p1()->x());
+    return  (m_reference->point2()->x() - m_reference->point1()->x());
 }

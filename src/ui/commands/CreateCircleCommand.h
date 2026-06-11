@@ -19,8 +19,8 @@ public:
     [[nodiscard]] auto circle() const -> Circle* { return m_circle; }
 
 private:
-    [[nodiscard]] auto resolveP1() const -> Point* { return (m_p1Cmd != nullptr) ? m_p1Cmd->point() : m_center; }
-    [[nodiscard]] auto resolveP2() const -> Point* { return (m_p2Cmd != nullptr) ? m_p2Cmd->point() : m_radiusPoint; }
+    [[nodiscard]] auto resolvePoint1() const -> Point* { return (m_p1Cmd != nullptr) ? m_p1Cmd->point() : m_center; }
+    [[nodiscard]] auto resolvePoint2() const -> Point* { return (m_p2Cmd != nullptr) ? m_p2Cmd->point() : m_radiusPoint; }
 
     SceneAdapter* m_adapter;
     CreatePointCommand* m_p1Cmd = nullptr;

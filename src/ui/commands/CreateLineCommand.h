@@ -21,8 +21,8 @@ public:
     [[nodiscard]] auto description() const -> QString override;
 
 private:
-    [[nodiscard]] auto resolveP1() const -> Point* { return (m_p1Cmd != nullptr) ? m_p1Cmd->point() : m_point1; }
-    [[nodiscard]] auto resolveP2() const -> Point* { return (m_p2Cmd != nullptr) ? m_p2Cmd->point() : m_point2; }
+    [[nodiscard]] auto resolvePoint1() const -> Point* { return (m_p1Cmd != nullptr) ? m_p1Cmd->point() : m_point1; }
+    [[nodiscard]] auto resolvePoint2() const -> Point* { return (m_p2Cmd != nullptr) ? m_p2Cmd->point() : m_point2; }
 
     SceneAdapter* m_adapter;
     CreatePointCommand* m_p1Cmd = nullptr;

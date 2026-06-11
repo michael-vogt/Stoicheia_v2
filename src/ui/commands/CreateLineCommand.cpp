@@ -12,8 +12,8 @@ CreateLineCommand::CreateLineCommand(SceneAdapter *adapter, CreatePointCommandPa
 {}
 
 void CreateLineCommand::execute() {
-    Point* point1 = resolveP1();
-    Point* point2 = resolveP2();
+    Point* point1 = resolvePoint1();
+    Point* point2 = resolvePoint2();
 
     switch (m_type) {
         case LinearObjectType::Line:

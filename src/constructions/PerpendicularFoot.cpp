@@ -33,8 +33,8 @@ void PerpendicularFoot::recompute() {
         return;
     }
 
-    const Point* point1 = m_line->p1();
-    const Point* point2 = m_line->p2();
+    const Point* point1 = m_line->point1();
+    const Point* point2 = m_line->point2();
     const double delta_x = point2->x() - point1->x();
     const double delta_y = point2->y() - point1->y();
     const double len2 = (delta_x*delta_x) + (delta_y*delta_y);

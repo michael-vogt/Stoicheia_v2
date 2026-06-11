@@ -38,8 +38,8 @@ auto DeleteObjectCommand::buildUndoFactory() -> std::function<void()> {
     }
 
     if (auto* line = dynamic_cast<Line*>(m_object)) {
-        Point* point1 = line->p1();
-        Point* point2 = line->p2();
+        Point* point1 = line->point1();
+        Point* point2 = line->point2();
         return [this, point1, point2]() -> void {
             auto* line = m_adapter->geoScene()->create<Line>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(line);
@@ -48,8 +48,8 @@ auto DeleteObjectCommand::buildUndoFactory() -> std::function<void()> {
     }
 
     if (auto* ray = dynamic_cast<Ray*>(m_object)) {
-        Point* point1 = ray->p1();
-        Point* point2 = ray->p2();
+        Point* point1 = ray->point1();
+        Point* point2 = ray->point2();
         return [this, point1, point2]() -> void {
             auto* ray = m_adapter->geoScene()->create<Ray>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(ray);
@@ -58,8 +58,8 @@ auto DeleteObjectCommand::buildUndoFactory() -> std::function<void()> {
     }
 
     if (auto* segment = dynamic_cast<Segment*>(m_object)) {
-        Point* point1 = segment->p1();
-        Point* point2 = segment->p2();
+        Point* point1 = segment->point1();
+        Point* point2 = segment->point2();
         return [this, point1, point2]() -> void {
             auto* segment = m_adapter->geoScene()->create<Segment>(PointPairForLinearObject{.point1=point1, .point2=point2});
             m_adapter->addLinearObject(segment);
@@ -119,8 +119,8 @@ auto DeleteObjectCommand::buildUndoFactory() -> std::function<void()> {
 
     // Schnittpunkte - IntersectionSet
     if (auto* lli = dynamic_cast<LineLineIntersection*>(m_object)) {
-        LinearObject* lo1 = lli->L1();
-        LinearObject* lo2 = lli->L2();
+        LinearObject* lo1 = lli->line1();
+        LinearObject* lo2 = lli->line2();
         return [this, lo1, lo2]() -> void {
             auto* intersectionSet = m_adapter->geoScene()->create<LineLineIntersection>(lo1, lo2);
             m_adapter->addIntersectionSet(intersectionSet);
