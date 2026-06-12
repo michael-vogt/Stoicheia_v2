@@ -82,6 +82,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
@@ -102,7 +104,7 @@ private:
     double m_gridSpacing = GridConstants::SPACING;
 
     // Zentrierung
-    int m_resizeCount = 0;
+    bool m_initialCenterDone = false;
 
     // Aktives Tool
     std::unique_ptr<Tool> m_activeTool;

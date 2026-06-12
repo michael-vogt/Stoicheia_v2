@@ -190,19 +190,39 @@ void DrawingBoard::mouseMoveEvent(QMouseEvent *event) { m_inputManager->handleMo
 void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) { m_inputManager->handleMouseRelease(event); }
 void DrawingBoard::wheelEvent(QWheelEvent *event) { m_inputManager->handleWheel(event); }
 
-void DrawingBoard::resizeEvent(QResizeEvent *event) {
-    QGraphicsView::resizeEvent(event);
-    if (m_resizeCount < 2) {
-        ++m_resizeCount;
-        QPointF origin = mapFromScene(QPointF(0, 0));
-        QPointF center = viewport()->rect().center();
-        QPointF delta  = origin - center;
-
-        horizontalScrollBar()->setValue(
-            horizontalScrollBar()->value() + static_cast<int>(delta.x()));
-        verticalScrollBar()->setValue(
-            verticalScrollBar()->value() + static_cast<int>(delta.y()));
+void DrawingBoard::showEvent(QShowEvent *event) {
+    QGraphicsView::showEvent(event);
+    if (!m_initialCenterDone) {
+        m_initialCenterDone = true;
+        const QPointF origin = mapFromScene(QPointF(0, 0));
+        const auto center = QPointF(viewport()->rect().center());
+        const QPointF delta = origin - center;
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() + qRound(delta.x()));
+        verticalScrollBar()->setValue(verticalScrollBar()->value() + qRound(delta.y()));
     }
+}
+
+void DrawingBoard::moveEvent(QMoveEvent *event) {
+    QGraphicsView::moveEvent(event);
+    viewport()->update();
+}
+
+void DrawingBoard::resizeEvent(QResizeEvent *event) {
+    if (!m_initialCenterDone) {
+        QGraphicsView::resizeEvent(event);
+        viewport()->update();
+        return;
+    }
+
+    int hBefore = horizontalScrollBar()->value();
+    int vBefore = verticalScrollBar()->value();
+
+    QGraphicsView::resizeEvent(event);
+
+    QSize delta = event->size() - event->oldSize();
+    horizontalScrollBar()->setValue(hBefore - delta.width() / 2);
+    verticalScrollBar()->setValue(vBefore - delta.height() / 2);
+
     viewport()->update();
 }
 
@@ -212,8 +232,9 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
 
     const QImage image(":/resources/logo.png");
     painter->setOpacity(Colors::WATERMARK_OPACITY);
-    QPoint viewport_center = viewport()->rect().center();
-    QSize size = image.size();
-    painter->drawImage(viewport_center.x() - (size.width() / 2), viewport_center.y() - (size.height() / 2), image);
+    const QRectF vr = viewport()->rect();
+    const QPointF vc = vr.center();
+    const QSizeF size = image.size() / image.devicePixelRatio();
+    painter->drawImage(QPointF(vc.x() - size.width() / 2, vc.y() - size.height() / 2), image);
     painter->restore();
 }
