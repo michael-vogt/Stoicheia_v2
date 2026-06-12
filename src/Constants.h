@@ -38,8 +38,8 @@ namespace Constants::UiMetricsConstants {
     constexpr double PASTE_OFFSET = 50;
     constexpr double HIT_TOLERANCE = 8;
     constexpr double SNAP_TOLERANCE = 15;
-    constexpr double ZOOM_FACTOR = 1.5;
-    constexpr double ZOOM_FACTOR_INV = 1.0 / 1.5;
+    constexpr double ZOOM_FACTOR = 1.15;
+    constexpr double ZOOM_FACTOR_INV = 1.0 / ZOOM_FACTOR;
 }
 
 namespace Constants::LayoutConstants {

@@ -85,8 +85,17 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
 
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
+
     double factor = event->angleDelta().y() > 0 ? UiMetricsConstants::ZOOM_FACTOR : UiMetricsConstants::ZOOM_FACTOR_INV;
+    QPoint mousePos = event->position().toPoint();
+
+    QPointF sceneBefore = m_board->mapToScene(mousePos);
     m_board->scale(factor, factor);
+
+    QPointF delta = m_board->mapFromScene(sceneBefore) - QPointF(mousePos);
+    m_board->horizontalScrollBar()->setValue(m_board->horizontalScrollBar()->value() + qRound(delta.x()));
+    m_board->verticalScrollBar()->setValue(m_board->verticalScrollBar()->value() + qRound(delta.y()));
+
     event->accept();
 }
 
