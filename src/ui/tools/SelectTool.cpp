@@ -1,8 +1,12 @@
 #include "SelectTool.h"
 
+#include "CoordinateInputDialog.h"
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/MoveCenterCommand.h"
+#include <memory>
+#include <qevent.h>
+#include <qnamespace.h>
 #include <ui/commands/MacroCommand.h>
 #include <ui/commands/DeleteObjectCommand.h>
 
@@ -150,6 +154,35 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
     m_activeMoves.clear();
     m_draggedPoints.clear();
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
+    event->accept();
+}
+
+void SelectTool::mouseDoubleClickEvent(QMouseEvent *event) {
+    if (event->button() != Qt::LeftButton) {
+        event->ignore();
+        return;
+    }
+
+    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    Point* hit = pointAt(scenePos);
+
+    if (hit == nullptr || !isDraggable(hit)) {
+        event->ignore();
+        return;
+    }
+
+    // Qt sendet bei Doppelklick: press→release→press→doubleClick.
+    // Der erste release hat bereits einen MoveCommand auf den Stack gelegt.
+    // Den nehmen wir zurück, bevor der Dialog geöffnet wird.
+    m_ctx.commandStack->undoLast();
+
+    CoordinateInputDialog dlg(m_ctx.drawingBoard);
+    dlg.setCoordinates(hit->x(), hit->y());
+    if (dlg.exec() == QDialog::Accepted) {
+        QPointF pos = dlg.coordinates();
+        m_ctx.commandStack->execute(
+            std::make_unique<MovePointCommand>(hit, pos.x(), pos.y()));
+    }
     event->accept();
 }
 

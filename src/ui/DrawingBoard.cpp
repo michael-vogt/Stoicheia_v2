@@ -2,6 +2,7 @@
 
 #include <QScrollBar>
 #include <QTimer>
+#include <qevent.h>
 
 #include "../Constants.h"
 #include "../GuiConstants.h"
@@ -188,6 +189,7 @@ void DrawingBoard::keyReleaseEvent(QKeyEvent *event) { m_inputManager->handleKey
 void DrawingBoard::mousePressEvent(QMouseEvent *event) { m_inputManager->handleMousePress(event); }
 void DrawingBoard::mouseMoveEvent(QMouseEvent *event) { m_inputManager->handleMouseMove(event); }
 void DrawingBoard::mouseReleaseEvent(QMouseEvent *event) { m_inputManager->handleMouseRelease(event); }
+void DrawingBoard::mouseDoubleClickEvent(QMouseEvent *event) { m_inputManager->handleMouseDoubleClick(event); }
 void DrawingBoard::wheelEvent(QWheelEvent *event) { m_inputManager->handleWheel(event); }
 
 void DrawingBoard::resizeEvent(QResizeEvent *event) {

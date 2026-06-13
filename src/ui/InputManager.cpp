@@ -5,6 +5,7 @@
 #include "LinearObjectType.h"
 #include <QScrollBar>
 #include <QShortcut>
+#include <qevent.h>
 #include <qnamespace.h>
 
 
@@ -76,6 +77,16 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
     }
     if (m_activeTool != nullptr) {
         m_activeTool->mouseReleaseEvent(event);
+        if (event->isAccepted()) {
+            return;
+        }
+    }
+    event->ignore();
+}
+
+void InputManager::handleMouseDoubleClick(QMouseEvent* event) {
+    if (m_activeTool != nullptr) {
+        m_activeTool->mouseDoubleClickEvent(event);
         if (event->isAccepted()) {
             return;
         }

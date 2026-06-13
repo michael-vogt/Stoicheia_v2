@@ -139,6 +139,8 @@ src/ui/dialogs/AppSettings.cpp
         src/ui/dialogs/AppSettings.h
         src/ui/dialogs/ColorButton.cpp
         src/ui/dialogs/ColorButton.h
+        src/ui/dialogs/CoordinateInputDialog.cpp
+        src/ui/dialogs/CoordinateInputDialog.h
         src/ui/dialogs/SettingsDialog.cpp
         src/ui/dialogs/SettingsDialog.h
         src/ui/dialogs/SettingsDialog.ui

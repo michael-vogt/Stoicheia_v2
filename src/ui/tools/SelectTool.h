@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QRubberBand>
+#include <qevent.h>
 
 #include "Tool.h"
 #include "geometry/Point.h"
@@ -22,7 +23,7 @@ public:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
 
     [[nodiscard]] auto cursor() const -> QCursor override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }

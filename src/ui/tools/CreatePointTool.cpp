@@ -3,7 +3,10 @@
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/CreatePointCommand.h"
+#include "../dialogs/CoordinateInputDialog.h"
 #include "../../Constants.h"
+#include <memory>
+#include <qevent.h>
 
 
 using namespace Constants;
@@ -12,7 +15,7 @@ CreatePointTool::CreatePointTool(const ToolContext &ctx) : Tool(ctx) {}
 
 void CreatePointTool::activate() {
     m_ctx.drawingBoard->viewport()->setCursor(cursor());
-    m_ctx.drawingBoard->showStatusLeft(tr("Punkt durch Klicken hinzufügen"));
+    m_ctx.drawingBoard->showStatusLeft(tr("Punkt durch Klicken hinzufügen oder Koordinaten eingeben"));
 }
 
 void CreatePointTool::deactivate() {
@@ -41,8 +44,29 @@ void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
 
+    m_lastMousePos = snapped;
     updatePreview(snapped);
     event->accept();
+}
+
+void CreatePointTool::keyPressEvent(QKeyEvent *event) {
+    // Zahl oder Minus gedrückt -> Dialog öffnen
+    const QString text = event->text();
+    if (!text.isEmpty() && (text[0].isDigit() || text[0] == '-' || text[0] == ',')) {
+        openCoordinateDialog(m_lastMousePos);
+        event->accept();
+        return;
+    }
+    event->ignore();
+}
+
+void CreatePointTool::openCoordinateDialog(const QPointF& scenePos) {
+    CoordinateInputDialog dlg(m_ctx.drawingBoard);
+    dlg.setCoordinates(scenePos.x(), scenePos.y());
+    if (dlg.exec() == QDialog::Accepted) {
+        QPointF pos = dlg.coordinates();
+        m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, pos.x(), pos.y()));
+    }
 }
 
 void CreatePointTool::updatePreview(const QPointF& scenePos) {
