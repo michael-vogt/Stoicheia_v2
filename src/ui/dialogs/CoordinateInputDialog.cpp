@@ -1,52 +1,39 @@
 #include "CoordinateInputDialog.h"
+#include "ui_CoordinateInputDialog.h"
 
 #include <QDoubleSpinBox>
-#include <QDialogButtonBox>
-#include <QFormLayout>
-#include <QVBoxLayout>
 #include <QPushButton>
 
 CoordinateInputDialog::CoordinateInputDialog(QWidget* parent)
-    : QDialog(parent)
+    : QDialog(parent), ui(new Ui::CoordinateInputDialog)
 {
-    setWindowTitle(tr("Koordinaten eingeben"));
+    ui->setupUi(this);
+
+    //setWindowTitle(tr("Koordinaten eingeben"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    m_xSpin = new QDoubleSpinBox(this);
-    m_xSpin->setRange(-1e6, 1e6);
-    m_xSpin->setDecimals(4);
-    m_xSpin->setSingleStep(1.0);
+    ui->labelX->setFocusPolicy(Qt::NoFocus);
+    ui->labelY->setFocusPolicy(Qt::NoFocus);
 
-    m_ySpin = new QDoubleSpinBox(this);
-    m_ySpin->setRange(-1e6, 1e6);
-    m_ySpin->setDecimals(4);
-    m_ySpin->setSingleStep(1.0);
-
-    auto* form = new QFormLayout;
-    form->addRow(tr("X:"), m_xSpin);
-    form->addRow(tr("Y:"), m_ySpin);
-
-    auto* buttons = new QDialogButtonBox(
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-    connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
-    auto* layout = new QVBoxLayout(this);
-    layout->addLayout(form);
-    layout->addWidget(buttons);
+    ui->xEdit->setValidator(new QDoubleValidator(-1e6, 1e6, 0, this));
+    ui->yEdit->setValidator(new QDoubleValidator(-1e6, 1e6, 0, this));
 
     // X-Feld beim Öffnen direkt auswählen
-    m_xSpin->selectAll();
-    m_xSpin->setFocus();
+    ui->xEdit->selectAll();
+    ui->xEdit->setFocus();
+}
+
+CoordinateInputDialog::~CoordinateInputDialog() {
+    delete ui;
 }
 
 void CoordinateInputDialog::setCoordinates(double x, double y) {
-    m_xSpin->setValue(x);
-    m_ySpin->setValue(y);
-    m_xSpin->selectAll();
-    m_xSpin->setFocus();
+    ui->xEdit->setText(QString::number(x));
+    ui->yEdit->setText(QString::number(y));
+    ui->xEdit->selectAll();
+    ui->xEdit->setFocus();
 }
 
 QPointF CoordinateInputDialog::coordinates() const {
-    return { m_xSpin->value(), m_ySpin->value() };
+    return { ui->xEdit->text().toDouble(), ui->yEdit->text().toDouble() };
 }

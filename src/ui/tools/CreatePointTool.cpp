@@ -51,6 +51,11 @@ void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
 
 void CreatePointTool::keyPressEvent(QKeyEvent *event) {
     // Zahl oder Minus gedrückt -> Dialog öffnen
+    if (m_dialogOpen) {
+        event->ignore();
+        return;
+    }
+
     const QString text = event->text();
     if (!text.isEmpty() && (text[0].isDigit() || text[0] == '-' || text[0] == ',')) {
         openCoordinateDialog(m_lastMousePos);
@@ -61,12 +66,14 @@ void CreatePointTool::keyPressEvent(QKeyEvent *event) {
 }
 
 void CreatePointTool::openCoordinateDialog(const QPointF& scenePos) {
+    m_dialogOpen = true;
     CoordinateInputDialog dlg(m_ctx.drawingBoard);
     dlg.setCoordinates(scenePos.x(), scenePos.y());
     if (dlg.exec() == QDialog::Accepted) {
         QPointF pos = dlg.coordinates();
         m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, pos.x(), pos.y()));
     }
+    m_dialogOpen = false;
 }
 
 void CreatePointTool::updatePreview(const QPointF& scenePos) {

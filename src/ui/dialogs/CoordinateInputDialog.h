@@ -1,19 +1,20 @@
 #pragma once
 #include <QDialog>
+#include <QDoubleValidator>
 #include <QPointF>
 
-class QDoubleSpinBox;
+namespace Ui { class CoordinateInputDialog; }
 
 class CoordinateInputDialog : public QDialog {
     Q_OBJECT
 
 public:
     explicit CoordinateInputDialog(QWidget* parent = nullptr);
+    ~CoordinateInputDialog() override;
 
     void setCoordinates(double x, double y);
     QPointF coordinates() const;
 
 private:
-    QDoubleSpinBox* m_xSpin;
-    QDoubleSpinBox* m_ySpin;
+    Ui::CoordinateInputDialog* ui;
 };

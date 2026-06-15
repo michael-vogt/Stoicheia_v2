@@ -1,4 +1,7 @@
 #include "InputManager.h"
+
+#include <QApplication>
+
 #include "Constants.h"
 #include "DrawingBoard.h"
 #include "tools/Tool.h"
@@ -104,6 +107,12 @@ void InputManager::handleWheel(QWheelEvent* event) {
 // ── Key Events ───────────────────────────────────────────────────────────────
 
 void InputManager::handleKeyPress(QKeyEvent* event) {
+    // Alle Tastatureingaben ignorieren solange ein modaler Dialog offen ist
+    if (QApplication::activeModalWidget() != nullptr) {
+        event->ignore();
+        return;
+    }
+
     // Aktiver Shortcut-Modus hat Vorrang
     if (m_shortcutMode != ShortcutMode::None) {
         handleShortcutKey(event);
@@ -169,6 +178,11 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
 }
 
 void InputManager::handleKeyRelease(QKeyEvent* event) {
+    if (QApplication::activeModalWidget() != nullptr) {
+        event->ignore();
+        return;
+    }
+
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
         m_spacePressed = false;
         if (!m_panning) {

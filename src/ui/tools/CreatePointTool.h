@@ -26,4 +26,5 @@ private:
 
     QGraphicsEllipseItem* m_preview = nullptr;
     QPointF m_lastMousePos;
+    bool m_dialogOpen = false;
 };
