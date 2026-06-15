@@ -1,10 +1,14 @@
 #include "InputManager.h"
+
+#include <QApplication>
+
 #include "Constants.h"
 #include "DrawingBoard.h"
 #include "tools/Tool.h"
 #include "LinearObjectType.h"
 #include <QScrollBar>
 #include <QShortcut>
+#include <qevent.h>
 #include <qnamespace.h>
 
 
@@ -83,6 +87,16 @@ void InputManager::handleMouseRelease(QMouseEvent* event) {
     event->ignore();
 }
 
+void InputManager::handleMouseDoubleClick(QMouseEvent* event) {
+    if (m_activeTool != nullptr) {
+        m_activeTool->mouseDoubleClickEvent(event);
+        if (event->isAccepted()) {
+            return;
+        }
+    }
+    event->ignore();
+}
+
 void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
 
@@ -102,6 +116,12 @@ void InputManager::handleWheel(QWheelEvent* event) {
 // ── Key Events ───────────────────────────────────────────────────────────────
 
 void InputManager::handleKeyPress(QKeyEvent* event) {
+    // Alle Tastatureingaben ignorieren solange ein modaler Dialog offen ist
+    if (QApplication::activeModalWidget() != nullptr) {
+        event->ignore();
+        return;
+    }
+
     // Aktiver Shortcut-Modus hat Vorrang
     if (m_shortcutMode != ShortcutMode::None) {
         handleShortcutKey(event);
@@ -167,6 +187,11 @@ void InputManager::handleKeyPress(QKeyEvent* event) {
 }
 
 void InputManager::handleKeyRelease(QKeyEvent* event) {
+    if (QApplication::activeModalWidget() != nullptr) {
+        event->ignore();
+        return;
+    }
+
     if (event->key() == Qt::Key_Space && !event->isAutoRepeat()) {
         m_spacePressed = false;
         if (!m_panning) {

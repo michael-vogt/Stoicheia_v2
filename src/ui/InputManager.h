@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
+#include <qevent.h>
 #include "Enums.h"
 #include "Structs.h"
 
@@ -22,6 +23,7 @@ public:
     void handleMousePress  (QMouseEvent*  event);
     void handleMouseMove   (QMouseEvent*  event);
     void handleMouseRelease(QMouseEvent*  event);
+    void handleMouseDoubleClick(QMouseEvent* event);
     void handleWheel       (QWheelEvent*  event);
     void handleKeyPress    (QKeyEvent*    event);
     void handleKeyRelease  (QKeyEvent*    event);

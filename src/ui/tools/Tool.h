@@ -2,6 +2,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <qevent.h>
 
 #include "ui/ToolContext.h"
 
@@ -16,6 +17,7 @@ public:
     virtual void mousePressEvent(QMouseEvent* event) { event->ignore(); }
     virtual void mouseMoveEvent(QMouseEvent* event) { event->ignore(); }
     virtual void mouseReleaseEvent(QMouseEvent* event) { event->ignore(); }
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) { event->ignore(); }
 
     virtual void keyPressEvent(QKeyEvent* event) { event->ignore(); }
     virtual void keyReleaseEvent(QKeyEvent* event) { event->ignore(); }

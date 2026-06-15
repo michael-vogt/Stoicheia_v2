@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QRubberBand>
+#include <qevent.h>
 
 #include "Tool.h"
 #include "geometry/Point.h"
@@ -22,7 +23,7 @@ public:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
 
     [[nodiscard]] auto cursor() const -> QCursor override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }
@@ -37,6 +38,7 @@ private:
     void updateRubberBand(const QPoint& viewPos);
     void finishRubberBand(const QPoint& viewPos);
     void setMergeCandidate(Point* candidate);
+    void setConstrainCandidate(GeoObject* candidate);
 
     std::vector<std::unique_ptr<MoveCommand>> m_activeMoves;
     std::vector<Point*> m_draggedPoints;
@@ -45,4 +47,5 @@ private:
     QPoint m_rubberStart;
     QRubberBand* m_rubberBand = nullptr;
     Point* m_mergeCandidate = nullptr;
+    GeoObject* m_constrainCandidate = nullptr; // Gerade oder Kreis für Einschränkung
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGraphicsView>
+#include <qevent.h>
 
 #include "HitTest.h"
 #include "SceneAdapter.h"
@@ -81,6 +82,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void moveEvent(QMoveEvent *event) override;

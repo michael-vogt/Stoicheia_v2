@@ -19,6 +19,7 @@ public:
 
     // Undo/Redo
     void undo();
+    void undoLast();
     void redo();
     [[nodiscard]] auto canUndo() const -> bool { return !m_undoStack.empty(); }
     [[nodiscard]] auto canRedo() const -> bool { return !m_redoStack.empty(); }

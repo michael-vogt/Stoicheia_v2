@@ -24,6 +24,16 @@ void CommandStack::undo() {
     emit changed();
 }
 
+void CommandStack::undoLast() {
+    if (!canUndo()) {
+        return;
+    }
+
+    m_undoStack.back()->undo();
+    m_undoStack.pop_back();
+    emit changed();
+}
+
 void CommandStack::redo() {
     if (!canRedo()) {
         return;
