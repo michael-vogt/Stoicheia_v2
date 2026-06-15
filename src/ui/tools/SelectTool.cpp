@@ -15,6 +15,8 @@
 #include "geometry/UpdateGuard.h"
 #include "ui/commands/MovePointCommand.h"
 #include "../../Constants.h"
+#include "geometry/Line.h"
+#include "ui/commands/ConstrainPointCommand.h"
 
 
 using namespace Constants;
@@ -30,6 +32,7 @@ void SelectTool::activate() {
 
 void SelectTool::deactivate() {
     setMergeCandidate(nullptr);
+    setConstrainCandidate(nullptr);
     if (m_rubberBand != nullptr) {
         m_rubberBand->hide();
         delete m_rubberBand;
@@ -44,7 +47,7 @@ void SelectTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    const QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     Point* hit = pointAt(scenePos);
 
     bool doMultiDrag = ((hit) != nullptr) ? m_ctx.adapter->selection().contains(hit) : (event->modifiers() & Qt::ShiftModifier) != 0;
@@ -94,15 +97,15 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF delta = scenePos - m_dragOffset - QPointF(m_draggedPoints.front()->x(), m_draggedPoints.front()->y());
+    const QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    const QPointF delta = scenePos - m_dragOffset - QPointF(m_draggedPoints.front()->x(), m_draggedPoints.front()->y());
 
     // Alle Punkte um denselben Delta verschieben
     {
         UpdateGuard guard;
         for (size_t i = 0; i < m_draggedPoints.size(); ++i) {
-            double newX = m_draggedPoints[i]->x() + delta.x();
-            double newY = m_draggedPoints[i]->y() + delta.y();
+            const double newX = m_draggedPoints[i]->x() + delta.x();
+            const double newY = m_draggedPoints[i]->y() + delta.y();
             m_activeMoves[i]->setTarget(newX, newY);
             m_activeMoves[i]->execute();
         }
@@ -112,6 +115,18 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
     if (m_draggedPoints.size() == 1) {
         Point* nearby = nearbyPoint(QPointF(m_draggedPoints[0]->x(), m_draggedPoints[0]->y()), m_draggedPoints[0]);
         setMergeCandidate(nearby);
+
+        // Nur Constrain-Kandidat setzen, wenn kein Merge-Kandidat vorhanden
+        if (nearby == nullptr) {
+            QPointF pos(m_draggedPoints[0]->x(), m_draggedPoints[0]->y());
+            GeoObject* constrainTarget = m_ctx.hitTest->linearObjectAt(pos);
+            if (constrainTarget == nullptr) {
+                constrainTarget = m_ctx.hitTest->circleAt(pos);
+            }
+            setConstrainCandidate(constrainTarget);
+        } else {
+            setConstrainCandidate(nullptr);
+        }
     }
 
     event->accept();
@@ -130,7 +145,9 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     Point* mergeTarget = m_mergeCandidate;
+    GeoObject* constrainTarget = m_constrainCandidate;
     setMergeCandidate(nullptr);
+    setConstrainCandidate(nullptr);
 
     if ((mergeTarget != nullptr) && m_draggedPoints.size() == 1) {
         // Merge nur bei Einzelpunkt-Drag
@@ -139,6 +156,18 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
             macro->add(std::move(move));
         }
         macro->add(std::make_unique<MergePointsCommand>(m_ctx.adapter, mergeTarget, m_draggedPoints[0]));
+        m_ctx.commandStack->execute(std::move(macro));
+    } else if (constrainTarget != nullptr && m_draggedPoints.size() == 1) {
+        // Punkt einschränken
+        auto macro = std::make_unique<MacroCommand>(tr("Punkt einschränken"));
+        for (auto& move : m_activeMoves) {
+            macro->add(std::move(move));
+        }
+        if (auto* line = dynamic_cast<LinearObject*>(constrainTarget)) {
+            macro->add(std::make_unique<ConstrainPointToLineCommand>(m_ctx.adapter, m_draggedPoints[0], line));
+        } else if (auto* circle = dynamic_cast<Circle*>(constrainTarget)) {
+            macro->add(std::make_unique<ConstrainPointToCircleCommand>(m_ctx.adapter, m_draggedPoints[0], circle));
+        }
         m_ctx.commandStack->execute(std::move(macro));
     } else if (m_activeMoves.size() == 1) {
         m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMoves[0]));
@@ -414,5 +443,19 @@ void SelectTool::setMergeCandidate(Point *candidate) {
     m_mergeCandidate = candidate;
     if (m_mergeCandidate != nullptr) {
         m_ctx.adapter->highlight(m_mergeCandidate, true);
+    }
+}
+
+void SelectTool::setConstrainCandidate(GeoObject *candidate) {
+    if (m_constrainCandidate == candidate) {
+        return;
+    }
+
+    if (m_constrainCandidate != nullptr) {
+        m_ctx.adapter->highlight(m_constrainCandidate, false);
+    }
+    m_constrainCandidate = candidate;
+    if (m_constrainCandidate != nullptr) {
+        m_ctx.adapter->highlight(m_constrainCandidate, true);
     }
 }

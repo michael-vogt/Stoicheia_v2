@@ -59,6 +59,8 @@ add_library(StoicheiaCore STATIC
         src/constructions/LineCircleIntersection.cpp
         src/constructions/LineLineIntersection.cpp
         src/constructions/CircleCircleIntersection.cpp
+        src/constructions/ConstrainedPoint.cpp
+        src/constructions/ConstrainedPoint.h
 )
 
 target_include_directories(StoicheiaCore PUBLIC
@@ -111,6 +113,8 @@ add_library(StoicheiaApp STATIC
         src/ui/commands/CopyCommand.cpp
         src/ui/commands/MergePointsCommand.cpp
         src/ui/InputManager.cpp
+        src/ui/commands/ConstrainPointCommand.cpp
+        src/ui/commands/ConstrainPointCommand.h
 )
 
 target_include_directories(StoicheiaApp PUBLIC

@@ -3,10 +3,13 @@
 #include "ui/DrawingBoard.h"
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/CreatePointCommand.h"
+#include "ui/commands/ConstrainPointCommand.h"
 #include "../dialogs/CoordinateInputDialog.h"
 #include "../../Constants.h"
 #include <memory>
 #include <qevent.h>
+
+#include "ui/commands/MacroCommand.h"
 
 
 using namespace Constants;
@@ -35,7 +38,32 @@ void CreatePointTool::mousePressEvent(QMouseEvent *event) {
     QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
     QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
 
-    m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y()));
+    // Liegt der Klick auf einer Geraden odr einem Kreis?
+    LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
+    Circle* circle = m_ctx.hitTest->circleAt(scenePos);
+
+    if (line != nullptr || circle != nullptr) {
+        // Freien Punkt erzeugen, dann sofort einschränken - als MacroCommand damit ein einzelnes Undo beide Schritte rückgängig macht
+        auto createCmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
+        CreatePointCommand* createRaw = createCmd.get();
+
+        auto macro = std::make_unique<MacroCommand>((line != nullptr) ? tr("Punkt auf Gerade") : tr("Punkt auf Kreis"));
+        macro->add(std::move(createCmd));
+
+        // execute() jetzt schon, damit createRaw->point() gesetzt ist
+        createRaw->execute();
+
+        if (line != nullptr) {
+            macro->add(std::make_unique<ConstrainPointToLineCommand>(m_ctx.adapter, createRaw->point(), line));
+        } else {
+            macro->add(std::make_unique<ConstrainPointToCircleCommand>(m_ctx.adapter, createRaw->point(), circle));
+        }
+
+        m_ctx.commandStack->execute(std::move(macro));
+    } else {
+        m_ctx.commandStack->execute(std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y()));
+    }
+
     event->accept();
 }
 
@@ -50,12 +78,13 @@ void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void CreatePointTool::keyPressEvent(QKeyEvent *event) {
-    // Zahl oder Minus gedrückt -> Dialog öffnen
+    // Wenn bereits ein Dialog offen ist, tue nichts. Der Dialog kümmert sich um die Tastatureingabe selbst
     if (m_dialogOpen) {
         event->ignore();
         return;
     }
 
+    // Zahl, Minus oder Komma gedrückt -> Dialog öffnen
     const QString text = event->text();
     if (!text.isEmpty() && (text[0].isDigit() || text[0] == '-' || text[0] == ',')) {
         openCoordinateDialog(m_lastMousePos);
