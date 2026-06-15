@@ -213,6 +213,36 @@ if (WIN32)
             $<TARGET_FILE:Stoicheia>
             COMMENT "Running windeployqt..."
     )
+
+    # extrahiere Sprachen für die es .ts-Dateien gibt
+    file(GLOB TS_FILES "${CMAKE_SOURCE_DIR}/translations/*.ts")
+    set(LANGUAGES "")
+    foreach (ts ${TS_FILES})
+        get_filename_component(fname ${ts} NAME_WE)
+        string(REGEX REPLACE "^.*_" "" lang ${fname})
+        list(APPEND LANGUAGES ${lang})
+    endforeach ()
+    list(REMOVE_DUPLICATES LANGUAGES)
+
+    if(NOT Qt6_INSTALL_PREFIX)
+        get_filename_component(Qt6_ROOT "${Qt6_DIR}/../../../" ABSOLUTE)
+    else()
+        set(Qt6_ROOT "${Qt6_INSTALL_PREFIX}")
+    endif()
+
+    set(QT_TRANSLATIONS "${Qt6_ROOT}/translations")
+
+    foreach (lang ${LANGUAGES})
+        set(src "${QT_TRANSLATIONS}/qtbase_${lang}.qm")
+        if (EXISTS ${src})
+            add_custom_command(TARGET Stoicheia POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${src}
+                    $<TARGET_FILE_DIR:Stoicheia>/translations/
+                    COMMENT "Copy qtbase_${lang}.qm..."
+            )
+        endif ()
+    endforeach ()
 endif()
 
 # -------------------------------------------------

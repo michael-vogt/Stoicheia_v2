@@ -13,6 +13,7 @@ public:
     FileManager(Scene* scene, SceneAdapter* adapter, CommandStack* commandStack, QWidget* parent);
 
     // Gibt false zurück wenn der Nutzer abbricht
+    auto closeFile() -> bool;
     auto newFile() -> bool;
     auto open() -> bool;
     auto openFile(const QString& filename) -> bool;

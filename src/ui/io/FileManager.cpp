@@ -17,6 +17,26 @@ FileManager::FileManager(Scene* scene, SceneAdapter* adapter,
       m_commandStack(commandStack), m_parent(parent)
 {}
 
+auto FileManager::closeFile() -> bool {
+    if (m_unsavedChanges) {
+        auto btn = QMessageBox::question(m_parent,
+            tr("Ungespeicherte Änderungen"),
+            tr("Möchten Sie die aktuellen Änderungen speichern?"),
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+        if (btn == QMessageBox::Save) {
+            return save();
+        }
+        return (btn == QMessageBox::Discard);
+    }
+
+    clearScene();
+    m_currentFile.clear();
+    m_unsavedChanges = false;
+    updateTitle();
+    return true;
+}
+
 auto FileManager::newFile() -> bool {
     if (m_unsavedChanges) {
         auto btn = QMessageBox::question(m_parent,

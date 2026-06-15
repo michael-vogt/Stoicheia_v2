@@ -171,7 +171,12 @@ void MainWindow::setupConnections() {
     });
 
     ui->actionQuit->setShortcut(QKeySequence::Close);
-    connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
+    //connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
+    connect(ui->actionQuit, &QAction::triggered, [this]() -> void {
+        if (m_fileManager->closeFile()) {
+            this->close();
+        }
+    });
 
     // Menu Edit
     ui->actionUndo->setShortcut(QKeySequence::Undo);
