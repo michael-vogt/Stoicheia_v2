@@ -8,8 +8,8 @@ ConstrainedPointOnLine::ConstrainedPointOnLine(LinearObject* line, const DoubleP
 {
     m_param = m_line->projectParameter({point.x, point.y});
     //m_line->addDependent(this);
-    m_line->p1()->addDependent(this);
-    m_line->p2()->addDependent(this);
+    m_line->point1()->addDependent(this);
+    m_line->point2()->addDependent(this);
     ConstrainedPointOnLine::recompute();
 }
 
@@ -23,8 +23,8 @@ void ConstrainedPointOnLine::recompute() {
         m_valid = false;
         return;
     }
-    const double x = m_line->p1()->x() + m_param * m_line->dx();
-    const double y = m_line->p1()->y() + m_param * m_line->dy();
+    const double x = m_line->point1()->x() + m_param * m_line->dx();
+    const double y = m_line->point1()->y() + m_param * m_line->dy();
     moveTo(x, y);
     m_valid = true;
 }
