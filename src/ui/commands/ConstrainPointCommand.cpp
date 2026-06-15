@@ -12,9 +12,17 @@ ConstrainPointToLineCommand::ConstrainPointToLineCommand(
 void ConstrainPointToLineCommand::execute() {
     m_rewired.clear();
 
-    // Eingeschränkten Punkt an der projizierten Position erzeugen
+    // Aktuelle Position des Punktes nehmen (nach eventuellen Move-Commands)
+    double curX = m_freePoint->x();
+    double curY = m_freePoint->y();
+
+    // Alten Punkt zuerst aus der grafischen Szene entfernen, bevor der neue erzeugt wird - verhindert
+    // Update-Kaskaden auf bereits entfernten Graphics-Items
+    m_adapter->removeGraphicsOnly(m_freePoint);
+
+    // Eingeschränkten Punkt erzeugen
     m_constrained = m_adapter->geoScene()->create<ConstrainedPointOnLine>(
-        m_line, DoublePair{m_oldX, m_oldY});
+        m_line, DoublePair{curX, curY});
     m_adapter->addPoint(m_constrained);
 
     // Alle Abhängigen des alten Punkts auf den neuen umhängen
@@ -27,15 +35,14 @@ void ConstrainPointToLineCommand::execute() {
         dep->recompute();
         m_rewired.push_back(dep);
     }
-
-    // Alten Punkt aus der grafischen Szene entfernen (Geometrie bleibt für Undo)
-    m_adapter->removeGraphicsOnly(m_freePoint);
 }
 
 void ConstrainPointToLineCommand::undo() {
     // Abhängige zurückhängen
     for (GeoObject* dep : m_rewired) {
-        if (!m_constrained->dependents().contains(dep)) continue;
+        if (!m_constrained->dependents().contains(dep)) {
+            continue;
+        }
         m_constrained->removeDependent(dep);
         m_freePoint->addDependent(dep);
         dep->replaceSource(GeoObjectPair{m_constrained, m_freePoint});
@@ -60,8 +67,13 @@ ConstrainPointToCircleCommand::ConstrainPointToCircleCommand(
 void ConstrainPointToCircleCommand::execute() {
     m_rewired.clear();
 
+    double curX = m_freePoint->x();
+    double curY = m_freePoint->y();
+
+    m_adapter->removeGraphicsOnly(m_freePoint);
+
     m_constrained = m_adapter->geoScene()->create<ConstrainedPointOnCircle>(
-        m_circle, DoublePair{m_oldX, m_oldY});
+        m_circle, DoublePair{curX, curY});
     m_adapter->addPoint(m_constrained);
 
     std::vector<GeoObject*> deps(
@@ -79,7 +91,9 @@ void ConstrainPointToCircleCommand::execute() {
 
 void ConstrainPointToCircleCommand::undo() {
     for (GeoObject* dep : m_rewired) {
-        if (!m_constrained->dependents().contains(dep)) continue;
+        if (!m_constrained->dependents().contains(dep)) {
+            continue;
+        }
         m_constrained->removeDependent(dep);
         m_freePoint->addDependent(dep);
         dep->replaceSource(GeoObjectPair{m_constrained, m_freePoint});

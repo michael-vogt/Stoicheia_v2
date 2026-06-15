@@ -111,19 +111,42 @@ void SelectTool::mouseMoveEvent(QMouseEvent *event) {
         }
     }
 
-    // Merge-Kandidat nur bei Einzelpunkt-Drag
+    // Merge- oder Constrain-Kandidat nur bei Einzelpunkt-Drag
     if (m_draggedPoints.size() == 1) {
         Point* nearby = nearbyPoint(QPointF(m_draggedPoints[0]->x(), m_draggedPoints[0]->y()), m_draggedPoints[0]);
         setMergeCandidate(nearby);
 
         // Nur Constrain-Kandidat setzen, wenn kein Merge-Kandidat vorhanden
         if (nearby == nullptr) {
+            GeoObject* constrainTarget = nullptr;
             QPointF pos(m_draggedPoints[0]->x(), m_draggedPoints[0]->y());
-            GeoObject* constrainTarget = m_ctx.hitTest->linearObjectAt(pos);
+            constrainTarget = m_ctx.hitTest->linearObjectAt(pos);
             if (constrainTarget == nullptr) {
                 constrainTarget = m_ctx.hitTest->circleAt(pos);
             }
-            setConstrainCandidate(constrainTarget);
+
+            // nur Constrain-Kandidat setzen, wenn gezogener Punkt keine source des constrainTarget ist
+            bool isDefiningPoint = false;
+            if (auto* line = dynamic_cast<LinearObject*>(constrainTarget)) {
+
+                for (GeoObject* obj : line->sources()) {
+                    if (obj == m_draggedPoints[0]) {
+                        isDefiningPoint = true;
+                        break;
+                    }
+                }
+            } else if (auto* circle = dynamic_cast<Circle*>(constrainTarget)) {
+                for (GeoObject* obj : circle->sources()) {
+                    if (obj == m_draggedPoints[0]) {
+                        isDefiningPoint = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!isDefiningPoint) {
+                setConstrainCandidate(constrainTarget);
+            }
         } else {
             setConstrainCandidate(nullptr);
         }
@@ -169,6 +192,7 @@ void SelectTool::mouseReleaseEvent(QMouseEvent *event) {
             macro->add(std::make_unique<ConstrainPointToCircleCommand>(m_ctx.adapter, m_draggedPoints[0], circle));
         }
         m_ctx.commandStack->execute(std::move(macro));
+        m_constrainCandidate = nullptr;
     } else if (m_activeMoves.size() == 1) {
         m_ctx.commandStack->pushWithoutExecute(std::move(m_activeMoves[0]));
     } else {

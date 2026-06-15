@@ -7,7 +7,9 @@ ConstrainedPointOnLine::ConstrainedPointOnLine(LinearObject* line, const DoubleP
     : Point(point.x, point.y), m_line(line)
 {
     m_param = m_line->projectParameter({point.x, point.y});
-    m_line->addDependent(this);
+    //m_line->addDependent(this);
+    m_line->p1()->addDependent(this);
+    m_line->p2()->addDependent(this);
     ConstrainedPointOnLine::recompute();
 }
 
@@ -46,7 +48,11 @@ ConstrainedPointOnCircle::ConstrainedPointOnCircle(Circle* circle, const DoubleP
     const double dx = point.x - circle->center()->x();
     const double dy = point.y - circle->center()->y();
     m_angle = std::atan2(dy, dx);
-    m_circle->addDependent(this);
+
+    //m_circle->addDependent(this);
+    m_circle->center()->addDependent(this);
+    m_circle->radiusPoint()->addDependent(this);
+
     ConstrainedPointOnCircle::recompute();
 }
 
