@@ -4,9 +4,43 @@
 <context>
     <name>ColorButton</name>
     <message>
-        <location filename="../src/ui/dialogs/ColorButton.cpp" line="12"/>
+        <location filename="../src/ui/dialogs/ColorButton.cpp" line="17"/>
         <source>Farbe wählen</source>
         <translation>Choisir une couleur</translation>
+    </message>
+</context>
+<context>
+    <name>ConstrainPointToCircleCommand</name>
+    <message>
+        <location filename="../src/ui/commands/ConstrainPointCommand.h" line="35"/>
+        <source>Punkt auf Kreis einschränken</source>
+        <translation>Contraindre un point au cercle</translation>
+    </message>
+</context>
+<context>
+    <name>ConstrainPointToLineCommand</name>
+    <message>
+        <location filename="../src/ui/commands/ConstrainPointCommand.h" line="16"/>
+        <source>Punkt auf Gerade einschränken</source>
+        <translation>Contraindre un point à la droite</translation>
+    </message>
+</context>
+<context>
+    <name>CoordinateInputDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/CoordinateInputDialog.ui" line="5"/>
+        <source>Koordinaten eingeben</source>
+        <translation>Saisir les coordonnées</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/CoordinateInputDialog.ui" line="11"/>
+        <source>X:</source>
+        <translation>X:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/CoordinateInputDialog.ui" line="22"/>
+        <source>Y:</source>
+        <translation>Y:</translation>
     </message>
 </context>
 <context>
@@ -28,12 +62,12 @@
 <context>
     <name>CreateCircleTool</name>
     <message>
-        <location filename="../src/ui/tools/CreateCircleTool.cpp" line="13"/>
+        <location filename="../src/ui/tools/CreateCircleTool.cpp" line="16"/>
         <source>Mittelpunkt klicken</source>
         <translation>Cliquer le centre</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateCircleTool.cpp" line="52"/>
+        <location filename="../src/ui/tools/CreateCircleTool.cpp" line="51"/>
         <source>Punkt auf dem Kreis klicken</source>
         <translation>Cliquer un point sur le cercle</translation>
     </message>
@@ -54,13 +88,13 @@
 <context>
     <name>CreateIntersectionTool</name>
     <message>
-        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="41"/>
+        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="38"/>
+        <location filename="../src/ui/tools/CreateIntersectionTool.h" line="15"/>
         <source>Erstes Objekt klicken (Gerade oder Kreis)</source>
         <translation>Cliquer le premier objet (droite ou cercle)</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="32"/>
+        <location filename="../src/ui/tools/CreateIntersectionTool.cpp" line="29"/>
         <source>Zweites Objekt klicken (Gerade oder Kreis)</source>
         <translation>Cliquer le deuxième objet (droite ou cercle)</translation>
     </message>
@@ -68,17 +102,17 @@
 <context>
     <name>CreateLineCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="35"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="40"/>
         <source>Gerade erstellen</source>
         <translation>Créer une droite</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="36"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="41"/>
         <source>Halbgerade erstellen</source>
         <translation>Créer une demi-droite</translation>
     </message>
     <message>
-        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="37"/>
+        <location filename="../src/ui/commands/CreateLineCommand.cpp" line="42"/>
         <source>Strecke erstellen</source>
         <translation>Créer un segment</translation>
     </message>
@@ -86,20 +120,35 @@
 <context>
     <name>CreateLineTool</name>
     <message>
-        <location filename="../src/ui/tools/CreateLineTool.cpp" line="14"/>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="21"/>
         <source>Ersten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke</source>
         <translation>Cliquer le premier point - L : Droite, R : Demi-droite, S : Segment</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateLineTool.cpp" line="80"/>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="56"/>
         <source>Zweiten Punkt klicken - L: Gerade, R: Halbgerade, S: Strecke</source>
         <translation>Cliquer le deuxième point - L : Droite, R : Demi-droite, S : Segment</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="70"/>
+        <source>Gerade erstellen</source>
+        <translation>Créer une droite</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="72"/>
+        <source>Halbgerade erstellen</source>
+        <translation>Créer une demi-droite</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreateLineTool.cpp" line="74"/>
+        <source>Strecke erstellen</source>
+        <translation>Créer un segment</translation>
     </message>
 </context>
 <context>
     <name>CreateMidpointCommand</name>
     <message>
-        <location filename="../src/ui/commands/CreateMidpointCommand.h" line="14"/>
+        <location filename="../src/ui/commands/CreateMidpointCommand.h" line="15"/>
         <source>Mittelpunkt erstellen</source>
         <translation>Créer un milieu</translation>
     </message>
@@ -107,13 +156,13 @@
 <context>
     <name>CreateMidpointTool</name>
     <message>
-        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="11"/>
-        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="38"/>
+        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="32"/>
+        <location filename="../src/ui/tools/CreateMidpointTool.h" line="16"/>
         <source>Ersten Punkt klicken</source>
         <translation>Cliquer le premier point</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="29"/>
+        <location filename="../src/ui/tools/CreateMidpointTool.cpp" line="23"/>
         <source>Zweiten Punkt klicken</source>
         <translation>Cliquer le deuxième point</translation>
     </message>
@@ -129,13 +178,13 @@
 <context>
     <name>CreateParallelTool</name>
     <message>
-        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="36"/>
+        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="32"/>
+        <location filename="../src/ui/tools/CreateParallelTool.h" line="16"/>
         <source>Referenzgerade klicken</source>
         <translation>Cliquer la droite de référence</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="26"/>
+        <location filename="../src/ui/tools/CreateParallelTool.cpp" line="22"/>
         <source>Punkt klicken durch den die Parallele läuft</source>
         <translation>Cliquer le point par lequel passe la parallèle</translation>
     </message>
@@ -159,13 +208,13 @@
 <context>
     <name>CreatePerpendicularFootTool</name>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="10"/>
-        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="36"/>
+        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="28"/>
+        <location filename="../src/ui/tools/CreatePerpendicularFootTool.h" line="15"/>
         <source>Punkt klicken</source>
         <translation>Cliquer un point</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="26"/>
+        <location filename="../src/ui/tools/CreatePerpendicularFootTool.cpp" line="18"/>
         <source>Gerade klicken</source>
         <translation>Cliquer la droite</translation>
     </message>
@@ -173,13 +222,13 @@
 <context>
     <name>CreatePerpendicularTool</name>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="11"/>
-        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="37"/>
+        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="33"/>
+        <location filename="../src/ui/tools/CreatePerpendicularTool.h" line="16"/>
         <source>Referenzgerade klicken</source>
         <translation>Cliquer la droite de référence</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="27"/>
+        <location filename="../src/ui/tools/CreatePerpendicularTool.cpp" line="23"/>
         <source>Punkt klicken durch den die Senkrechte läuft</source>
         <translation>Cliquer le point par lequel passe la perpendiculaire</translation>
     </message>
@@ -195,9 +244,23 @@
 <context>
     <name>CreatePointTool</name>
     <message>
-        <location filename="../src/ui/tools/CreatePointTool.cpp" line="11"/>
         <source>Punkt durch Klicken hinzufügen</source>
-        <translation>Ajouter un point en cliquant</translation>
+        <translation type="vanished">Ajouter un point en cliquant</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreatePointTool.cpp" line="21"/>
+        <source>Punkt durch Klicken hinzufügen oder Koordinaten eingeben</source>
+        <translation>Ajouter un point en cliquant ou en saisissant les coordonnées</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreatePointTool.cpp" line="50"/>
+        <source>Punkt auf Gerade</source>
+        <translation>Point sur une droite</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/CreatePointTool.cpp" line="50"/>
+        <source>Punkt auf Kreis</source>
+        <translation>Point sur un cercle</translation>
     </message>
 </context>
 <context>
@@ -215,9 +278,8 @@
         <translation type="vanished">Déplacement</translation>
     </message>
     <message>
-        <location filename="../src/ui/DrawingBoard.h" line="88"/>
         <source>Snapping</source>
-        <translation>Accrochage</translation>
+        <translation type="vanished">Accrochage</translation>
     </message>
     <message>
         <source>Geometrie: [P] Punkt [L] Gerade [R] Halbgerade [S] Strecke [C] Kreis [Esc] Abbrechen</source>
@@ -227,16 +289,21 @@
         <source>Konstruktion: [S] Schnittpunkt [M] Mittelpunkt [P] Parallele [E] Senkrechte [L] Lotfußpunkt [Esc] Abbrechen</source>
         <translation type="vanished">Construction : [S] Intersection [M] Milieu [P] Parallèle [E] Perpendiculaire [L] Pied de perpendiculaire [Esc] Annuler</translation>
     </message>
+    <message>
+        <location filename="../src/ui/DrawingBoard.cpp" line="56"/>
+        <source>Zoom: %1%</source>
+        <translation>Zoom: %1%</translation>
+    </message>
 </context>
 <context>
     <name>ExportManager</name>
     <message>
-        <location filename="../src/ui/io/ExportManager.cpp" line="23"/>
+        <location filename="../src/ui/io/ExportManager.cpp" line="24"/>
         <source>Exportieren</source>
         <translation>Exporter</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/ExportManager.cpp" line="37"/>
+        <location filename="../src/ui/io/ExportManager.cpp" line="41"/>
         <source>Fehler beim Export</source>
         <translation>Erreur lors de l&apos;export</translation>
     </message>
@@ -255,55 +322,57 @@
     </message>
     <message>
         <location filename="../src/ui/io/FileManager.cpp" line="23"/>
-        <location filename="../src/ui/io/FileManager.cpp" line="40"/>
-        <location filename="../src/ui/io/FileManager.cpp" line="58"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="43"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="64"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="88"/>
         <source>Ungespeicherte Änderungen</source>
         <translation>Modifications non enregistrées</translation>
     </message>
     <message>
         <location filename="../src/ui/io/FileManager.cpp" line="24"/>
-        <location filename="../src/ui/io/FileManager.cpp" line="41"/>
-        <location filename="../src/ui/io/FileManager.cpp" line="59"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="44"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="65"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="89"/>
         <source>Möchten Sie die aktuellen Änderungen speichern?</source>
         <translation>Voulez-vous enregistrer les modifications actuelles ?</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="49"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="77"/>
         <source>Datei öffnen</source>
         <translation>Ouvrir un fichier</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="75"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="111"/>
         <source>Datei speichern</source>
         <translation>Enregistrer le fichier</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="83"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="123"/>
         <source>SVG exportieren</source>
         <translation>Exporter en SVG</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="90"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="134"/>
         <source>Fehler</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="100"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="144"/>
         <source>Fehler beim Speichern</source>
         <translation>Erreur lors de l&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="116"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="160"/>
         <source>Fehler beim Laden</source>
         <translation>Erreur lors du chargement</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="136"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="180"/>
         <source>Unbenannt</source>
         <translation>Sans titre</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/FileManager.cpp" line="139"/>
+        <location filename="../src/ui/io/FileManager.cpp" line="183"/>
         <source>Stoicheia (Στοιχεῖα) – %1%2</source>
         <translation>Stoicheia (Στοιχεῖα) – %1%2</translation>
     </message>
@@ -311,22 +380,22 @@
 <context>
     <name>InputManager</name>
     <message>
-        <location filename="../src/ui/InputManager.cpp" line="47"/>
+        <location filename="../src/ui/InputManager.cpp" line="235"/>
         <source>Panning</source>
         <translation>Déplacement</translation>
     </message>
     <message>
-        <location filename="../src/ui/InputManager.cpp" line="214"/>
+        <location filename="../src/ui/InputManager.cpp" line="351"/>
         <source>Geometrie: [P] Punkt  [L] Gerade  [R] Halbgerade  [S] Strecke  [C] Kreis  [Esc] Abbrechen</source>
         <translation>Géométrie : [P] Point  [L] Droite  [R] Demi-droite  [S] Segment  [C] Cercle  [Échap] Annuler</translation>
     </message>
     <message>
-        <location filename="../src/ui/InputManager.cpp" line="219"/>
+        <location filename="../src/ui/InputManager.cpp" line="356"/>
         <source>Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  [P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  [Esc] Abbrechen</source>
         <translation>Construction : [S] Point d&apos;intersection  [M] Milieu  [P] Parallèle  [E] Perpendiculaire  [L] Pied de la perpendiculaire  [Échap] Annuler</translation>
     </message>
     <message>
-        <location filename="../src/ui/InputManager.cpp" line="311"/>
+        <location filename="../src/ui/InputManager.cpp" line="365"/>
         <source>Snapping</source>
         <translation>Accrochage</translation>
     </message>
@@ -475,13 +544,13 @@
     </message>
     <message>
         <location filename="../src/ui/MainWindow.ui" line="162"/>
-        <location filename="../src/ui/MainWindow.cpp" line="189"/>
+        <location filename="../src/ui/MainWindow.cpp" line="207"/>
         <source>Rückgängig</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../src/ui/MainWindow.ui" line="170"/>
-        <location filename="../src/ui/MainWindow.cpp" line="190"/>
+        <location filename="../src/ui/MainWindow.cpp" line="208"/>
         <source>Wiederholen</source>
         <translation>Rétablir</translation>
     </message>
@@ -491,22 +560,22 @@
         <translation>Paramètres...</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="189"/>
+        <location filename="../src/ui/MainWindow.cpp" line="207"/>
         <source>Rückgängig: </source>
         <translation>Annuler : </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="190"/>
+        <location filename="../src/ui/MainWindow.cpp" line="208"/>
         <source>Wiederholen: </source>
         <translation>Rétablir : </translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="198"/>
+        <location filename="../src/ui/MainWindow.cpp" line="216"/>
         <source>(keine)</source>
         <translation>(aucun)</translation>
     </message>
     <message>
-        <location filename="../src/ui/MainWindow.cpp" line="214"/>
+        <location filename="../src/ui/MainWindow.cpp" line="233"/>
         <source>Liste leeren</source>
         <translation>Vider la liste</translation>
     </message>
@@ -546,17 +615,17 @@
 <context>
     <name>PngExporter</name>
     <message>
-        <location filename="../src/ui/io/PngExporter.cpp" line="8"/>
+        <location filename="../src/ui/io/PngExporter.cpp" line="12"/>
         <source>Keine sichtbaren Objekte</source>
         <translation>Aucun objet visible</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/PngExporter.cpp" line="31"/>
+        <location filename="../src/ui/io/PngExporter.cpp" line="34"/>
         <source>Konnte Datei nicht schreiben</source>
         <translation>Impossible d&apos;écrire le fichier</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/PngExporter.h" line="14"/>
+        <location filename="../src/ui/io/PngExporter.h" line="18"/>
         <source>PNG-Dateien (*.png)</source>
         <translation>Fichiers PNG (*.png)</translation>
     </message>
@@ -751,31 +820,77 @@
 <context>
     <name>SelectTool</name>
     <message>
-        <location filename="../src/ui/tools/SelectTool.cpp" line="16"/>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="34"/>
         <source>Objekt auswählen und/oder verschieben</source>
         <translation>Sélectionner et/ou déplacer un objet</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/SelectTool.cpp" line="206"/>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="197"/>
         <source>Punkte zusammenführen</source>
         <translation>Fusionner les points</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/SelectTool.cpp" line="215"/>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="205"/>
+        <source>Punkt einschränken</source>
+        <translation>Contraindre un point</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="220"/>
         <source>Objekte verschieben</source>
         <translation>Déplacer des objets</translation>
     </message>
     <message>
-        <location filename="../src/ui/tools/SelectTool.cpp" line="287"/>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="334"/>
         <source>Objekte löschen</source>
         <translation>Supprimer des objets</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="369"/>
+        <source>Ausblenden</source>
+        <translation>Masquer</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="369"/>
+        <source>Einblenden</source>
+        <translation>Afficher</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="374"/>
+        <source>Farbe ändern...</source>
+        <translation>Modifier la couleur...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/tools/SelectTool.cpp" line="391"/>
+        <source>Farbe wählen</source>
+        <translation>Choisir une couleur</translation>
+    </message>
+</context>
+<context>
+    <name>SetColorCommand</name>
+    <message>
+        <location filename="../src/ui/commands/SetColorCommand.h" line="15"/>
+        <source>Farbe setzen</source>
+        <translation>Définir la couleur</translation>
+    </message>
+</context>
+<context>
+    <name>SetVisibilityCommand</name>
+    <message>
+        <location filename="../src/ui/commands/SetVisibilityCommand.h" line="15"/>
+        <source>Objekt einblenden</source>
+        <translation>Afficher l&apos;objet</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/commands/SetVisibilityCommand.h" line="15"/>
+        <source>Objekt ausblenden</source>
+        <translation>Masquer l&apos;objet</translation>
     </message>
 </context>
 <context>
     <name>SettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/SettingsDialog.ui" line="20"/>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="54"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="61"/>
         <source>Einstellungen</source>
         <translation>Paramètres</translation>
     </message>
@@ -805,26 +920,26 @@
         <translation>Couleurs</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="59"/>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="149"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="66"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="93"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="60"/>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="150"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="67"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="94"/>
         <source>Abbrechen</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="61"/>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="151"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="68"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="95"/>
         <source>Anwenden</source>
         <translation>Appliquer</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="62"/>
-        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="152"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="69"/>
+        <location filename="../src/ui/dialogs/SettingsDialog.cpp" line="96"/>
         <source>Standard</source>
         <translation>Par défaut</translation>
     </message>
@@ -922,12 +1037,12 @@
 <context>
     <name>SvgExporter</name>
     <message>
-        <location filename="../src/ui/io/SvgExporter.cpp" line="17"/>
+        <location filename="../src/ui/io/SvgExporter.cpp" line="13"/>
         <source>Keine sichtbaren Objekte</source>
         <translation>Aucun objet visible</translation>
     </message>
     <message>
-        <location filename="../src/ui/io/SvgExporter.h" line="12"/>
+        <location filename="../src/ui/io/SvgExporter.h" line="13"/>
         <source>SVG-Dateien (*.svg)</source>
         <translation>Fichiers SVG (*.svg)</translation>
     </message>
