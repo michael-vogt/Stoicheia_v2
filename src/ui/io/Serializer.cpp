@@ -140,6 +140,28 @@ auto Serializer::serializeObject(GeoObject* obj, int ident, const std::unordered
         jsobObj["c2"]   = ref(cci->circle2());
     }
 
+    // Darstellungseigenschaften (Farbe, Sichtbarkeit) mitspeichern. IntersectionPoints haben kein eigenes Item
+    // (Member von IntersectionSet), daher nur speichern wenn ein Item existiert.
+    if (auto* item = m_adapter->itemFor(obj)) {
+        QPen pen;
+        bool hasPen = false;
+        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
+            pen = pi->pen();
+            hasPen = true;
+        } else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            pen = li->pen();
+            hasPen = true;
+        } else if (auto* ci = dynamic_cast<GeoCircleItem*>(item)) {
+            pen = ci->pen();
+            hasPen = true;
+        }
+
+        if (hasPen) {
+            jsobObj["color"] = pen.color().name(QColor::HexArgb);
+        }
+        jsobObj["visible"] = item->isVisible();
+    }
+
     return jsobObj;
 }
 
@@ -342,6 +364,32 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
     }
 
     if (obj != nullptr) {
+        // Darstellungseigenschaften (Farbe, Sichtbarkeit) wiederherstellen.
+        // IntersectionPoints haben kein eigenes Item, daher Existenz prüfen.
+        if (auto* item = m_adapter->itemFor(obj)) {
+            if (jsonObj.contains("color")) {
+                QColor color(jsonObj["color"].toString());
+                if (color.isValid()) {
+                    if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
+                        QPen pen = pi->pen();
+                        pen.setColor(color);
+                        pi->setPen(pen);
+                    } else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item)) {
+                        QPen pen = li->pen();
+                        pen.setColor(color);
+                        li->setPen(pen);
+                    } else if (auto* ci = dynamic_cast<GeoCircleItem*>(item)) {
+                        QPen pen = ci->pen();
+                        pen.setColor(color);
+                        ci->setPen(pen);
+                    }
+                }
+            }
+            if (jsonObj.contains("visible")) {
+                bool visible = jsonObj["visible"].toBool(true);
+                visible ? m_adapter->show(obj) : m_adapter->hide(obj);
+            }
+        }
         idMap[ident] = obj;
     }
 
@@ -533,12 +581,10 @@ void Serializer::collectDependencies(GeoObject* obj, std::unordered_set<GeoObjec
 
 auto Serializer::collectSaveableObjects() const -> std::unordered_set<GeoObject*> {
     const auto& items = m_adapter->geoGraphicsItems();
-    // Nur sichtbare, valide, nicht-IntersectionPoint Objekte speichern
+    // Alle validen Objekte speichern - auch ausgeblendete (Sichtbarkeit wird separat als Attribut "visible"
+    // mitgespeichert - siehe serisalizeObject())
     std::unordered_set<GeoObject*> saveable;
     for (const auto& [obj, item] : items) {
-        if (!item->isVisible()) {
-            continue;
-        }
         if (!obj->isValid()) {
             continue;
         }
