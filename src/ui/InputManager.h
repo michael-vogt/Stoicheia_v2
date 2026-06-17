@@ -38,6 +38,7 @@ signals:
     void toolChangeRequested(ToolTypePair toolTypePair);
     void undoRequested();
     void redoRequested();
+    void zoomChanged(double zoomPercent);
 
 private:
     // Pan

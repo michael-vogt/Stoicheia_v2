@@ -5,7 +5,9 @@
 #include "ui/commands/CommandStack.h"
 #include "ui/commands/MoveCenterCommand.h"
 #include <memory>
+#include <QColorDialog>
 #include <qevent.h>
+#include <QMenu>
 #include <qnamespace.h>
 #include <ui/commands/MacroCommand.h>
 #include <ui/commands/DeleteObjectCommand.h>
@@ -17,6 +19,8 @@
 #include "../../Constants.h"
 #include "geometry/Line.h"
 #include "ui/commands/ConstrainPointCommand.h"
+#include "ui/commands/SetColorCommand.h"
+#include "ui/commands/SetVisibilityCommand.h"
 
 
 using namespace Constants;
@@ -42,6 +46,22 @@ void SelectTool::deactivate() {
 }
 
 void SelectTool::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::RightButton) {
+        const QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+        GeoObject* obj = m_ctx.hitTest->anyObjectAt(scenePos);
+        if (obj == nullptr) {
+            Point* p = pointAt(scenePos);
+            obj = p;
+        }
+        if (obj != nullptr) {
+            showContextMenu(event, obj);
+            event->accept();
+            return;
+        }
+        event->ignore();
+        return;
+    }
+
     if (event->button() != Qt::LeftButton) {
         event->ignore();
         return;
@@ -334,6 +354,46 @@ void SelectTool::keyPressEvent(QKeyEvent *event) { // NOLINT
         return;
     }
     event->ignore();
+}
+
+void SelectTool::showContextMenu(QMouseEvent *event, GeoObject *obj) {
+    auto* item = m_ctx.adapter->itemFor(obj);
+    if (item == nullptr) {
+        return;
+    }
+
+    QMenu menu(m_ctx.drawingBoard);
+
+    // Sichtbarkeit umschalten
+    bool currentlyvisible = item->isVisible();
+    QAction* visAction = menu.addAction(currentlyvisible ? tr("Ausblenden") : tr("Einblenden"));
+
+    menu.addSeparator();
+
+    // Farbe ändern
+    QAction* colorAction = menu.addAction(tr("Farbe ändern..."));
+
+    QAction* chosen = menu.exec(event->globalPosition().toPoint());
+
+    if (chosen == visAction) {
+        m_ctx.commandStack->execute(std::make_unique<SetVisibilityCommand>(m_ctx.adapter, obj, !currentlyvisible));
+    } else if (chosen == colorAction) {
+        // Aktuelle Farbe ermitteln
+        QColor current = Qt::black;
+        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
+            current = pi->pen().color();
+        } else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            current = li->pen().color();
+        } else if (auto* ci = dynamic_cast<GeoCircleItem*>(item)) {
+            current = ci->pen().color();
+        }
+
+        QColor newColor = QColorDialog::getColor(current, m_ctx.drawingBoard, tr("Farbe wählen"));
+        if (newColor.isValid()) {
+            m_ctx.commandStack->execute(std::make_unique<SetColorCommand>(m_ctx.adapter, obj, newColor));
+        }
+
+    }
 }
 
 auto SelectTool::pointAt(const QPointF &scenePos) const -> Point * {

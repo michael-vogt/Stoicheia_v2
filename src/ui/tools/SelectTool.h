@@ -29,6 +29,7 @@ public:
     [[nodiscard]] auto cursor() const -> QCursor override { return !m_draggedPoints.empty() ? Qt::ClosedHandCursor : Qt::ArrowCursor; }
 
 private:
+    void showContextMenu(QMouseEvent* event, GeoObject* obj);
     [[nodiscard]] auto pointAt(const QPointF& scenePos) const -> Point*;
     auto nearbyPoint(const QPointF& scenePos, Point* exclude) const -> Point*;
     [[nodiscard]] auto itemAt(const QPointF& scenePos, const std::type_info& type) const -> GeoGraphicsItem*;

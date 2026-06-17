@@ -24,8 +24,7 @@ using namespace Constants;
 using namespace GuiConstants;
 
 DrawingBoard::DrawingBoard(QWidget *parent)
-: QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene)
-{
+: QGraphicsView(parent), m_adapter(&m_geoScene, &m_qtScene), m_activeTool(nullptr), m_activeToolType(ToolType::Select) {
     AppSettings& settings = AppSettings::instance();
     setScene(&m_qtScene);
     setRenderHint(QPainter::Antialiasing);
@@ -53,6 +52,9 @@ DrawingBoard::DrawingBoard(QWidget *parent)
     connect(m_inputManager, &InputManager::statusMessage, this, &DrawingBoard::statusMessage);
     connect(m_inputManager, &InputManager::shortcutModeChanged, this, &DrawingBoard::shortcutModeChanged);
     connect(m_inputManager, &InputManager::toolChangeRequested, this, &DrawingBoard::onToolChangeRequested);
+    connect(m_inputManager, &InputManager::zoomChanged, this, [this](double zoomPercent) {
+        showStatusRight(tr("Zoom: %1%").arg(qRound(zoomPercent)));
+    });
 
     connect(&m_adapter, &SceneAdapter::selectionChanged, [this]() {
         viewport()->update();

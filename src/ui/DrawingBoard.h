@@ -72,6 +72,7 @@ signals:
     void statusBarTextChanged(StatusBarPart sbp, const QString& text);
     void toolChanged(ToolType type);
     void shortcutModeChanged(ShortcutMode mode);
+    void zoomFactorChanged(double factor);
 
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) override;

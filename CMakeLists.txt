@@ -115,6 +115,8 @@ add_library(StoicheiaApp STATIC
         src/ui/InputManager.cpp
         src/ui/commands/ConstrainPointCommand.cpp
         src/ui/commands/ConstrainPointCommand.h
+        src/ui/commands/SetColorCommand.cpp
+        src/ui/commands/SetVisibilityCommand.cpp
 )
 
 target_include_directories(StoicheiaApp PUBLIC
