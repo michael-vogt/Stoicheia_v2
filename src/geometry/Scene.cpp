@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <functional>
+#include <initializer_list>
+#include <utility>
 
 void Scene::remove(GeoObject* target) {
     target->detach();
@@ -47,4 +49,22 @@ void Scene::clear() {
         obj->detach();
     }
     m_objects.clear();
+}
+
+void Scene::restoreFromGraveyard(GeoObject* target) {
+    auto iter = std::ranges::find_if(m_graveyard, [target](const auto& ptr) -> auto { return ptr.get() == target; });
+    if (iter != m_graveyard.end()) {
+        m_objects.push_back(std::move(*iter));
+        m_graveyard.erase(iter);
+    }
+}
+
+void Scene::restoreFromGraveyardWithSources(GeoObject* target, std::initializer_list<GeoObject*> sources) {
+    restoreFromGraveyard(target);
+    for (GeoObject* src : sources) {
+        if (src != nullptr) {
+            src->addDependent(target);
+        }
+    }
+    target->recompute();
 }

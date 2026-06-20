@@ -2,6 +2,12 @@
 #include "../geometry/Point.h"
 #include "../geometry/LinearObject.h"
 #include "../geometry/Circle.h"
+#include "GeoCircleItem.h"
+#include "GeoPointItem.h"
+#include "Structs.h"
+#include "geometry/Point.h"
+#include "ui/GeoLinearObjectItem.h"
+#include <qnamespace.h>
 
 SceneAdapter::SceneAdapter(Scene* geoScene, QGraphicsScene* qtScene)
     : m_geoScene(geoScene), m_qtScene(qtScene)
@@ -12,6 +18,7 @@ auto SceneAdapter::addPoint(Point* point, const QPen& pen) -> GeoPointItem* {
     item->setPen(pen);
     m_qtScene->addItem(item);
     m_map[point] = item;
+    applyStyle(point, item);
     return item;
 }
 
@@ -19,6 +26,7 @@ auto SceneAdapter::addLinearObject(LinearObject* linearObject) -> GeoLinearObjec
     auto* item = new GeoLinearObjectItem(linearObject);
     m_qtScene->addItem(item);
     m_map[linearObject] = item;
+    applyStyle(linearObject, item);
     return item;
 }
 
@@ -26,6 +34,7 @@ auto SceneAdapter::addCircle(Circle* circle) -> GeoCircleItem* {
     auto* item = new GeoCircleItem(circle);
     m_qtScene->addItem(item);
     m_map[circle] = item;
+    applyStyle(circle, item);
     return item;
 }
 
@@ -81,7 +90,7 @@ auto SceneAdapter::itemFor(GeoObject* geoObject) const -> GeoGraphicsItem* {
     return iter != m_map.end() ? iter->second : nullptr;
 }
 
-Point *SceneAdapter::radiusPointFor(const Point *centerPoint) const {
+auto SceneAdapter::radiusPointFor(const Point *centerPoint) const -> Point * {
     for (const auto &geo: m_map | std::views::keys) {
         if (const auto* circle = dynamic_cast<Circle*>(geo)) {
             if (circle->center() == centerPoint) {
@@ -141,6 +150,7 @@ void SceneAdapter::highlight(GeoObject *obj, bool isHighlighted) {
 }
 
 void SceneAdapter::hide(GeoObject *obj) {
+    m_styles[obj].visible = false;
     auto iter = m_map.find(obj);
     if (iter != m_map.end()) {
         iter->second->setVisible(false);
@@ -148,11 +158,94 @@ void SceneAdapter::hide(GeoObject *obj) {
 }
 
 void SceneAdapter::show(GeoObject *obj) {
+    m_styles[obj].visible = true;
     auto iter = m_map.find(obj);
     if (iter != m_map.end()) {
         iter->second->setVisible(true);
     }
 }
+
+void SceneAdapter::setColor(GeoObject* obj, const QColor& color) {
+    m_styles[obj].color = color;
+    auto *item = itemFor(obj);
+    if (item == nullptr) {
+        return;
+    }
+
+    if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+        QPen pen = pointItem->pen();
+        pen.setColor(color);
+        pointItem->setPen(pen);
+    } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
+        QPen pen = linearItem->pen();
+        pen.setColor(color);
+        linearItem->setPen(pen);
+    } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
+        QPen pen = circleItem->pen();
+        pen.setColor(color);
+        circleItem->setPen(pen);
+    }
+}
+
+auto SceneAdapter::colorOf(GeoObject* obj) const -> QColor {
+    auto iter = m_styles.find(obj);
+    if (iter != m_styles.end() && iter->second.color.isValid()) {
+        return iter->second.color;
+    }
+
+    // Fallback: Farbe ausa aktuellem Item lesen
+    if (auto* item = itemFor(obj)) {
+        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+            return pointItem->pen().color();
+        }
+        if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            return linearItem->pen().color();
+        }
+        if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
+            return circleItem->pen().color();
+        }
+    }
+
+    return Qt::black;
+}
+
+auto SceneAdapter::visibleOf(GeoObject* obj) const -> bool {
+    auto iter = m_styles.find(obj);
+    if (iter != m_styles.end()) {
+        return iter->second.visible;
+    }
+    if (auto* item = itemFor(obj)) {
+        return item->isVisible();
+    }
+    return true;
+}
+
+void SceneAdapter::applyStyle(GeoObject* obj, GeoGraphicsItem* item) const {
+    auto iter = m_styles.find(obj);
+    if (iter == m_styles.end()) {
+        return;
+    }
+
+    const ObjectStyle& style = iter->second;
+    if (style.color.isValid()) {
+        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+            QPen pen = pointItem->pen();
+            pen.setColor(style.color);
+            pointItem->setPen(pen);
+        } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            QPen pen = linearItem->pen();
+            pen.setColor(style.color);
+            linearItem->setPen(pen);
+        } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
+            QPen pen = circleItem->pen();
+            pen.setColor(style.color);
+            circleItem->setPen(pen);
+        }
+    }
+    item->setVisible(style.visible);
+}
+
+
 
 void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
     auto iter = m_map.find(obj);
@@ -165,4 +258,17 @@ void SceneAdapter::removeGraphicsOnly(GeoObject *obj) {
 
 void SceneAdapter::copySelection() {
     m_clipboard = selection();
+}
+
+void SceneAdapter::transferStyle(GeoObjectPair pair) {
+    auto iter = m_styles.find(pair.oldGeoObject);
+    if (iter == m_styles.end()) { 
+        return;           // kein gespeicherter Style → nichts zu tun
+    }
+    m_styles[pair.newGeoObject] = iter->second;              // Style auf neuen Pointer umhängen
+    m_styles.erase(iter);                         // alten Eintrag entfernen
+    // Sofort auf das neue Item anwenden, falls es bereits existiert
+    if (auto* item = itemFor(pair.newGeoObject)) {
+        applyStyle(pair.newGeoObject, item);
+    }
 }

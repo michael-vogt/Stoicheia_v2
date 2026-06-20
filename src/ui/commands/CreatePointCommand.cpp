@@ -5,11 +5,19 @@ CreatePointCommand::CreatePointCommand(SceneAdapter *adapter, double pos_x, doub
 {}
 
 void CreatePointCommand::execute() {
-    m_point = m_adapter->geoScene()->create<Point>(m_x, m_y);
+    if (m_point == nullptr) {
+        // erstmaliges Ausführen: neuen Punkt erzeugen
+        m_point = m_adapter->geoScene()->create<Point>(m_x, m_y);
+    } else {
+        // Redo: Punkt ist noch im Graveyard – zurückholen statt neu erzeugen,
+        // damit alle Commands, die m_point kennen, denselben Pointer benutzen.
+        m_adapter->geoScene()->restoreFromGraveyard(m_point);
+    }
     m_adapter->addPoint(m_point);
 }
 
 void CreatePointCommand::undo() {
     m_adapter->remove(m_point);
-    m_point = nullptr;
+    // m_point absichtlich NICHT auf nullptr setzen – für das nächste Redo.
+    //m_point = nullptr;
 }

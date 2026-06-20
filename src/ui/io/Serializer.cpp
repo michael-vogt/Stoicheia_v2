@@ -370,7 +370,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
             if (jsonObj.contains("color")) {
                 QColor color(jsonObj["color"].toString());
                 if (color.isValid()) {
-                    if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
+                    m_adapter->setColor(obj, color);
+                    /*if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
                         QPen pen = pi->pen();
                         pen.setColor(color);
                         pi->setPen(pen);
@@ -382,7 +383,7 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
                         QPen pen = ci->pen();
                         pen.setColor(color);
                         ci->setPen(pen);
-                    }
+                    }*/
                 }
             }
             if (jsonObj.contains("visible")) {
