@@ -7,6 +7,7 @@
 #include "GeoLinearObjectItem.h"
 #include "GeoCircleItem.h"
 #include "GeoIntersectionPointItem.h"
+#include "Structs.h"
 #include "constructions/IntersectionSet.h"
 #include "dialogs/AppSettings.h"
 #include "../Constants.h"
@@ -43,7 +44,6 @@ public:
     [[nodiscard]] auto intersectionSets() const -> const std::unordered_set<IntersectionSet*>& { return m_intersectionSets; }
 
     auto radiusPointFor(const Point* centerPoint) const -> Point*;
-
     [[nodiscard]] auto geoScene() const -> Scene* { return m_geoScene; }
 
     void select(GeoObject* geoObject);
@@ -52,11 +52,17 @@ public:
     [[nodiscard]] auto selection() const -> const std::unordered_set<GeoObject*>& { return m_selection; }
 
     void clear();
-
     void highlight(GeoObject* obj, bool isHighlighted);
     void hide(GeoObject* obj);
     void show(GeoObject* obj);
+    void setVisible(GeoObject* obj, bool visible) { visible ? show(obj) : hide(obj); }
+    void setColor(GeoObject* obj, const QColor& color);
     void removeGraphicsOnly(GeoObject* obj);
+
+    [[nodiscard]] auto colorOf(GeoObject* obj) const -> QColor;
+    [[nodiscard]] auto visibleOf(GeoObject* obj) const -> bool;
+
+    void transferStyle(GeoObjectPair pair);
 
     void copySelection();
     [[nodiscard]] auto clipboard() const -> std::unordered_set<GeoObject*> { return m_clipboard; };
@@ -65,10 +71,18 @@ signals:
     void selectionChanged();
 
 private:
+    struct ObjectStyle {
+        QColor color;
+        bool visible = true;
+    };
+
+    void applyStyle(GeoObject* obj, GeoGraphicsItem* item) const;
+
     Scene*          m_geoScene;
     QGraphicsScene* m_qtScene;
 
     std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
+    std::unordered_map<GeoObject*, ObjectStyle> m_styles;
     std::unordered_set<GeoObject*> m_selection;
     std::unordered_set<IntersectionSet*> m_intersectionSets;
     std::unordered_set<GeoObject*> m_clipboard;

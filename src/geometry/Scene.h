@@ -1,5 +1,6 @@
 #pragma once
 
+#include <initializer_list>
 #include <memory>
 #include <vector>
 
@@ -32,6 +33,13 @@ public:
     // Aufräumen
     void clear();
     void clearGraveyard() { m_graveyard.clear(); }
+
+    // Objekt aus dem Graveyard in die aktive Liste zurückholen (für Redo nach Undo).
+    // Der Pointer bleibt identisch – alle Commands, die ihn kennen, bleiben korrekt.
+    // Für einfache Punkte (keine Quellen) ausreichend; abgeleitete Objekte werden
+    // von Create*Commands ohnehin neu erzeugt.
+    void restoreFromGraveyard(GeoObject* target);
+    void restoreFromGraveyardWithSources(GeoObject* target, std::initializer_list<GeoObject*> sources);
 
 
 private:
