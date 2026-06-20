@@ -14,6 +14,7 @@ public:
 
     [[nodiscard]] auto boundingRect() const -> QRectF override;
     [[nodiscard]] auto  point() const -> Point* { return m_point; };
+    [[nodiscard]] auto pen() const -> QPen { return m_pen; };
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;

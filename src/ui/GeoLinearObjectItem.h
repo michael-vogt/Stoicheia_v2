@@ -25,6 +25,7 @@ public:
 
     [[nodiscard]] auto linearObject() const -> LinearObject* { return m_linearObject; }
 
+    [[nodiscard]] auto pen() const -> QPen { return m_pen; }
     void setPen(const QPen& pen) { m_pen = pen; update(); }
     void setExtent(double extent) { m_extent = extent; update(); }
     auto contains(const QPointF &point) -> bool override;

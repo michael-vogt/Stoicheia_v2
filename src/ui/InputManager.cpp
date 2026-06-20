@@ -110,6 +110,10 @@ void InputManager::handleWheel(QWheelEvent* event) {
     m_board->horizontalScrollBar()->setValue(m_board->horizontalScrollBar()->value() + qRound(delta.x()));
     m_board->verticalScrollBar()->setValue(m_board->verticalScrollBar()->value() + qRound(delta.y()));
 
+    double zoomPercent = std::abs(m_board->transform().m11()) * 100.0;
+    emit zoomChanged(zoomPercent);
+    //m_board->notifyZoomFactorChanged(factor);
+
     event->accept();
 }
 

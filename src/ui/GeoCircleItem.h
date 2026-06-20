@@ -19,6 +19,7 @@ public:
 
     [[nodiscard]] auto circle() const -> Circle* { return m_circle; }
 
+    [[nodiscard]] auto pen() const -> QPen { return m_pen; }
     void setPen(const QPen& pen) { m_pen = pen; update(); }
     void setBrush(const QBrush& brush) { m_brush = brush; update(); }
 
