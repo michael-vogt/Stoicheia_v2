@@ -1,0 +1,16 @@
+{
+    "cmake.configureOnOpen": true,
+    "clangd.arguments": [
+        "--clang-tidy",
+        "--background-index",
+        "--log=verbose",
+        "--compile-commands-dir=build"
+    ],
+    "clangd.path": "C:/Program Files/LLVM/bin/clangd.exe",
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "cmake.configureSettings": {
+        "CMAKE_C_COMPILER": "C:/Qt/6.11.0/mingw_64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/Qt/6.11.0/mingw_64/bin/g++.exe",
+    },
+    "cmake.generator": "MinGW Makefiles"
+}
