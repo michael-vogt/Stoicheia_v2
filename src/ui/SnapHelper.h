@@ -8,6 +8,7 @@
 
 using namespace Constants;
 
+
 class SnapHelper {
 public:
     explicit SnapHelper(QGraphicsScene* scene, const Grid* grid);

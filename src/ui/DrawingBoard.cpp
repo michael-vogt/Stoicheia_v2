@@ -52,11 +52,11 @@ DrawingBoard::DrawingBoard(QWidget *parent)
     connect(m_inputManager, &InputManager::statusMessage, this, &DrawingBoard::statusMessage);
     connect(m_inputManager, &InputManager::shortcutModeChanged, this, &DrawingBoard::shortcutModeChanged);
     connect(m_inputManager, &InputManager::toolChangeRequested, this, &DrawingBoard::onToolChangeRequested);
-    connect(m_inputManager, &InputManager::zoomChanged, this, [this](double zoomPercent) {
+    connect(m_inputManager, &InputManager::zoomChanged, this, [this](double zoomPercent) -> void {
         showStatusRight(tr("Zoom: %1%").arg(qRound(zoomPercent)));
     });
 
-    connect(&m_adapter, &SceneAdapter::selectionChanged, [this]() {
+    connect(&m_adapter, &SceneAdapter::selectionChanged, [this]() -> void {
         viewport()->update();
     });
 }
@@ -182,7 +182,8 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
         return viewport()->mapFrom(this, mapFromScene(point));
     };
 
-    m_grid.drawLabels(painter, toViewport, {.width=viewport()->width(), .height=viewport()->height()});
+    double zoomFactor = std::abs(transform().m11());
+    m_grid.drawLabels(painter, toViewport, {.width=viewport()->width(), .height=viewport()->height()}, zoomFactor);
     painter->restore();
 }
 
@@ -224,8 +225,8 @@ void DrawingBoard::resizeEvent(QResizeEvent *event) {
     QGraphicsView::resizeEvent(event);
 
     QSize delta = event->size() - event->oldSize();
-    horizontalScrollBar()->setValue(hBefore - delta.width() / 2);
-    verticalScrollBar()->setValue(vBefore - delta.height() / 2);
+    horizontalScrollBar()->setValue(hBefore - (delta.width() / 2));
+    verticalScrollBar()->setValue(vBefore - (delta.height() / 2));
 
     viewport()->update();
 }
@@ -236,9 +237,9 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
 
     const QImage image(":/resources/logo.png");
     painter->setOpacity(Colors::WATERMARK_OPACITY);
-    const QRectF vr = viewport()->rect();
-    const QPointF vc = vr.center();
+    const QRectF viewportRect = viewport()->rect();
+    const QPointF viewportCenter = viewportRect.center();
     const QSizeF size = image.size() / image.devicePixelRatio();
-    painter->drawImage(QPointF(vc.x() - size.width() / 2, vc.y() - size.height() / 2), image);
+    painter->drawImage(QPointF(viewportCenter.x() - (size.width() / 2), viewportCenter.y() - (size.height() / 2)), image);
     painter->restore();
 }

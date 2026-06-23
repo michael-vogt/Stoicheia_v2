@@ -2,6 +2,7 @@
 #include <QString>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <qjsonobject.h>
 #include <qjsonvalue.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -30,6 +31,7 @@ private:
     // Save
     auto serializeScene() const -> QJsonObject;
     auto serializeObject(GeoObject* obj, int ident, const std::unordered_map<GeoObject*, int>& idMap) const -> QJsonObject;
+    void serializeDisplayProperties(GeoObject* obj, QJsonObject& jsonObj) const;
 
     // Load
     auto deserializeScene(const QJsonArray& objects) -> bool;

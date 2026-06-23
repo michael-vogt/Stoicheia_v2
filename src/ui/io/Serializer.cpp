@@ -73,96 +73,100 @@ auto Serializer::serializeObject(GeoObject* obj, int ident, const std::unordered
         return iter != idMap.end() ? iter->second : -1;
     };
 
-    QJsonObject jsobObj;
-    jsobObj["id"] = ident;
+    QJsonObject jsonObj;
+    jsonObj["id"] = ident;
 
     if (auto* intersectionPoint = dynamic_cast<IntersectionPoint*>(obj)) {
-        jsobObj["type"] = "IntersectionPoint";
+        jsonObj["type"] = "IntersectionPoint";
         for (IntersectionSet* iset : m_adapter->intersectionSets()) {
             if (iset->first() == intersectionPoint) {
-                jsobObj["intersectionSet"] = ref(iset);
-                jsobObj["index"] = 0;
+                jsonObj["intersectionSet"] = ref(iset);
+                jsonObj["index"] = 0;
                 break;
             }
             if (iset->second() == intersectionPoint) {
-                jsobObj["intersectionSet"] = ref(iset);
-                jsobObj["index"] = 1;
+                jsonObj["intersectionSet"] = ref(iset);
+                jsonObj["index"] = 1;
                 break;
             }
         }
     } else if (auto* point = dynamic_cast<Point*>(obj)) {
-        jsobObj["type"] = "Point";
-        jsobObj["x"]    = point->x();
-        jsobObj["y"]    = point->y();
+        jsonObj["type"] = "Point";
+        jsonObj["x"]    = point->x();
+        jsonObj["y"]    = point->y();
     } else if (auto* line = dynamic_cast<Line*>(obj)) {
-        jsobObj["type"] = "Line";
-        jsobObj["p1"]   = ref(line->point1());
-        jsobObj["p2"]   = ref(line->point2());
+        jsonObj["type"] = "Line";
+        jsonObj["p1"]   = ref(line->point1());
+        jsonObj["p2"]   = ref(line->point2());
     } else if (auto* ray = dynamic_cast<Ray*>(obj)) {
-        jsobObj["type"] = "Ray";
-        jsobObj["p1"]   = ref(ray->point1());
-        jsobObj["p2"]   = ref(ray->point2());
+        jsonObj["type"] = "Ray";
+        jsonObj["p1"]   = ref(ray->point1());
+        jsonObj["p2"]   = ref(ray->point2());
     } else if (auto* segment = dynamic_cast<Segment*>(obj)) {
-        jsobObj["type"] = "Segment";
-        jsobObj["p1"]   = ref(segment->point1());
-        jsobObj["p2"]   = ref(segment->point2());
+        jsonObj["type"] = "Segment";
+        jsonObj["p1"]   = ref(segment->point1());
+        jsonObj["p2"]   = ref(segment->point2());
     } else if (auto* circle = dynamic_cast<Circle*>(obj)) {
-        jsobObj["type"]   = "Circle";
-        jsobObj["center"] = ref(circle->center());
-        jsobObj["radius"] = ref(circle->radiusPoint());
+        jsonObj["type"]   = "Circle";
+        jsonObj["center"] = ref(circle->center());
+        jsonObj["radius"] = ref(circle->radiusPoint());
     } else if (auto* midpoint = dynamic_cast<Midpoint*>(obj)) {
-        jsobObj["type"] = "Midpoint";
-        jsobObj["p1"]   = ref(midpoint->point1());
-        jsobObj["p2"]   = ref(midpoint->point2());
+        jsonObj["type"] = "Midpoint";
+        jsonObj["p1"]   = ref(midpoint->point1());
+        jsonObj["p2"]   = ref(midpoint->point2());
     } else if (auto* para = dynamic_cast<Parallel*>(obj)) {
-        jsobObj["type"]      = "Parallel";
-        jsobObj["origin"]    = ref(para->origin());
-        jsobObj["reference"] = ref(para->reference());
+        jsonObj["type"]      = "Parallel";
+        jsonObj["origin"]    = ref(para->origin());
+        jsonObj["reference"] = ref(para->reference());
     } else if (auto* perp = dynamic_cast<Perpendicular*>(obj)) {
-        jsobObj["type"]      = "Perpendicular";
-        jsobObj["origin"]    = ref(perp->origin());
-        jsobObj["reference"] = ref(perp->reference());
+        jsonObj["type"]      = "Perpendicular";
+        jsonObj["origin"]    = ref(perp->origin());
+        jsonObj["reference"] = ref(perp->reference());
     } else if (auto* perp_foot = dynamic_cast<PerpendicularFoot*>(obj)) {
-        jsobObj["type"]  = "PerpendicularFoot";
-        jsobObj["point"] = ref(perp_foot->point());
-        jsobObj["line"]  = ref(perp_foot->line());
+        jsonObj["type"]  = "PerpendicularFoot";
+        jsonObj["point"] = ref(perp_foot->point());
+        jsonObj["line"]  = ref(perp_foot->line());
     } else if (auto* lli = dynamic_cast<LineLineIntersection*>(obj)) {
-        jsobObj["type"] = "LineLineIntersection";
-        jsobObj["l1"]   = ref(lli->line1());
-        jsobObj["l2"]   = ref(lli->line2());
+        jsonObj["type"] = "LineLineIntersection";
+        jsonObj["l1"]   = ref(lli->line1());
+        jsonObj["l2"]   = ref(lli->line2());
     } else if (auto* lci = dynamic_cast<LineCircleIntersection*>(obj)) {
-        jsobObj["type"]   = "LineCircleIntersection";
-        jsobObj["line"]   = ref(lci->line());
-        jsobObj["circle"] = ref(lci->circle());
+        jsonObj["type"]   = "LineCircleIntersection";
+        jsonObj["line"]   = ref(lci->line());
+        jsonObj["circle"] = ref(lci->circle());
     } else if (auto* cci = dynamic_cast<CircleCircleIntersection*>(obj)) {
-        jsobObj["type"] = "CircleCircleIntersection";
-        jsobObj["c1"]   = ref(cci->circle1());
-        jsobObj["c2"]   = ref(cci->circle2());
+        jsonObj["type"] = "CircleCircleIntersection";
+        jsonObj["c1"]   = ref(cci->circle1());
+        jsonObj["c2"]   = ref(cci->circle2());
     }
 
+    serializeDisplayProperties(obj, jsonObj);
+
+    return jsonObj;
+}
+
+void Serializer::serializeDisplayProperties(GeoObject* obj, QJsonObject& jsonObj) const {
     // Darstellungseigenschaften (Farbe, Sichtbarkeit) mitspeichern. IntersectionPoints haben kein eigenes Item
     // (Member von IntersectionSet), daher nur speichern wenn ein Item existiert.
     if (auto* item = m_adapter->itemFor(obj)) {
         QPen pen;
         bool hasPen = false;
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
-            pen = pi->pen();
+        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
+            pen = pointItem->pen();
             hasPen = true;
-        } else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item)) {
-            pen = li->pen();
+        } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            pen = linearItem->pen();
             hasPen = true;
-        } else if (auto* ci = dynamic_cast<GeoCircleItem*>(item)) {
-            pen = ci->pen();
+        } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
+            pen = circleItem->pen();
             hasPen = true;
         }
 
         if (hasPen) {
-            jsobObj["color"] = pen.color().name(QColor::HexArgb);
+            jsonObj["color"] = pen.color().name(QColor::HexArgb);
         }
-        jsobObj["visible"] = item->isVisible();
+        jsonObj["visible"] = item->isVisible();
     }
-
-    return jsobObj;
 }
 
 // ── Load ─────────────────────────────────────────────────────────────────────

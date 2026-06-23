@@ -16,7 +16,7 @@ class Grid {
 public:
     // Zeichnen
     void drawBackground(QPainter* painter, const QRectF& rect) const;
-    void drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& sceneToViewport, IntPair viewSize) const;
+    void drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& sceneToViewport, IntPair viewSize, double zoomFactor) const;
 
     // Snapping
     [[nodiscard]] auto snap(const QPointF& scenePos, bool forceSnap) const -> QPointF;
