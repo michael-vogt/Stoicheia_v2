@@ -54,7 +54,7 @@ MainWindow::MainWindow(const QString& title, QTranslator* translator, QWidget* p
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, this, &MainWindow::updateUndoRedo);
     connect(m_drawingBoard->commandStack(), &CommandStack::changed, m_fileManager, &FileManager::markChanged);
     connect(m_drawingBoard, &DrawingBoard::statusBarTextChanged, this, &MainWindow::setStatus);
-    connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() {
+    connect(m_drawingBoard, &DrawingBoard::escapePressed, [this]() -> void {
         m_drawingBoard->setTool<SelectTool>(ToolType::Select);
     });
 
@@ -103,9 +103,9 @@ void MainWindow::switchLanguage() {
     if (m_translator == nullptr) {
         return;
     }
-    QString languageCode = AppSettings::instance().general.language;
+    QString language_code = AppSettings::instance().general.language;
     qApp->removeTranslator(m_translator);
-    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(languageCode))) {
+    if (m_translator->load(QString(":/i18n/app_%1.qm").arg(language_code))) {
         qApp->installTranslator(m_translator);
     }
     ui->retranslateUi(this);
@@ -181,31 +181,31 @@ void MainWindow::setupConnections() {
     // Menu Edit
     ui->actionUndo->setShortcut(QKeySequence::Undo);
     ui->actionUndo->setEnabled(false);
-    connect(ui->actionUndo, &QAction::triggered, [this]() {
+    connect(ui->actionUndo, &QAction::triggered, [this]() -> void {
         m_drawingBoard->commandStack()->undo();
         updateUndoRedo();
     });
 
     ui->actionRedo->setShortcut(QKeySequence::Redo);
     ui->actionRedo->setEnabled(false);
-    connect(ui->actionRedo, &QAction::triggered, [this]() {
+    connect(ui->actionRedo, &QAction::triggered, [this]() -> void {
         m_drawingBoard->commandStack()->redo();
         updateUndoRedo();
     });
 
-    connect(ui->actionCopy, &QAction::triggered, [this]() { m_drawingBoard->copySelection(); });
-    connect(ui->actionPaste, &QAction::triggered, [this]() { m_drawingBoard->pasteSelection(); });
+    connect(ui->actionCopy, &QAction::triggered, [this]() -> void { m_drawingBoard->copySelection(); });
+    connect(ui->actionPaste, &QAction::triggered, [this]() -> void { m_drawingBoard->pasteSelection(); });
 }
 
 void MainWindow::updateUndoRedo() const {
     ui->actionUndo->setEnabled(m_drawingBoard->commandStack()->canUndo());
     ui->actionRedo->setEnabled(m_drawingBoard->commandStack()->canRedo());
 
-    QString undoDesc = m_drawingBoard->commandStack()->nextUndoDescription();
-    QString redoDesc = m_drawingBoard->commandStack()->nextRedoDescription();
+    QString undo_desc = m_drawingBoard->commandStack()->nextUndoDescription();
+    QString redo_desc = m_drawingBoard->commandStack()->nextRedoDescription();
 
-    ui->actionUndo->setText(undoDesc.isEmpty() ? tr("Rückgängig") : tr("Rückgängig: ") + undoDesc);
-    ui->actionRedo->setText(redoDesc.isEmpty() ? tr("Wiederholen") : tr("Wiederholen: ") + redoDesc);
+    ui->actionUndo->setText(undo_desc.isEmpty() ? tr("Rückgängig") : tr("Rückgängig: ") + undo_desc);
+    ui->actionRedo->setText(redo_desc.isEmpty() ? tr("Wiederholen") : tr("Wiederholen: ") + redo_desc);
 }
 
 void MainWindow::updateRecentFilesMenu() {
@@ -230,8 +230,8 @@ void MainWindow::updateRecentFilesMenu() {
     }
 
     ui->menuRecent->addSeparator();
-    const auto* clearAction = ui->menuRecent->addAction(tr("Liste leeren"));
-    connect(clearAction, &QAction::triggered, [this]() {
+    const auto* clear_action = ui->menuRecent->addAction(tr("Liste leeren"));
+    connect(clear_action, &QAction::triggered, [this]() -> void {
         AppSettings::instance().general.recentFiles.files.clear();
         AppSettings::instance().save();
         updateRecentFilesMenu();

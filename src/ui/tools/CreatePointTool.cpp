@@ -34,29 +34,29 @@ void CreatePointTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     // Liegt der Klick auf einer Geraden odr einem Kreis?
-    LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
-    Circle* circle = m_ctx.hitTest->circleAt(scenePos);
+    LinearObject* line = m_ctx.hitTest->linearObjectAt(scene_pos);
+    Circle* circle = m_ctx.hitTest->circleAt(scene_pos);
 
     if (line != nullptr || circle != nullptr) {
         // Freien Punkt erzeugen, dann sofort einschränken - als MacroCommand damit ein einzelnes Undo beide Schritte rückgängig macht
-        auto createCmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
-        CreatePointCommand* createRaw = createCmd.get();
+        auto create_cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
+        CreatePointCommand* create_raw = create_cmd.get();
 
         auto macro = std::make_unique<MacroCommand>((line != nullptr) ? tr("Punkt auf Gerade") : tr("Punkt auf Kreis"));
-        macro->add(std::move(createCmd));
+        macro->add(std::move(create_cmd));
 
         // execute() jetzt schon, damit createRaw->point() gesetzt ist
-        createRaw->execute();
+        create_raw->execute();
 
         if (line != nullptr) {
-            macro->add(std::make_unique<ConstrainPointToLineCommand>(m_ctx.adapter, createRaw->point(), line));
+            macro->add(std::make_unique<ConstrainPointToLineCommand>(m_ctx.adapter, create_raw->point(), line));
         } else {
-            macro->add(std::make_unique<ConstrainPointToCircleCommand>(m_ctx.adapter, createRaw->point(), circle));
+            macro->add(std::make_unique<ConstrainPointToCircleCommand>(m_ctx.adapter, create_raw->point(), circle));
         }
 
         m_ctx.commandStack->execute(std::move(macro));
@@ -68,9 +68,9 @@ void CreatePointTool::mousePressEvent(QMouseEvent *event) {
 }
 
 void CreatePointTool::mouseMoveEvent(QMouseEvent *event) {
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     m_lastMousePos = snapped;
     updatePreview(snapped);

@@ -9,13 +9,13 @@ CreateIntersectionTool::CreateIntersectionTool(const ToolContext& ctx)
 void CreateIntersectionTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
 
     // Nur LinearObject oder Circle akzeptieren
     GeoObject* hit = nullptr;
-    if (auto* linearObject = m_ctx.hitTest->linearObjectAt(scenePos)) {
-        hit = linearObject;
-    } else if (auto* circle = m_ctx.hitTest->circleAt(scenePos)) {
+    if (auto* linear_object = m_ctx.hitTest->linearObjectAt(scene_pos)) {
+        hit = linear_object;
+    } else if (auto* circle = m_ctx.hitTest->circleAt(scene_pos)) {
         hit = circle;
     }
 

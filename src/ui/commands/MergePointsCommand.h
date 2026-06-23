@@ -9,7 +9,7 @@ class MergePointsCommand : public Command {
     Q_OBJECT
 
 public:
-    MergePointsCommand(SceneAdapter* adapter, Point* survivor, Point* absorbed);
+    MergePointsCommand(SceneAdapter* adapter, PointPairForMergePointCommand points);
 
     // Getter
     Point* survivor() const { return m_survivor; }

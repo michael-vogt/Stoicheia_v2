@@ -12,9 +12,9 @@ public:
     explicit CoordinateInputDialog(QWidget* parent = nullptr);
     ~CoordinateInputDialog() override;
 
-    void setCoordinates(double x, double y);
-    QPointF coordinates() const;
+    void setCoordinates(double pos_x, double pos_y);
+    [[nodiscard]] auto coordinates() const -> QPointF;
 
 private:
-    Ui::CoordinateInputDialog* ui;
+    Ui::CoordinateInputDialog* ui; // NOLINT: readabbvility-identifier-naming - Attribut MUSS ui heißen, da es sonst nicht mit dem UI-File zusammenpasst
 };

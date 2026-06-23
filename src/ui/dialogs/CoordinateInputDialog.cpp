@@ -27,13 +27,13 @@ CoordinateInputDialog::~CoordinateInputDialog() {
     delete ui;
 }
 
-void CoordinateInputDialog::setCoordinates(double x, double y) {
-    ui->xEdit->setText(QString::number(x));
-    ui->yEdit->setText(QString::number(y));
+void CoordinateInputDialog::setCoordinates(double pos_x, double pos_y) {
+    ui->xEdit->setText(QString::number(pos_x));
+    ui->yEdit->setText(QString::number(pos_y));
     ui->xEdit->selectAll();
     ui->xEdit->setFocus();
 }
 
-QPointF CoordinateInputDialog::coordinates() const {
-    return { ui->xEdit->text().toDouble(), ui->yEdit->text().toDouble() };
+auto CoordinateInputDialog::coordinates() const -> QPointF {
+    return { ui->xEdit->text().toDouble(),ui->yEdit->text().toDouble() };
 }

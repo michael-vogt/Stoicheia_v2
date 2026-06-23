@@ -10,8 +10,8 @@ CreateMidpointTool::CreateMidpointTool(const ToolContext& ctx)
 void CreateMidpointTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    Point*  hit      = m_ctx.hitTest->pointAt(scenePos);
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    Point*  hit      = m_ctx.hitTest->pointAt(scene_pos);
 
     if (hit == nullptr) { 
         event->accept(); return; 
@@ -40,8 +40,8 @@ void CreateMidpointTool::mouseMoveEvent(QMouseEvent* event) {
         return; 
     }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
     setPreviewLine(QLineF(m_firstPoint->x(), m_firstPoint->y(),
-                          scenePos.x(),      scenePos.y()));
+                          scene_pos.x(),      scene_pos.y()));
     event->accept();
 }

@@ -26,16 +26,20 @@ void Grid::drawBackground(QPainter* painter, const QRectF& rect) const {
     double left = std::floor(rect.left() / m_spacing) * m_spacing;
     double top = std::floor(rect.top() / m_spacing) * m_spacing;
 
-    for (double pos_x = left; pos_x <= rect.right(); pos_x += m_spacing) {
+    double pos_x = left;
+    while (pos_x <= rect.right()) {
         if (std::abs(pos_x) > GridConstants::RASTER_START) {
             painter->drawLine(QPointF(pos_x, rect.top()), QPointF(pos_x, rect.bottom()));
         }
+        pos_x += m_spacing;
     }
 
-    for (double pos_y = top; pos_y <= rect.bottom(); pos_y += m_spacing) {
+    double pos_y = top;
+    while (pos_y <= rect.bottom()) {
         if (std::abs(pos_y) > GridConstants::RASTER_START) {
             painter->drawLine(QPointF(rect.left(), pos_y), QPointF(rect.right(), pos_y));
         }
+        pos_y += m_spacing;
     }
 }
 
@@ -51,29 +55,29 @@ void Grid::drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& 
     painter->setFont(font);
 
     const int margin   = 4;
-    const int tickSize = static_cast<int>(std::clamp(4.0 * zoomFactor, 4.0, 12.0));
-    const int penWidth = static_cast<int>(std::clamp(1.0 * zoomFactor, 1.0, 3.0));
+    const int tick_size = static_cast<int>(std::clamp(4.0 * zoomFactor, 4.0, 12.0));
+    const int pen_width = static_cast<int>(std::clamp(1.0 * zoomFactor, 1.0, 3.0));
 
-    QPen tickPen(m_labelColor);
-    tickPen.setWidth(penWidth);
-    painter->setPen(tickPen);
+    QPen tick_pen(m_labelColor);
+    tick_pen.setWidth(pen_width);
+    painter->setPen(tick_pen);
 
 
-    const double targetPixelSpacing = 80.0;
-    double rawStep = targetPixelSpacing / (zoomFactor * m_spacing);
-    double magnitude = std::pow(10.0, std::floor(std::log10(rawStep)));
-    double normalized = rawStep / magnitude;
-    double niceStep;
+    const double target_pixel_spacing = 80.0;
+    double raw_step = target_pixel_spacing / (zoomFactor * m_spacing);
+    double magnitude = std::pow(10.0, std::floor(std::log10(raw_step)));
+    double normalized = raw_step / magnitude;
+    double nice_step;
     if (normalized < 1.5) {
-        niceStep = 1.0 * magnitude;
+        nice_step = 1.0 * magnitude;
     } else if (normalized < 3.5) {
-        niceStep = 2.0 * magnitude;
+        nice_step = 2.0 * magnitude;
     } else if (normalized < 7.5) {
-        niceStep = 5.0 * magnitude;
+        nice_step = 5.0 * magnitude;
     } else {
-        niceStep = 10.0 * magnitude;
+        nice_step = 10.0 * magnitude;
     }
-    double tickStep = niceStep * m_spacing;
+    double tick_step = nice_step * m_spacing;
 
 
     QPointF origin = toViewport(QPointF(0,0));
@@ -81,59 +85,68 @@ void Grid::drawLabels(QPainter* painter, const std::function<QPointF(QPointF)>& 
     int origin_y = static_cast<int>(origin.y());
 
     // X-Achse
-    int labelY = static_cast<int>(std::clamp(
+    int label_y = static_cast<int>(std::clamp(
         static_cast<double>(origin_y + margin + 12),
         static_cast<double>(margin + 12),
         static_cast<double>(viewSize.height - margin)));
 
     // sichtbaren Bereich in Szenenkoordinaten approximieren
     // (wird von DrawingBoard als rect übergeben)
-    for (double pos_x = -GridConstants::EXTENT; pos_x <= GridConstants::EXTENT; pos_x += tickStep) {
+    double pos_x = -GridConstants::EXTENT;
+    while (pos_x <= GridConstants::EXTENT) {
         if (std::abs(pos_x) < GridConstants::RASTER_START) { 
+            pos_x += tick_step;
+            //pos_x = (pos_x < 0) ? GridConstants::RASTER_START : pos_x + tick_step;
             continue;
         }
-        QPointF viewportPoint = toViewport(QPointF(pos_x, 0));
-        if (viewportPoint.x() < 0 || viewportPoint.x() > viewSize.width) {
+        QPointF viewport_point = toViewport(QPointF(pos_x, 0));
+        if (viewport_point.x() < 0 || viewport_point.x() > viewSize.width) {
+            pos_x += tick_step;
             continue;
         }
-        int viewport_x = static_cast<int>(viewportPoint.x());
-        painter->drawLine(viewport_x, origin_y - tickSize, viewport_x, origin_y + tickSize);
+        int viewport_x = static_cast<int>(viewport_point.x());
+        painter->drawLine(viewport_x, origin_y - tick_size, viewport_x, origin_y + tick_size);
         QString label;
-        double rounded = std::round(pos_x / tickStep) * tickStep;
+        double rounded = std::round(pos_x / tick_step) * tick_step;
         if (std::abs(rounded - std::round(rounded)) < Constants::NumericConstants::DOUBLE_EPS) {
             label = QString::number(static_cast<int>(std::round(rounded)));
         } else {
             label = QString::number(rounded, 'g', 4);
         }
-        painter->drawText(QRect(viewport_x-20, labelY-12, 40, 14),
+        painter->drawText(QRect(viewport_x-20, label_y-12, 40, 14),
                           Qt::AlignHCenter, label);
+        pos_x += tick_step;
     }
 
     // Y-Achse
-    int labelX = static_cast<int>(std::clamp(
+    int label_x = static_cast<int>(std::clamp(
         static_cast<double>(origin_x + margin),
         static_cast<double>(margin),
         static_cast<double>(viewSize.width - 40 - margin)));
 
-    for (double pos_y = -GridConstants::EXTENT; pos_y <= GridConstants::EXTENT; pos_y += tickStep) {
+    double pos_y = -GridConstants::EXTENT;
+    while (pos_y <= GridConstants::EXTENT) {
         if (std::abs(pos_y) < GridConstants::RASTER_START) {
+            pos_y += tick_step;
             continue;
         }
-        QPointF viewportPoint = toViewport(QPointF(0, pos_y));
-        if (viewportPoint.y() < 0 || viewportPoint.y() > viewSize.height) {
+        QPointF viewport_point = toViewport(QPointF(0, pos_y));
+        if (viewport_point.y() < 0 || viewport_point.y() > viewSize.height) {
+            pos_y += tick_step;
             continue;
         }
-        int viewport_y = static_cast<int>(viewportPoint.y());
-        painter->drawLine(origin_x - tickSize, viewport_y, origin_x + tickSize, viewport_y);
+        int viewport_y = static_cast<int>(viewport_point.y());
+        painter->drawLine(origin_x - tick_size, viewport_y, origin_x + tick_size, viewport_y);
         QString label;
-        double rounded = std::round(pos_y / tickStep) * tickStep;
+        double rounded = std::round(pos_y / tick_step) * tick_step;
         if (std::round(rounded - std::round(rounded)) < Constants::NumericConstants::DOUBLE_EPS) {
             label = QString::number(static_cast<int>(std::round(rounded)));
         } else {
             label = QString::number(rounded, 'g', 4);
         }
-        painter->drawText(QRect(labelX, viewport_y-7, 38, 14),
+        painter->drawText(QRect(label_x, viewport_y-7, 38, 14),
                           Qt::AlignLeft | Qt::AlignVCenter, label);
+        pos_y += tick_step;
     }
 
     painter->drawText(QRect(origin_x+margin, origin_y+margin, 20, 14), Qt::AlignLeft, "0");

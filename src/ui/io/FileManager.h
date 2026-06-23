@@ -30,6 +30,8 @@ public slots: // NOLINT
         void markChanged()             { m_unsavedChanges = true;  updateTitle(); }
 
 private:
+    auto filterJSON() const -> QString { return tr("Stoicheia-Dateien (*.sto)"); };
+    auto filterSVG() const -> QString { return tr("SVG-Dateien (*.svg)"); };
     auto saveToFile(const QString& filename) -> bool;
     auto loadFromFile(const QString& filename) -> bool;
     void clearScene() const;

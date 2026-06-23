@@ -8,8 +8,6 @@
 #include <QMessageBox>
 #include <QMainWindow>
 
-static const QString FILTER_JSON = FileManager::tr("Stoicheia-Dateien (*.sto)");
-static const QString FILTER_SVG  = FileManager::tr("SVG-Dateien (*.svg)");
 
 FileManager::FileManager(Scene* scene, SceneAdapter* adapter,
                           CommandStack* commandStack, QWidget* parent)
@@ -74,7 +72,7 @@ auto FileManager::open() -> bool {
     }
 
     QString filename = QFileDialog::getOpenFileName(
-        m_parent, tr("Datei öffnen"), {}, FILTER_JSON);
+        m_parent, tr("Datei öffnen"), {}, filterJSON());
     if (filename.isEmpty()) {
         return false;
     }
@@ -108,7 +106,7 @@ auto FileManager::save() -> bool {
 
 auto FileManager::saveAs() -> bool {
     QString filename = QFileDialog::getSaveFileName(
-        m_parent, tr("Datei speichern"), {}, FILTER_JSON);
+        m_parent, tr("Datei speichern"), {}, filterJSON());
     if (filename.isEmpty()) {
         return false;
     }
@@ -120,7 +118,7 @@ auto FileManager::saveAs() -> bool {
 
 auto FileManager::exportSVG() const -> bool {
     QString filename = QFileDialog::getSaveFileName(
-        m_parent, tr("SVG exportieren"), {}, FILTER_SVG);
+        m_parent, tr("SVG exportieren"), {}, filterSVG());
     if (filename.isEmpty()) {
         return false;
     }

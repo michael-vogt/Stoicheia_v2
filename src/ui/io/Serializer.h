@@ -4,8 +4,8 @@
 #include <QJsonArray>
 #include <qjsonobject.h>
 #include <qjsonvalue.h>
-#include <unordered_map>
-#include <unordered_set>
+#include <map>
+#include <set>
 #include <vector>
 
 
@@ -30,21 +30,21 @@ public:
 private:
     // Save
     auto serializeScene() const -> QJsonObject;
-    auto serializeObject(GeoObject* obj, int ident, const std::unordered_map<GeoObject*, int>& idMap) const -> QJsonObject;
+    auto serializeObject(GeoObject* obj, unsigned int ident, const std::map<GeoObject*, unsigned int>& idMap) const -> QJsonObject;
     void serializeDisplayProperties(GeoObject* obj, QJsonObject& jsonObj) const;
 
     // Load
     auto deserializeScene(const QJsonArray& objects) -> bool;
-    auto deserializeObject(const QJsonValueConstRef& val, std::unordered_map<int, GeoObject*>& idMap) -> bool;
-    static auto ref(const QString& key, const QJsonObject& jsonObj, const std::unordered_map<int, GeoObject*>& idMap) -> GeoObject*;
+    auto deserializeObject(const QJsonValueConstRef& val, std::map<int, GeoObject*>& idMap) -> bool;
+    static auto ref(const QString& key, const QJsonObject& jsonObj, const std::map<int, GeoObject*>& idMap) -> GeoObject*;
 
     // SVG
     auto buildSVG() const -> QString;
 
-    auto buildDependencyOrder(const std::unordered_set<GeoObject*>& saveable) const -> std::vector<GeoObject*>;
-    static auto buildIdMap(const std::vector<GeoObject*>& sorted)  -> std::unordered_map<GeoObject*, int>;
-    void collectDependencies(GeoObject* obj, std::unordered_set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::unordered_set<GeoObject*>& saveable) const;
-    auto collectSaveableObjects() const -> std::unordered_set<GeoObject*>;
+    auto buildDependencyOrder(const std::set<GeoObject*>& saveable) const -> std::vector<GeoObject*>;
+    static auto buildIdMap(const std::vector<GeoObject*>& sorted)  -> std::map<GeoObject*, unsigned int>;
+    void collectDependencies(GeoObject* obj, std::set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::set<GeoObject*>& saveable) const;
+    auto collectSaveableObjects() const -> std::set<GeoObject*>;
 
     Scene*        m_scene;
     SceneAdapter* m_adapter;

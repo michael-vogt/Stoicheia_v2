@@ -46,8 +46,8 @@ DrawingBoard::DrawingBoard(QWidget *parent)
 
     m_inputManager = new InputManager(this, this);
 
-    connect(m_inputManager, &InputManager::undoRequested, [this]() { m_commandStack.undo(); });
-    connect(m_inputManager, &InputManager::redoRequested, [this]() { m_commandStack.redo(); });
+    connect(m_inputManager, &InputManager::undoRequested, [this]() -> void { m_commandStack.undo(); });
+    connect(m_inputManager, &InputManager::redoRequested, [this]() -> void { m_commandStack.redo(); });
     connect(m_inputManager, &InputManager::escapePressed, this, &DrawingBoard::escapePressed);
     connect(m_inputManager, &InputManager::statusMessage, this, &DrawingBoard::statusMessage);
     connect(m_inputManager, &InputManager::shortcutModeChanged, this, &DrawingBoard::shortcutModeChanged);
@@ -79,10 +79,10 @@ void DrawingBoard::setGridSpacing(const double spacing) {
 void DrawingBoard::resetView() {
     setTransformationAnchor(QGraphicsView::NoAnchor);
     QTransform trans = transform();
-    double scaleX = trans.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
-    double scaleY = trans.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
+    double scale_x = trans.m11(); // in case of rotation and/or shear: std::sqrt(t.m11() * t.m11() + t.m21() * t.m21());
+    double scale_y = trans.m22(); // in case of rotation and/or shear: std::sqrt(t.m22() * t.m22() + t.m12() * t.m12());
     centerOn(0, 0);
-    scale(1.0 / scaleX, -1.0 / scaleY);
+    scale(1.0 / scale_x, -1.0 / scale_y);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }
 
@@ -178,12 +178,12 @@ void DrawingBoard::drawForeground(QPainter *painter, const QRectF &rect) {
     painter->save();
     painter->setTransform(QTransform());
 
-    auto toViewport = [this](QPointF point) -> QPointF {
+    auto to_viewport = [this](QPointF point) -> QPointF {
         return viewport()->mapFrom(this, mapFromScene(point));
     };
 
-    double zoomFactor = std::abs(transform().m11());
-    m_grid.drawLabels(painter, toViewport, {.width=viewport()->width(), .height=viewport()->height()}, zoomFactor);
+    double zoom_factor = std::abs(transform().m11());
+    m_grid.drawLabels(painter, to_viewport, {.width=viewport()->width(), .height=viewport()->height()}, zoom_factor);
     painter->restore();
 }
 
@@ -219,14 +219,14 @@ void DrawingBoard::resizeEvent(QResizeEvent *event) {
         return;
     }
 
-    int hBefore = horizontalScrollBar()->value();
-    int vBefore = verticalScrollBar()->value();
+    int h_before = horizontalScrollBar()->value();
+    int v_before = verticalScrollBar()->value();
 
     QGraphicsView::resizeEvent(event);
 
     QSize delta = event->size() - event->oldSize();
-    horizontalScrollBar()->setValue(hBefore - (delta.width() / 2));
-    verticalScrollBar()->setValue(vBefore - (delta.height() / 2));
+    horizontalScrollBar()->setValue(h_before - (delta.width() / 2));
+    verticalScrollBar()->setValue(v_before - (delta.height() / 2));
 
     viewport()->update();
 }
@@ -237,9 +237,9 @@ void DrawingBoard::drawWatermark(QPainter *painter) const {
 
     const QImage image(":/resources/logo.png");
     painter->setOpacity(Colors::WATERMARK_OPACITY);
-    const QRectF viewportRect = viewport()->rect();
-    const QPointF viewportCenter = viewportRect.center();
+    const QRectF viewport_rect = viewport()->rect();
+    const QPointF viewport_center = viewport_rect.center();
     const QSizeF size = image.size() / image.devicePixelRatio();
-    painter->drawImage(QPointF(viewportCenter.x() - (size.width() / 2), viewportCenter.y() - (size.height() / 2)), image);
+    painter->drawImage(QPointF(viewport_center.x() - (size.width() / 2), viewport_center.y() - (size.height() / 2)), image);
     painter->restore();
 }

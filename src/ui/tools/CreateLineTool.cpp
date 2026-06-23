@@ -39,9 +39,9 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     if (m_firstPoint == nullptr) {
         // Erster Klick: bestehenden Punkt nehmen oder neuen erzeugen
@@ -76,28 +76,28 @@ void CreateLineTool::mousePressEvent(QMouseEvent *event) {
         auto macro = std::make_unique<MacroCommand>(description);
 
         // Ersten Punkt ins Macro, falls wir ihn erstellt haben
-        CreatePointCommand* p1Cmd = nullptr;
+        CreatePointCommand* p1_cmd = nullptr;
         Point* point1 = m_firstPoint;
 
         if (m_firstIsNew) {
             auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, m_firstScenePos.x(), m_firstScenePos.y());
-            p1Cmd = cmd.get();
+            p1_cmd = cmd.get();
             point1 = nullptr;
             macro->add(std::move(cmd));
         }
 
         // Zweiter Punkt
-        CreatePointCommand* p2Cmd = nullptr;
-        Point* point2 = pointAt(scenePos);
+        CreatePointCommand* p2_cmd = nullptr;
+        Point* point2 = pointAt(scene_pos);
 
         if (point2 == nullptr) {
             auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
-            p2Cmd = cmd.get();
+            p2_cmd = cmd.get();
             point2 = nullptr;
             macro->add(std::move(cmd));
         }
 
-        macro->add(std::make_unique<CreateLineCommand>(m_ctx.adapter, CreatePointCommandPairForLinearObject{.firstPoint=p1Cmd, .secondPoint=p2Cmd}, PointPairForLinearObject{.point1=point1, .point2=point2}, m_type));
+        macro->add(std::make_unique<CreateLineCommand>(m_ctx.adapter, CreatePointCommandPairForLinearObject{.firstPoint=p1_cmd, .secondPoint=p2_cmd}, PointPairForLinearObject{.point1=point1, .point2=point2}, m_type));
         m_ctx.commandStack->execute(std::move(macro));
 
         removePreview();
@@ -113,9 +113,9 @@ void CreateLineTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     m_lastScenePos = snapped;
     m_preview->setLine(computePreviewLine(snapped));
@@ -149,8 +149,8 @@ auto CreateLineTool::pointAt(const QPointF &scenePos) const -> Point* {
     const auto items = m_ctx.drawingBoard->scene()->items(
         QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
     for (QGraphicsItem *item : items) {
-        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-            return pointItem->point();
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            return point_item->point();
         }
     }
     return nullptr;
@@ -158,14 +158,14 @@ auto CreateLineTool::pointAt(const QPointF &scenePos) const -> Point* {
 
 void CreateLineTool::setType(const LinearObjectType type) {
     m_type = type;
-    ToolType toolType = ToolType::CreateSegment;
+    ToolType tool_type = ToolType::CreateSegment;
     if (type == LinearObjectType::Line) {
-        toolType = ToolType::CreateLine;
+        tool_type = ToolType::CreateLine;
     } else if (type == LinearObjectType::Ray) {
-        toolType = ToolType::CreateRay;
+        tool_type = ToolType::CreateRay;
     }
     
-    m_ctx.drawingBoard->updateToolType(toolType);
+    m_ctx.drawingBoard->updateToolType(tool_type);
     if (m_preview != nullptr) {
         m_preview->setLine(computePreviewLine(m_lastScenePos));
     }

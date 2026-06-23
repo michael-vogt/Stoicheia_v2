@@ -6,15 +6,15 @@
 ConstrainedPointOnLine::ConstrainedPointOnLine(LinearObject* line, const DoublePair point)
     : Point(point.x, point.y), m_line(line)
 {
-    m_param = m_line->projectParameter({point.x, point.y});
+    m_param = m_line->projectParameter(DoublePair{.x=point.x, .y=point.y});
     //m_line->addDependent(this);
     m_line->point1()->addDependent(this);
     m_line->point2()->addDependent(this);
     ConstrainedPointOnLine::recompute();
 }
 
-void ConstrainedPointOnLine::setParam(const double t) {
-    m_param = t;
+void ConstrainedPointOnLine::setParam(const double param_t) {
+    m_param = param_t;
     recompute();
 }
 
@@ -23,14 +23,16 @@ void ConstrainedPointOnLine::recompute() {
         m_valid = false;
         return;
     }
-    const double x = m_line->point1()->x() + m_param * m_line->dx();
-    const double y = m_line->point1()->y() + m_param * m_line->dy();
-    moveTo(x, y);
+    const double pos_x = m_line->point1()->x() + (m_param * m_line->dx());
+    const double pos_y = m_line->point1()->y() + (m_param * m_line->dy());
+    moveTo(pos_x, pos_y);
     m_valid = true;
 }
 
 void ConstrainedPointOnLine::onSourceRemoved(GeoObject* src) {
-    if (src == m_line) m_line = nullptr;
+    if (src == m_line) {
+        m_line = nullptr;
+    }
     m_valid = false;
 }
 
@@ -45,9 +47,9 @@ void ConstrainedPointOnLine::replaceSource(const GeoObjectPair source) {
 ConstrainedPointOnCircle::ConstrainedPointOnCircle(Circle* circle, const DoublePair point)
     : Point(point.x, point.y), m_circle(circle)
 {
-    const double dx = point.x - circle->center()->x();
-    const double dy = point.y - circle->center()->y();
-    m_angle = std::atan2(dy, dx);
+    const double delta_x = point.x - circle->center()->x();
+    const double delta_y = point.y - circle->center()->y();
+    m_angle = std::atan2(delta_y, delta_x);
 
     //m_circle->addDependent(this);
     m_circle->center()->addDependent(this);
@@ -62,18 +64,20 @@ void ConstrainedPointOnCircle::setAngle(const double angle) {
 }
 
 void ConstrainedPointOnCircle::recompute() {
-    if (!m_circle || !m_circle->isValid()) {
+    if (m_circle == nullptr || !m_circle->isValid()) {
         m_valid = false;
         return;
     }
-    const double x = m_circle->center()->x() + m_circle->radius() * std::cos(m_angle);
-    const double y = m_circle->center()->y() + m_circle->radius() * std::sin(m_angle);
-    moveTo(x, y);
+    const double pos_x = m_circle->center()->x() + (m_circle->radius() * std::cos(m_angle));
+    const double pos_y = m_circle->center()->y() + (m_circle->radius() * std::sin(m_angle));
+    moveTo(pos_x, pos_y);
     m_valid = true;
 }
 
 void ConstrainedPointOnCircle::onSourceRemoved(GeoObject* src) {
-    if (src == m_circle) m_circle = nullptr;
+    if (src == m_circle) {
+        m_circle = nullptr;
+    }
     m_valid = false;
 }
 

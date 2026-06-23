@@ -13,21 +13,21 @@ void Scene::remove(GeoObject* target) {
 }
 
 void Scene::removeCascade(GeoObject* target) {
-    std::vector<GeoObject*> toDelete;
-    std::function<void(GeoObject*)> collect = [&](GeoObject* obj) {
+    std::vector<GeoObject*> to_delete;
+    std::function<void(GeoObject*)> collect = [&](GeoObject* obj) -> void {
       for (GeoObject* dep : obj->dependents()) {
-          toDelete.push_back(dep);
+          to_delete.push_back(dep);
           collect(dep);
       }
     };
     collect(target);
-    toDelete.push_back(target);
+    to_delete.push_back(target);
 
-    for (GeoObject* obj : toDelete) {
+    for (GeoObject* obj : to_delete) {
         obj->detach();
     }
     std::erase_if(m_objects, [&](const auto& ptr) -> auto {
-        return std::ranges::contains(toDelete, ptr.get());
+        return std::ranges::contains(to_delete, ptr.get());
     });
 }
 

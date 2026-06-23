@@ -9,16 +9,16 @@ CreatePerpendicularFootTool::CreatePerpendicularFootTool(const ToolContext& ctx)
 void CreatePerpendicularFootTool::mousePressEvent(QMouseEvent* event) {
     if (event->button() != Qt::LeftButton) { event->ignore(); return; }
 
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
 
     if (m_point == nullptr) {
-        m_point = m_ctx.hitTest->pointAt(scenePos);
+        m_point = m_ctx.hitTest->pointAt(scene_pos);
         if (m_point != nullptr) {
             highlightObject(m_point, true);
             showStatus(tr("Gerade klicken"));
         }
     } else {
-        LinearObject* line = m_ctx.hitTest->linearObjectAt(scenePos);
+        LinearObject* line = m_ctx.hitTest->linearObjectAt(scene_pos);
         if (line != nullptr) {
             m_ctx.commandStack->execute(
                 std::make_unique<CreatePerpendicularFootCommand>(

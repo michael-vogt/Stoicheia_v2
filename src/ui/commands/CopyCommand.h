@@ -9,7 +9,7 @@ class CopyCommand : public Command {
     Q_OBJECT
 
 public:
-    CopyCommand(SceneAdapter* adapter, const std::unordered_set<GeoObject*>& selection, const QPointF& offset);
+    CopyCommand(SceneAdapter* adapter, const std::set<GeoObject*>& selection, const QPointF& offset);
 
     void execute() override;
     void undo() override;
@@ -33,5 +33,5 @@ private:
     QPointF m_offset;
 
     // Mapping: original -> Kopie
-    std::unordered_map<GeoObject*, GeoObject*> m_map;
+    std::map<GeoObject*, GeoObject*> m_map;
 };

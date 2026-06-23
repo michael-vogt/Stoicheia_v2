@@ -21,11 +21,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <qjsonobject.h>
-#include <unordered_map>
-#include <unordered_set>
+#include <map>
+#include <set>
 #include <vector>
 
-static constexpr int FILE_VERSION = 1;
+static constexpr int file_version = 1;
 //constexpr double eps = std::numeric_limits<double>::epsilon();
 
 using namespace Constants::ExportConstants;
@@ -53,96 +53,96 @@ auto Serializer::serializeScene() const -> QJsonObject {
 
     auto saveable = collectSaveableObjects();
     auto sorted = buildDependencyOrder(saveable);
-    auto idMap = buildIdMap(sorted);
+    auto id_map = buildIdMap(sorted);
 
     // Serialisieren
     QJsonArray objects;
-    for (int i = 0; i < static_cast<int>(sorted.size()); ++i) {
-        objects.append(serializeObject(sorted[i], i, idMap));
+    for (std::size_t i = 0; i < sorted.size(); ++i) {
+        objects.append(serializeObject(sorted[i], static_cast<unsigned int>(i), id_map));
     }
 
     QJsonObject root;
-    root["version"] = FILE_VERSION;
+    root["version"] = file_version;
     root["objects"] = objects;
     return root;
 }
 
-auto Serializer::serializeObject(GeoObject* obj, int ident, const std::unordered_map<GeoObject*, int>& idMap) const -> QJsonObject {
-    auto ref = [&](GeoObject* obj) -> int {
+auto Serializer::serializeObject(GeoObject* obj, unsigned int ident, const std::map<GeoObject*, unsigned int>& idMap) const -> QJsonObject {
+    auto ref = [&](GeoObject* obj) -> unsigned int {
         auto iter = idMap.find(obj);
         return iter != idMap.end() ? iter->second : -1;
     };
 
-    QJsonObject jsonObj;
-    jsonObj["id"] = ident;
+    QJsonObject json_obj;
+    json_obj["id"] = static_cast<int>(ident);
 
-    if (auto* intersectionPoint = dynamic_cast<IntersectionPoint*>(obj)) {
-        jsonObj["type"] = "IntersectionPoint";
+    if (auto* intersection_point = dynamic_cast<IntersectionPoint*>(obj)) {
+        json_obj["type"] = "IntersectionPoint";
         for (IntersectionSet* iset : m_adapter->intersectionSets()) {
-            if (iset->first() == intersectionPoint) {
-                jsonObj["intersectionSet"] = ref(iset);
-                jsonObj["index"] = 0;
+            if (iset->first() == intersection_point) {
+                json_obj["intersectionSet"] = static_cast<int>(ref(iset));
+                json_obj["index"] = 0;
                 break;
             }
-            if (iset->second() == intersectionPoint) {
-                jsonObj["intersectionSet"] = ref(iset);
-                jsonObj["index"] = 1;
+            if (iset->second() == intersection_point) {
+                json_obj["intersectionSet"] = static_cast<int>(ref(iset));
+                json_obj["index"] = 1;
                 break;
             }
         }
     } else if (auto* point = dynamic_cast<Point*>(obj)) {
-        jsonObj["type"] = "Point";
-        jsonObj["x"]    = point->x();
-        jsonObj["y"]    = point->y();
+        json_obj["type"] = "Point";
+        json_obj["x"]    = point->x();
+        json_obj["y"]    = point->y();
     } else if (auto* line = dynamic_cast<Line*>(obj)) {
-        jsonObj["type"] = "Line";
-        jsonObj["p1"]   = ref(line->point1());
-        jsonObj["p2"]   = ref(line->point2());
+        json_obj["type"] = "Line";
+        json_obj["p1"]   = static_cast<int>(ref(line->point1()));
+        json_obj["p2"]   = static_cast<int>(ref(line->point2()));
     } else if (auto* ray = dynamic_cast<Ray*>(obj)) {
-        jsonObj["type"] = "Ray";
-        jsonObj["p1"]   = ref(ray->point1());
-        jsonObj["p2"]   = ref(ray->point2());
+        json_obj["type"] = "Ray";
+        json_obj["p1"]   = static_cast<int>(ref(ray->point1()));
+        json_obj["p2"]   = static_cast<int>(ref(ray->point2()));
     } else if (auto* segment = dynamic_cast<Segment*>(obj)) {
-        jsonObj["type"] = "Segment";
-        jsonObj["p1"]   = ref(segment->point1());
-        jsonObj["p2"]   = ref(segment->point2());
+        json_obj["type"] = "Segment";
+        json_obj["p1"]   = static_cast<int>(ref(segment->point1()));
+        json_obj["p2"]   = static_cast<int>(ref(segment->point2()));
     } else if (auto* circle = dynamic_cast<Circle*>(obj)) {
-        jsonObj["type"]   = "Circle";
-        jsonObj["center"] = ref(circle->center());
-        jsonObj["radius"] = ref(circle->radiusPoint());
+        json_obj["type"]   = "Circle";
+        json_obj["center"] = static_cast<int>(ref(circle->center()));
+        json_obj["radius"] = static_cast<int>(ref(circle->radiusPoint()));
     } else if (auto* midpoint = dynamic_cast<Midpoint*>(obj)) {
-        jsonObj["type"] = "Midpoint";
-        jsonObj["p1"]   = ref(midpoint->point1());
-        jsonObj["p2"]   = ref(midpoint->point2());
+        json_obj["type"] = "Midpoint";
+        json_obj["p1"]   = static_cast<int>(ref(midpoint->point1()));
+        json_obj["p2"]   = static_cast<int>(ref(midpoint->point2()));
     } else if (auto* para = dynamic_cast<Parallel*>(obj)) {
-        jsonObj["type"]      = "Parallel";
-        jsonObj["origin"]    = ref(para->origin());
-        jsonObj["reference"] = ref(para->reference());
+        json_obj["type"]      = "Parallel";
+        json_obj["origin"]    = static_cast<int>(ref(para->origin()));
+        json_obj["reference"] = static_cast<int>(ref(para->reference()));
     } else if (auto* perp = dynamic_cast<Perpendicular*>(obj)) {
-        jsonObj["type"]      = "Perpendicular";
-        jsonObj["origin"]    = ref(perp->origin());
-        jsonObj["reference"] = ref(perp->reference());
+        json_obj["type"]      = "Perpendicular";
+        json_obj["origin"]    = static_cast<int>(ref(perp->origin()));
+        json_obj["reference"] = static_cast<int>(ref(perp->reference()));
     } else if (auto* perp_foot = dynamic_cast<PerpendicularFoot*>(obj)) {
-        jsonObj["type"]  = "PerpendicularFoot";
-        jsonObj["point"] = ref(perp_foot->point());
-        jsonObj["line"]  = ref(perp_foot->line());
+        json_obj["type"]  = "PerpendicularFoot";
+        json_obj["point"] = static_cast<int>(ref(perp_foot->point()));
+        json_obj["line"]  = static_cast<int>(ref(perp_foot->line()));
     } else if (auto* lli = dynamic_cast<LineLineIntersection*>(obj)) {
-        jsonObj["type"] = "LineLineIntersection";
-        jsonObj["l1"]   = ref(lli->line1());
-        jsonObj["l2"]   = ref(lli->line2());
+        json_obj["type"] = "LineLineIntersection";
+        json_obj["l1"]   = static_cast<int>(ref(lli->line1()));
+        json_obj["l2"]   = static_cast<int>(ref(lli->line2()));
     } else if (auto* lci = dynamic_cast<LineCircleIntersection*>(obj)) {
-        jsonObj["type"]   = "LineCircleIntersection";
-        jsonObj["line"]   = ref(lci->line());
-        jsonObj["circle"] = ref(lci->circle());
+        json_obj["type"]   = "LineCircleIntersection";
+        json_obj["line"]   = static_cast<int>(ref(lci->line()));
+        json_obj["circle"] = static_cast<int>(ref(lci->circle()));
     } else if (auto* cci = dynamic_cast<CircleCircleIntersection*>(obj)) {
-        jsonObj["type"] = "CircleCircleIntersection";
-        jsonObj["c1"]   = ref(cci->circle1());
-        jsonObj["c2"]   = ref(cci->circle2());
+        json_obj["type"] = "CircleCircleIntersection";
+        json_obj["c1"]   = static_cast<int>(ref(cci->circle1()));
+        json_obj["c2"]   = static_cast<int>(ref(cci->circle2()));
     }
 
-    serializeDisplayProperties(obj, jsonObj);
+    serializeDisplayProperties(obj, json_obj);
 
-    return jsonObj;
+    return json_obj;
 }
 
 void Serializer::serializeDisplayProperties(GeoObject* obj, QJsonObject& jsonObj) const {
@@ -150,19 +150,19 @@ void Serializer::serializeDisplayProperties(GeoObject* obj, QJsonObject& jsonObj
     // (Member von IntersectionSet), daher nur speichern wenn ein Item existiert.
     if (auto* item = m_adapter->itemFor(obj)) {
         QPen pen;
-        bool hasPen = false;
-        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-            pen = pointItem->pen();
-            hasPen = true;
-        } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
-            pen = linearItem->pen();
-            hasPen = true;
-        } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
-            pen = circleItem->pen();
-            hasPen = true;
+        bool has_pen = false;
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            pen = point_item->pen();
+            has_pen = true;
+        } else if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            pen = linear_item->pen();
+            has_pen = true;
+        } else if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+            pen = circle_item->pen();
+            has_pen = true;
         }
 
-        if (hasPen) {
+        if (has_pen) {
             jsonObj["color"] = pen.color().name(QColor::HexArgb);
         }
         jsonObj["visible"] = item->isVisible();
@@ -178,15 +178,15 @@ auto Serializer::load(const QString& filename) -> bool {
         return false;
     }
 
-    QJsonParseError parseError;
-    auto doc = QJsonDocument::fromJson(file.readAll(), &parseError);
-    if (parseError.error != QJsonParseError::NoError) {
-        m_lastError = parseError.errorString();
+    QJsonParseError parse_error;
+    auto doc = QJsonDocument::fromJson(file.readAll(), &parse_error);
+    if (parse_error.error != QJsonParseError::NoError) {
+        m_lastError = parse_error.errorString();
         return false;
     }
 
     QJsonObject root = doc.object();
-    if (root["version"].toInt() > FILE_VERSION) {
+    if (root["version"].toInt() > file_version) {
         m_lastError = "Dateiversion wird nicht unterstützt";
         return false;
     }
@@ -199,33 +199,33 @@ auto Serializer::deserializeScene(const QJsonArray& objects) -> bool {
     // 1. Alle Objekte erzeugen (damit Referenzen aufgelöst werden können)
     // 2. Referenzen auflösen und grafische Objekte anlegen
 
-    std::unordered_map<int, GeoObject*> idMap;
+    std::map<int, GeoObject*> id_map;
 
     for (const auto& val : objects) {
-        if (!deserializeObject(val, idMap)) {
+        if (!deserializeObject(val, id_map)) {
             return false;
         }
     }
     return true;
 }
 
-auto Serializer::ref(const QString& key, const QJsonObject& jsonObj, const std::unordered_map<int, GeoObject*>& idMap) -> GeoObject* {
-    int refId = jsonObj[key].toInt(-1);
-    auto iter = idMap.find(refId);
+auto Serializer::ref(const QString& key, const QJsonObject& jsonObj, const std::map<int, GeoObject*>& idMap) -> GeoObject* {
+    int ref_id = jsonObj[key].toInt(-1);
+    auto iter = idMap.find(ref_id);
     return (iter != idMap.end()) ? iter->second : nullptr;
 }
 
-auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered_map<int, GeoObject*>& idMap) -> bool { // NOLINT
-    QJsonObject jsonObj = val.toObject();
-    int         ident   = jsonObj["id"].toInt();
-    QString     type    = jsonObj["type"].toString();
+auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::map<int, GeoObject*>& idMap) -> bool { // NOLINT
+    QJsonObject json_obj = val.toObject();
+    int         ident   = json_obj["id"].toInt();
+    QString     type    = json_obj["type"].toString();
 
     GeoObject* obj = nullptr;
 
     if (type == "IntersectionPoint") {
-        int setId  = jsonObj["intersectionSet"].toInt(-1);
-        int index  = jsonObj["index"].toInt(0);
-        auto iter = idMap.find(setId);
+        int set_id  = json_obj["intersectionSet"].toInt(-1);
+        int index   = json_obj["index"].toInt(0);
+        auto iter = idMap.find(set_id);
         if (iter == idMap.end()) {
             m_lastError = "IntersectionSet nicht gefunden";
             return false;
@@ -242,12 +242,12 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
     } 
     
     if (type == "Point") {
-        auto* point = m_scene->create<Point>(jsonObj["x"].toDouble(), jsonObj["y"].toDouble());
+        auto* point = m_scene->create<Point>(json_obj["x"].toDouble(), json_obj["y"].toDouble());
         m_adapter->addPoint(point);
         obj = point;
     } else if (type == "Line") {
-        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
-        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        auto* point1 = dynamic_cast<Point*>(ref("p1", json_obj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", json_obj, idMap));
         if ((point1 == nullptr) || (point2 == nullptr)) { 
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -257,8 +257,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = line;
 
     } else if (type == "Ray") {
-        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
-        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        auto* point1 = dynamic_cast<Point*>(ref("p1", json_obj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", json_obj, idMap));
         if ((point1 == nullptr) || (point2 == nullptr)) { 
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -268,8 +268,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = ray;
 
     } else if (type == "Segment") {
-        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
-        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        auto* point1 = dynamic_cast<Point*>(ref("p1", json_obj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", json_obj, idMap));
         if ((point1 == nullptr) || (point2 == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -279,8 +279,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = segment;
 
     } else if (type == "Circle") {
-        auto* center = dynamic_cast<Point*>(ref("center", jsonObj, idMap));
-        auto* radius = dynamic_cast<Point*>(ref("radius", jsonObj, idMap));
+        auto* center = dynamic_cast<Point*>(ref("center", json_obj, idMap));
+        auto* radius = dynamic_cast<Point*>(ref("radius", json_obj, idMap));
         if ((center == nullptr) || (radius == nullptr)) { 
             m_lastError = "Ungültige Referenz"; 
             return false; 
@@ -290,8 +290,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = circle;
 
     } else if (type == "Midpoint") {
-        auto* point1 = dynamic_cast<Point*>(ref("p1", jsonObj, idMap));
-        auto* point2 = dynamic_cast<Point*>(ref("p2", jsonObj, idMap));
+        auto* point1 = dynamic_cast<Point*>(ref("p1", json_obj, idMap));
+        auto* point2 = dynamic_cast<Point*>(ref("p2", json_obj, idMap));
         if ((point1 == nullptr) || (point2 == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -301,30 +301,30 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = midpoint;
 
     } else if (type == "Parallel") {
-        auto* origin = dynamic_cast<Point*>(ref("origin", jsonObj, idMap));
-        auto* refObj = dynamic_cast<LinearObject*>(ref("reference", jsonObj, idMap));
-        if ((origin == nullptr) || (refObj == nullptr)) {
+        auto* origin = dynamic_cast<Point*>(ref("origin", json_obj, idMap));
+        auto* ref_obj = dynamic_cast<LinearObject*>(ref("reference", json_obj, idMap));
+        if ((origin == nullptr) || (ref_obj == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
         }
-        auto* para = m_scene->create<Parallel>(origin, refObj);
+        auto* para = m_scene->create<Parallel>(origin, ref_obj);
         m_adapter->addLinearObject(para->line());
         obj = para;
 
     } else if (type == "Perpendicular") {
-        auto* origin = dynamic_cast<Point*>(ref("origin", jsonObj, idMap));
-        auto* refObj = dynamic_cast<LinearObject*>(ref("reference", jsonObj, idMap));
-        if ((origin == nullptr) || (refObj == nullptr)) {
+        auto* origin = dynamic_cast<Point*>(ref("origin", json_obj, idMap));
+        auto* ref_obj = dynamic_cast<LinearObject*>(ref("reference", json_obj, idMap));
+        if ((origin == nullptr) || (ref_obj == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
         }
-        auto* perp = m_scene->create<Perpendicular>(origin, refObj);
+        auto* perp = m_scene->create<Perpendicular>(origin, ref_obj);
         m_adapter->addLinearObject(perp->line());
         obj = perp;
 
     } else if (type == "PerpendicularFoot") {
-        auto* point = dynamic_cast<Point*>(ref("point", jsonObj, idMap));
-        auto* line  = dynamic_cast<LinearObject*>(ref("line", jsonObj, idMap));
+        auto* point = dynamic_cast<Point*>(ref("point", json_obj, idMap));
+        auto* line  = dynamic_cast<LinearObject*>(ref("line", json_obj, idMap));
         if ((point == nullptr) || (line == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -334,8 +334,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = perp_foot;
 
     } else if (type == "LineLineIntersection") {
-        auto* line1 = dynamic_cast<LinearObject*>(ref("l1", jsonObj, idMap));
-        auto* line2 = dynamic_cast<LinearObject*>(ref("l2", jsonObj, idMap));
+        auto* line1 = dynamic_cast<LinearObject*>(ref("l1", json_obj, idMap));
+        auto* line2 = dynamic_cast<LinearObject*>(ref("l2", json_obj, idMap));
         if ((line1 == nullptr) || (line2 == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -345,8 +345,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = lli;
 
     } else if (type == "LineCircleIntersection") {
-        auto* line   = dynamic_cast<LinearObject*>(ref("line", jsonObj, idMap));
-        auto* circle = dynamic_cast<Circle*>(ref("circle", jsonObj, idMap));
+        auto* line   = dynamic_cast<LinearObject*>(ref("line", json_obj, idMap));
+        auto* circle = dynamic_cast<Circle*>(ref("circle", json_obj, idMap));
         if ((line == nullptr) || (circle == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -356,8 +356,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         obj = lci;
 
     } else if (type == "CircleCircleIntersection") {
-        auto* circle1 = dynamic_cast<Circle*>(ref("c1", jsonObj, idMap));
-        auto* circle2 = dynamic_cast<Circle*>(ref("c2", jsonObj, idMap));
+        auto* circle1 = dynamic_cast<Circle*>(ref("c1", json_obj, idMap));
+        auto* circle2 = dynamic_cast<Circle*>(ref("c2", json_obj, idMap));
         if ((circle1 == nullptr) || (circle2 == nullptr)) {
             m_lastError = "Ungültige Referenz";
             return false; 
@@ -371,8 +371,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
         // Darstellungseigenschaften (Farbe, Sichtbarkeit) wiederherstellen.
         // IntersectionPoints haben kein eigenes Item, daher Existenz prüfen.
         if (auto* item = m_adapter->itemFor(obj)) {
-            if (jsonObj.contains("color")) {
-                QColor color(jsonObj["color"].toString());
+            if (json_obj.contains("color")) {
+                QColor color(json_obj["color"].toString());
                 if (color.isValid()) {
                     m_adapter->setColor(obj, color);
                     /*if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
@@ -390,8 +390,8 @@ auto Serializer::deserializeObject(const QJsonValueConstRef& val, std::unordered
                     }*/
                 }
             }
-            if (jsonObj.contains("visible")) {
-                bool visible = jsonObj["visible"].toBool(true);
+            if (json_obj.contains("visible")) {
+                bool visible = json_obj["visible"].toBool(true);
                 visible ? m_adapter->show(obj) : m_adapter->hide(obj);
             }
         }
@@ -415,16 +415,16 @@ auto Serializer::exportSVG(const QString& filename) const -> bool {
 
 auto Serializer::buildSVG() const -> QString {
     // Bounding box aus allen Objekten bestimmen
-    double minX =  SVG::BOUNDINGBOX_WIDTH;
-    double minY =  SVG::BOUNDINGBOX_WIDTH;
-    double maxX = -SVG::BOUNDINGBOX_WIDTH;
-    double maxY = -SVG::BOUNDINGBOX_WIDTH;
+    double min_x =  SVG::BOUNDINGBOX_WIDTH;
+    double min_y =  SVG::BOUNDINGBOX_WIDTH;
+    double max_x = -SVG::BOUNDINGBOX_WIDTH;
+    double max_y = -SVG::BOUNDINGBOX_WIDTH;
 
     const auto& items = m_adapter->geoGraphicsItems();
 
     auto expand = [&](double pos_x, double pos_y) -> void {
-        minX = std::min(minX, pos_x); minY = std::min(minY, pos_y);
-        maxX = std::max(maxX, pos_x); maxY = std::max(maxY, pos_y);
+        min_x = std::min(min_x, pos_x); min_y = std::min(min_y, pos_y);
+        max_x = std::max(max_x, pos_x); max_y = std::max(max_y, pos_y);
     };
 
     for (const auto& [obj, item] : items) {
@@ -436,23 +436,23 @@ auto Serializer::buildSVG() const -> QString {
         }
     }
 
-    if (minX > maxX) { 
-        minX = -SVG::MINSIZE;
-        maxX = SVG::MINSIZE;
-        minY = -SVG::MINSIZE;
-        maxY = SVG::MINSIZE; 
+    if (min_x > max_x) { 
+        min_x = -SVG::MINSIZE;
+        max_x = SVG::MINSIZE;
+        min_y = -SVG::MINSIZE;
+        max_y = SVG::MINSIZE; 
     }
-    minX -= SVG::MARGIN;
-    minY -= SVG::MARGIN;
-    maxX += SVG::MARGIN;
-    maxY += SVG::MARGIN;
+    min_x -= SVG::MARGIN;
+    min_y -= SVG::MARGIN;
+    max_x += SVG::MARGIN;
+    max_y += SVG::MARGIN;
 
-    double width = maxX - minX;
-    double height = maxY - minY;
+    double width = max_x - min_x;
+    double height = max_y - min_y;
 
     // SVG-Koordinaten: Y-Achse invertieren (SVG hat Y nach unten)
-    auto svgX = [&](double pos_x) -> double { return pos_x - minX; };
-    auto svgY = [&](double pos_y) -> double { return height - (pos_y - minY); }; // Y-Flip
+    auto svg_x = [&](double pos_x) -> double { return pos_x - min_x; };
+    auto svg_y = [&](double pos_y) -> double { return height - (pos_y - min_y); }; // Y-Flip
 
     QString svg;
     svg += QString(R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -467,9 +467,9 @@ auto Serializer::buildSVG() const -> QString {
             continue;
         }
 
-        if (auto* linearObject = dynamic_cast<LinearObject*>(obj)) {
-            double delta_x = linearObject->dx();
-            double delta_y = linearObject->dy();
+        if (auto* linear_object = dynamic_cast<LinearObject*>(obj)) {
+            double delta_x = linear_object->dx();
+            double delta_y = linear_object->dy();
             double len = std::sqrt((delta_x*delta_x) + (delta_y*delta_y));
             if (len < eps) {
                 continue;
@@ -477,14 +477,14 @@ auto Serializer::buildSVG() const -> QString {
             double dir_x = delta_x/len;
             double dir_y = delta_y/len;
 
-            double p1_x = linearObject->point1()->x();
-            double p1_y = linearObject->point1()->y();
-            double p2_x = linearObject->point2()->x();
-            double p2_y = linearObject->point2()->y();
-            if (dynamic_cast<Ray*>(linearObject) != nullptr) {
+            double p1_x = linear_object->point1()->x();
+            double p1_y = linear_object->point1()->y();
+            double p2_x = linear_object->point2()->x();
+            double p2_y = linear_object->point2()->y();
+            if (dynamic_cast<Ray*>(linear_object) != nullptr) {
                 p2_x += (dir_x*SVG::LINE_EXTENT);
                 p2_y += (dir_y*SVG::LINE_EXTENT);
-            } else if (dynamic_cast<Line*>(linearObject) != nullptr) {
+            } else if (dynamic_cast<Line*>(linear_object) != nullptr) {
                 p1_x -= (dir_x*SVG::LINE_EXTENT);
                 p1_y -= (dir_y*SVG::LINE_EXTENT);
                 p2_x += (dir_x*SVG::LINE_EXTENT);
@@ -494,23 +494,23 @@ auto Serializer::buildSVG() const -> QString {
             svg += QString(R"(  <line x1="%1" y1="%2" x2="%3" y2="%4"
         stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(p1_x)).arg(svgY(p1_y))
-                .arg(svgX(p2_x)).arg(svgY(p2_y));
+                .arg(svg_x(p1_x)).arg(svg_y(p1_y))
+                .arg(svg_x(p2_x)).arg(svg_y(p2_y));
 
         } else if (auto* circle = dynamic_cast<Circle*>(obj)) {
             svg += QString(R"(  <circle cx="%1" cy="%2" r="%3"
         fill="none" stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(circle->center()->x()))
-                .arg(svgY(circle->center()->y()))
+                .arg(svg_x(circle->center()->x()))
+                .arg(svg_y(circle->center()->y()))
                 .arg(circle->radius());
 
         } else if (auto* point = dynamic_cast<Point*>(obj)) {
             svg += QString(R"(  <circle cx="%1" cy="%2" r="4"
         fill="white" stroke="black" stroke-width="1.5"/>
 )")
-                .arg(svgX(point->x()))
-                .arg(svgY(point->y()));
+                .arg(svg_x(point->x()))
+                .arg(svg_y(point->y()));
         }
     }
 
@@ -518,10 +518,10 @@ auto Serializer::buildSVG() const -> QString {
     return svg;
 }
 
-auto Serializer::buildDependencyOrder(const std::unordered_set<GeoObject*>& saveable) const -> std::vector<GeoObject*> {
+auto Serializer::buildDependencyOrder(const std::set<GeoObject*>& saveable) const -> std::vector<GeoObject*> {
     // Topologisch sortieren – nur saveables
     std::vector<GeoObject*> sorted;
-    std::unordered_set<GeoObject*> visited;
+    std::set<GeoObject*> visited;
 
     for (GeoObject* obj : saveable) {
         collectDependencies(obj, visited, sorted, saveable);
@@ -530,31 +530,31 @@ auto Serializer::buildDependencyOrder(const std::unordered_set<GeoObject*>& save
     return sorted;
 }
 
-auto Serializer::buildIdMap(const std::vector<GeoObject*>& sorted) -> std::unordered_map<GeoObject*, int> {
-    std::unordered_map<GeoObject*, int> idMap;
+auto Serializer::buildIdMap(const std::vector<GeoObject*>& sorted) -> std::map<GeoObject*, unsigned int> {
+    std::map<GeoObject*, unsigned int> id_map;
     // IDs in topologischer Reihenfolge vergeben
     // IntersectionPoints bekommen auch IDs (für Referenzen aus anderen Objekten)
-    for (int i = 0; i < static_cast<int>(sorted.size()); ++i) {
-        idMap[sorted[i]] = i;
+    for (std::size_t i = 0; i < sorted.size(); ++i) {
+        id_map[sorted[i]] = static_cast<unsigned int>(i);
     }
 
     // IntersectionPoints der gespeicherten IntersectionSets mit IDs versehen
-    int nextId = static_cast<int>(sorted.size());
+    int next_id = static_cast<int>(sorted.size());
     for (GeoObject* obj : sorted) {
         if (auto* iset = dynamic_cast<IntersectionSet*>(obj)) {
-            if (!idMap.contains(iset->first())) {
-                idMap[iset->first()]  = nextId++;
+            if (!id_map.contains(iset->first())) {
+                id_map[iset->first()]  = next_id++;
             }
-            if (!idMap.contains(iset->second())) {
-                idMap[iset->second()] = nextId++;
+            if (!id_map.contains(iset->second())) {
+                id_map[iset->second()] = next_id++;
             }
         }
     }
 
-    return idMap;
+    return id_map;
 }
 
-void Serializer::collectDependencies(GeoObject* obj, std::unordered_set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::unordered_set<GeoObject*>& saveable) const {
+void Serializer::collectDependencies(GeoObject* obj, std::set<GeoObject*>& visited, std::vector<GeoObject*>& sorted, const std::set<GeoObject*>& saveable) const {
     if (visited.contains(obj)) {
             return;
         }
@@ -568,10 +568,10 @@ void Serializer::collectDependencies(GeoObject* obj, std::unordered_set<GeoObjec
         }
 
         // IntersectionPoint: IntersectionSet als implizite Quelle behandeln
-        if (auto* intersectionPoint = dynamic_cast<IntersectionPoint*>(obj)) {
+        if (auto* intersection_point = dynamic_cast<IntersectionPoint*>(obj)) {
             for (auto& [geoObj, unused] : m_adapter->geoGraphicsItems()) {
                 if (auto* iset = dynamic_cast<IntersectionSet*>(geoObj)) {
-                    if (iset->first() == intersectionPoint || iset->second() == intersectionPoint) {
+                    if (iset->first() == intersection_point || iset->second() == intersection_point) {
                         if (saveable.contains(iset)) {
                             collectDependencies(iset, visited, sorted, saveable);
                         }
@@ -584,11 +584,11 @@ void Serializer::collectDependencies(GeoObject* obj, std::unordered_set<GeoObjec
         sorted.push_back(obj);
 }
 
-auto Serializer::collectSaveableObjects() const -> std::unordered_set<GeoObject*> {
+auto Serializer::collectSaveableObjects() const -> std::set<GeoObject*> {
     const auto& items = m_adapter->geoGraphicsItems();
     // Alle validen Objekte speichern - auch ausgeblendete (Sichtbarkeit wird separat als Attribut "visible"
     // mitgespeichert - siehe serisalizeObject())
-    std::unordered_set<GeoObject*> saveable;
+    std::set<GeoObject*> saveable;
     for (const auto& [obj, item] : items) {
         if (!obj->isValid()) {
             continue;

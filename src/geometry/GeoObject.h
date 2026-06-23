@@ -1,6 +1,5 @@
 #pragma once
-
-#include <unordered_set>
+#include <set>
 #include "../Structs.h"
 
 class UpdateGuard;
@@ -12,8 +11,8 @@ public:
 
     // Getter
     [[nodiscard]] auto isValid() const -> bool { return m_valid; }
-    auto dependents() -> std::unordered_set<GeoObject*> { return m_dependents; }
-    auto sources() -> std::unordered_set<GeoObject*>& { return m_sources; }
+    auto dependents() -> std::set<GeoObject*> { return m_dependents; }
+    auto sources() -> std::set<GeoObject*>& { return m_sources; }
 
     // Objekt aktualisieren
     void addDependent(GeoObject* dep);
@@ -29,8 +28,8 @@ protected:
     void notify();
     void notifyDirect();
 
-    std::unordered_set<GeoObject*> m_dependents;
-    std::unordered_set<GeoObject*> m_sources;
+    std::set<GeoObject*> m_dependents;
+    std::set<GeoObject*> m_sources;
     bool m_valid = true;
 
 private:

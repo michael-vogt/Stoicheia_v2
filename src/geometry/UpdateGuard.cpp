@@ -3,7 +3,8 @@
 #include <functional>
 #include <queue>
 #include <stdexcept>
-#include <unordered_map>
+#include <map>
+#include <iostream>
 
 void updateGuardDequeue(class GeoObject *obj) {
     UpdateGuard::dequeue(obj);
@@ -11,24 +12,40 @@ void updateGuardDequeue(class GeoObject *obj) {
 
 int UpdateGuard::depth = 0;
 bool UpdateGuard::flushing = false;
-std::unordered_set<GeoObject*> UpdateGuard::pending;
+
+UpdateGuard::~UpdateGuard() { // NOLINT
+    if (--depth == 0) {
+        try {
+            flush();
+        } catch (const std::runtime_error& e) {
+            // Log the error, but don't throw from the destructor
+            std::cerr << "Error during UpdateGuard flush: " << e.what();
+        }
+    }
+}
+
+auto UpdateGuard::pending() -> std::set<GeoObject*>& {
+    static std::set<GeoObject*> instance;
+    return instance;
+}
+
 
 void UpdateGuard::flush() {
-    std::unordered_map<GeoObject*, int> inDegree;
-    for (GeoObject* obj : pending) {
-        inDegree[obj] = 0;
+    std::map<GeoObject*, int> in_degree;
+    for (GeoObject* obj : pending()) {
+        in_degree[obj] = 0;
     }
 
-    for (GeoObject* obj : pending) {
+    for (GeoObject* obj : pending()) {
         for (GeoObject* dep : obj->dependents()) {
-            if (pending.contains(dep)) {
-                inDegree[dep]++;
+            if (pending().contains(dep)) {
+                in_degree[dep]++;
             }
         }
     }
 
     std::queue<GeoObject*> ready;
-    for (auto& [obj, degree] : inDegree) {
+    for (auto& [obj, degree] : in_degree) {
         if (degree == 0) {
             ready.push(obj);
         }
@@ -41,20 +58,20 @@ void UpdateGuard::flush() {
         order.push_back(obj);
 
         for (GeoObject* dep : obj->dependents()) {
-            if (!pending.contains(dep)) {
+            if (!pending().contains(dep)) {
                 continue;
             }
-            if (--inDegree[dep] == 0) {
+            if (--in_degree[dep] == 0) {
                 ready.push(dep);
             }
         }
     }
 
-    if (order.size() != pending.size()) {
+    if (order.size() != pending().size()) {
         throw std::runtime_error("Zyklus im Abhängigkeitsgraph!");
     }
 
-    pending.clear();
+    pending().clear();
     flushing = true;
     for (GeoObject* obj : order) {
         if (obj->isValid()) {
@@ -84,8 +101,8 @@ void GeoObject::notify() {
 }
 
 void GeoObject::notifyDirect() {
-    std::unordered_set<GeoObject*> visited;
-    std::function<void(GeoObject*)> propagate = [&](GeoObject* obj) {
+    std::set<GeoObject*> visited;
+    std::function<void(GeoObject*)> propagate = [&](GeoObject* obj) -> void {
         for (GeoObject* dep : obj->dependents()) {
             if (visited.contains(dep)) {
                 continue;

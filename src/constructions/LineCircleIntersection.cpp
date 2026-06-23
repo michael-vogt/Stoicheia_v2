@@ -65,9 +65,9 @@ void LineCircleIntersection::compute() {
         const double param_t = -coeff_b / (2*coeff_a);
         setResults(1, {.x=point1_x + (param_t*delta_x), .y=point1_y + (param_t*delta_y)});
     } else {
-        const double sqrtDiscriminant = sqrt(discriminant);
-        const double param_t1 = (-coeff_b - sqrtDiscriminant) / (2*coeff_a);
-        const double param_t2 = (-coeff_b + sqrtDiscriminant) / (2*coeff_a);
+        const double sqrt_discriminant = sqrt(discriminant);
+        const double param_t1 = (-coeff_b - sqrt_discriminant) / (2*coeff_a);
+        const double param_t2 = (-coeff_b + sqrt_discriminant) / (2*coeff_a);
         setResults(2, 
             {.x=point1_x + (param_t1*delta_x), .y=point1_y + (param_t1*delta_y)},
             {.x=point1_x + (param_t2*delta_x), .y=point1_y + (param_t2*delta_y)});

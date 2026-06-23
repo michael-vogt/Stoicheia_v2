@@ -1,8 +1,8 @@
 #include "MergePointsCommand.h"
 #include "Structs.h"
 
-MergePointsCommand::MergePointsCommand(SceneAdapter *adapter, Point *survivor, Point *absorbed)
-    : m_adapter(adapter), m_survivor(survivor), m_absorbed(absorbed)
+MergePointsCommand::MergePointsCommand(SceneAdapter *adapter, PointPairForMergePointCommand points)
+    : m_adapter(adapter), m_survivor(points.survivor), m_absorbed(points.absorbed)
 {}
 
 void MergePointsCommand::execute() {

@@ -21,7 +21,7 @@ struct LinePoints {
 /*
  * Functions
  */
-LineParameters lineParametersFromPoints(const Point* p1, const Point* p2);
-LinePoints linePointsFromParameters(double a, double b, double c);
+LineParameters lineParametersFromPoints(const Point* point1, const Point* point2);
+LinePoints linePointsFromParameters( double param_a,  double param_b,  double param_c);
 
 bool polygonPointsFormConvexPolygon(const std::vector<Point*>& points);

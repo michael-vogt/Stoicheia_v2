@@ -1,6 +1,6 @@
 #pragma once
 #include <QGraphicsScene>
-#include <unordered_map>
+#include <map>
 #include "../geometry/Scene.h"
 #include "GeoGraphicsItem.h"
 #include "GeoPointItem.h"
@@ -39,9 +39,9 @@ public:
 
     // Zugriff auf das grafische Objekt zu einem Geometrie-Objekt
     auto itemFor(GeoObject* geoObject) const -> GeoGraphicsItem*;
-    auto geoGraphicsItems() -> std::unordered_map<GeoObject*, GeoGraphicsItem*>& { return m_map; }
+    auto geoGraphicsItems() -> std::map<GeoObject*, GeoGraphicsItem*>& { return m_map; }
 
-    [[nodiscard]] auto intersectionSets() const -> const std::unordered_set<IntersectionSet*>& { return m_intersectionSets; }
+    [[nodiscard]] auto intersectionSets() const -> const std::set<IntersectionSet*>& { return m_intersectionSets; }
 
     auto radiusPointFor(const Point* centerPoint) const -> Point*;
     [[nodiscard]] auto geoScene() const -> Scene* { return m_geoScene; }
@@ -49,7 +49,7 @@ public:
     void select(GeoObject* geoObject);
     void deselect(GeoObject* geoObject);
     void clearSelection();
-    [[nodiscard]] auto selection() const -> const std::unordered_set<GeoObject*>& { return m_selection; }
+    [[nodiscard]] auto selection() const -> const std::set<GeoObject*>& { return m_selection; }
 
     void clear();
     void highlight(GeoObject* obj, bool isHighlighted);
@@ -65,7 +65,7 @@ public:
     void transferStyle(GeoObjectPair pair);
 
     void copySelection();
-    [[nodiscard]] auto clipboard() const -> std::unordered_set<GeoObject*> { return m_clipboard; };
+    [[nodiscard]] auto clipboard() const -> std::set<GeoObject*> { return m_clipboard; };
 
 signals:
     void selectionChanged();
@@ -81,10 +81,10 @@ private:
     Scene*          m_geoScene;
     QGraphicsScene* m_qtScene;
 
-    std::unordered_map<GeoObject*, GeoGraphicsItem*> m_map;
-    std::unordered_map<GeoObject*, ObjectStyle> m_styles;
-    std::unordered_set<GeoObject*> m_selection;
-    std::unordered_set<IntersectionSet*> m_intersectionSets;
-    std::unordered_set<GeoObject*> m_clipboard;
+    std::map<GeoObject*, GeoGraphicsItem*> m_map;
+    std::map<GeoObject*, ObjectStyle> m_styles;
+    std::set<GeoObject*> m_selection;
+    std::set<IntersectionSet*> m_intersectionSets;
+    std::set<GeoObject*> m_clipboard;
 
 };

@@ -9,25 +9,28 @@ SetColorCommand::SetColorCommand(SceneAdapter* adapter, GeoObject* object, const
 {
     // Alte Farbe aus dem Item lesen
     if (auto* item = m_adapter->itemFor(m_object)) {
-        if (auto* pi = dynamic_cast<GeoPointItem*>(item))
-            m_oldColor = pi->pen().color();
-        else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item))
-            m_oldColor = li->pen().color();
-        else if (auto* ci = dynamic_cast<GeoCircleItem*>(item))
-            m_oldColor = ci->pen().color();
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            m_oldColor = point_item->pen().color();
+        }else if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            m_oldColor = linear_item->pen().color();
+        } else if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+            m_oldColor = circle_item->pen().color();
+        }
     }
 }
 
 void SetColorCommand::applyColor(SceneAdapter* adapter, GeoObject* obj, const QColor& color) {
     auto* item = adapter->itemFor(obj);
-    if (!item) return;
+    if (item == nullptr) {
+        return;
+    }
 
-    if (auto* pi = dynamic_cast<GeoPointItem*>(item)) {
-        QPen pen = pi->pen(); pen.setColor(color); pi->setPen(pen);
-    } else if (auto* li = dynamic_cast<GeoLinearObjectItem*>(item)) {
-        QPen pen = li->pen(); pen.setColor(color); li->setPen(pen);
-    } else if (auto* ci = dynamic_cast<GeoCircleItem*>(item)) {
-        QPen pen = ci->pen(); pen.setColor(color); ci->setPen(pen);
+    if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+        QPen pen = point_item->pen(); pen.setColor(color); point_item->setPen(pen);
+    } else if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+        QPen pen = linear_item->pen(); pen.setColor(color); linear_item->setPen(pen);
+    } else if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+        QPen pen = circle_item->pen(); pen.setColor(color); circle_item->setPen(pen);
     }
 }
 

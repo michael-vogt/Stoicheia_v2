@@ -68,7 +68,7 @@ m_snapshotGeneral(settings.general)
     ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
     ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Standard"));
 
-    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() { apply(); accept(); });
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() -> void { apply(); accept(); });
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &SettingsDialog::apply);
     connect(ui->buttonBox->button(QDialogButtonBox::Reset), &QPushButton::clicked, this, &SettingsDialog::resetToDefaults);
@@ -89,7 +89,7 @@ void SettingsDialog::changeEvent(QEvent* event) {
     QDialog::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
-        QTimer::singleShot(0, this, [this]() {
+        QTimer::singleShot(0, this, [this]() -> void {
             ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
             ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Abbrechen"));
             ui->buttonBox->button(QDialogButtonBox::Apply)->setText(tr("Anwenden"));
@@ -110,10 +110,10 @@ void SettingsDialog::resetToDefaults() const {
 }
 
 void SettingsDialog::fillLanguages() const {
-    auto languageMap = buildLanguageMap(":/i18n/");
+    auto language_map = buildLanguageMap(":/i18n/");
 
     QVector<QPair<QString, QString>> list;
-    for (auto it = languageMap.begin(); it != languageMap.end(); ++it) {
+    for (auto it = language_map.begin(); it != language_map.end(); ++it) {
         list.append({it.key(), it.value()});
     }
 

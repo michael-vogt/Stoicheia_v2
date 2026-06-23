@@ -24,6 +24,11 @@ struct PointPairForCircle {
     Point* radiusPoint;
 };
 
+struct PointPairForMergePointCommand {
+    Point* survivor;
+    Point* absorbed;
+};
+
 class GeoObject;
 
 struct GeoObjectPair {

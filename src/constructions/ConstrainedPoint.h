@@ -9,10 +9,10 @@ class ConstrainedPointOnLine : public Point {
 public:
     ConstrainedPointOnLine(LinearObject* line, DoublePair point);
 
-    LinearObject* line() const { return m_line; }
-    double param() const { return m_param; }
+    [[nodiscard]] LinearObject* line() const { return m_line; }
+    [[nodiscard]] double param() const { return m_param; }
 
-    void setParam(double t);
+    void setParam(double param_t);
     void recompute() override;
     void onSourceRemoved(GeoObject* src) override;
     void replaceSource(GeoObjectPair source) override;
@@ -28,8 +28,8 @@ class ConstrainedPointOnCircle : public Point {
 public:
     ConstrainedPointOnCircle(Circle* circle, DoublePair point);
 
-    Circle* circle() const { return m_circle; }
-    double angle() const { return m_angle; }
+    [[nodiscard]] Circle* circle() const { return m_circle; }
+    [[nodiscard]] double angle() const { return m_angle; }
 
     void setAngle(double angle);
     void recompute() override;

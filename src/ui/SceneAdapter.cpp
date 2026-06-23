@@ -172,18 +172,18 @@ void SceneAdapter::setColor(GeoObject* obj, const QColor& color) {
         return;
     }
 
-    if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-        QPen pen = pointItem->pen();
+    if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+        QPen pen = point_item->pen();
         pen.setColor(color);
-        pointItem->setPen(pen);
-    } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
-        QPen pen = linearItem->pen();
+        point_item->setPen(pen);
+    } else if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+        QPen pen = linear_item->pen();
         pen.setColor(color);
-        linearItem->setPen(pen);
-    } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
-        QPen pen = circleItem->pen();
+        linear_item->setPen(pen);
+    } else if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+        QPen pen = circle_item->pen();
         pen.setColor(color);
-        circleItem->setPen(pen);
+        circle_item->setPen(pen);
     }
 }
 
@@ -195,14 +195,14 @@ auto SceneAdapter::colorOf(GeoObject* obj) const -> QColor {
 
     // Fallback: Farbe ausa aktuellem Item lesen
     if (auto* item = itemFor(obj)) {
-        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-            return pointItem->pen().color();
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            return point_item->pen().color();
         }
-        if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
-            return linearItem->pen().color();
+        if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            return linear_item->pen().color();
         }
-        if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
-            return circleItem->pen().color();
+        if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+            return circle_item->pen().color();
         }
     }
 
@@ -228,18 +228,18 @@ void SceneAdapter::applyStyle(GeoObject* obj, GeoGraphicsItem* item) const {
 
     const ObjectStyle& style = iter->second;
     if (style.color.isValid()) {
-        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-            QPen pen = pointItem->pen();
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            QPen pen = point_item->pen();
             pen.setColor(style.color);
-            pointItem->setPen(pen);
-        } else if (auto* linearItem = dynamic_cast<GeoLinearObjectItem*>(item)) {
-            QPen pen = linearItem->pen();
+            point_item->setPen(pen);
+        } else if (auto* linear_item = dynamic_cast<GeoLinearObjectItem*>(item)) {
+            QPen pen = linear_item->pen();
             pen.setColor(style.color);
-            linearItem->setPen(pen);
-        } else if (auto* circleItem = dynamic_cast<GeoCircleItem*>(item)) {
-            QPen pen = circleItem->pen();
+            linear_item->setPen(pen);
+        } else if (auto* circle_item = dynamic_cast<GeoCircleItem*>(item)) {
+            QPen pen = circle_item->pen();
             pen.setColor(style.color);
-            circleItem->setPen(pen);
+            circle_item->setPen(pen);
         }
     }
     item->setVisible(style.visible);

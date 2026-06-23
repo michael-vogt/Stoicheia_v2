@@ -20,7 +20,7 @@ InputManager::InputManager(DrawingBoard* board, QObject* parent)
     // Escape-Shortcut direkt auf dem DrawingBoard – greift auch während Drag
     auto* escShortcut = new QShortcut(Qt::Key_Escape, m_board); // NOLINT
     escShortcut->setContext(Qt::WidgetWithChildrenShortcut);
-    connect(escShortcut, &QShortcut::activated, [this]() {
+    connect(escShortcut, &QShortcut::activated, [this]() -> void {
         // 1. Shortcut-Modus abbrechen
         if (m_shortcutMode != ShortcutMode::None) {
             setShortcutMode(ShortcutMode::None);
@@ -31,10 +31,10 @@ InputManager::InputManager(DrawingBoard* board, QObject* parent)
         }
         // 2. Tool fragen
         if (m_activeTool) {
-            QKeyEvent escEvent(QEvent::KeyPress,
+            QKeyEvent esc_event(QEvent::KeyPress,
                                Qt::Key_Escape, Qt::NoModifier);
-            m_activeTool->keyPressEvent(&escEvent);
-            if (escEvent.isAccepted()) {
+            m_activeTool->keyPressEvent(&esc_event);
+            if (esc_event.isAccepted()) {
                 return;
             }
         }
@@ -101,17 +101,17 @@ void InputManager::handleWheel(QWheelEvent* event) {
     if (m_spacePressed) { event->ignore(); return; }
 
     double factor = event->angleDelta().y() > 0 ? UiMetricsConstants::ZOOM_FACTOR : UiMetricsConstants::ZOOM_FACTOR_INV;
-    QPoint mousePos = event->position().toPoint();
+    QPoint mouse_pos = event->position().toPoint();
 
-    QPointF sceneBefore = m_board->mapToScene(mousePos);
+    QPointF scene_before = m_board->mapToScene(mouse_pos);
     m_board->scale(factor, factor);
 
-    QPointF delta = m_board->mapFromScene(sceneBefore) - QPointF(mousePos);
+    QPointF delta = m_board->mapFromScene(scene_before) - QPointF(mouse_pos);
     m_board->horizontalScrollBar()->setValue(m_board->horizontalScrollBar()->value() + qRound(delta.x()));
     m_board->verticalScrollBar()->setValue(m_board->verticalScrollBar()->value() + qRound(delta.y()));
 
-    double zoomPercent = std::abs(m_board->transform().m11()) * 100.0;
-    emit zoomChanged(zoomPercent);
+    double zoom_percent = std::abs(m_board->transform().m11()) * 100.0;
+    emit zoomChanged(zoom_percent);
     //m_board->notifyZoomFactorChanged(factor);
 
     event->accept();
@@ -278,61 +278,61 @@ void InputManager::handleShortcutKey(QKeyEvent* event) {
     }
 
     if (m_shortcutMode == ShortcutMode::Geometry) {
-        int subType = -1;
-        int toolType = -1;
+        int sub_type = -1;
+        int tool_type = -1;
         switch (event->key()) {
             case Qt::Key_P:
-                toolType = static_cast<int>(ToolType::CreatePoint);
+                tool_type = static_cast<int>(ToolType::CreatePoint);
                 break;
             case Qt::Key_L:
-                toolType = static_cast<int>(ToolType::CreateLine);
-                subType  = static_cast<int>(LinearObjectType::Line);
+                tool_type = static_cast<int>(ToolType::CreateLine);
+                sub_type  = static_cast<int>(LinearObjectType::Line);
                 break;
             case Qt::Key_R:
-                toolType = static_cast<int>(ToolType::CreateRay);
-                subType  = static_cast<int>(LinearObjectType::Ray);
+                tool_type = static_cast<int>(ToolType::CreateRay);
+                sub_type  = static_cast<int>(LinearObjectType::Ray);
                 break;
             case Qt::Key_S:
-                toolType = static_cast<int>(ToolType::CreateSegment);
-                subType  = static_cast<int>(LinearObjectType::Segment);
+                tool_type = static_cast<int>(ToolType::CreateSegment);
+                sub_type  = static_cast<int>(LinearObjectType::Segment);
                 break;
             case Qt::Key_C:
-                toolType = static_cast<int>(ToolType::CreateCircle);
+                tool_type = static_cast<int>(ToolType::CreateCircle);
                 break;
             default:
                 event->ignore();
                 return;
         }
         setShortcutMode(ShortcutMode::None);
-        emit toolChangeRequested({.toolType=toolType, .subType=subType});
+        emit toolChangeRequested({.toolType=tool_type, .subType=sub_type});
         event->accept();
         return;
     }
 
     if (m_shortcutMode == ShortcutMode::Construction) {
-        int toolType = -1;
+        int tool_type = -1;
         switch (event->key()) {
             case Qt::Key_S:
-                toolType = static_cast<int>(ToolType::CreateIntersection);
+                tool_type = static_cast<int>(ToolType::CreateIntersection);
                 break;
             case Qt::Key_M:
-                toolType = static_cast<int>(ToolType::CreateMidpoint);
+                tool_type = static_cast<int>(ToolType::CreateMidpoint);
                 break;
             case Qt::Key_P:
-                toolType = static_cast<int>(ToolType::CreateParallel);
+                tool_type = static_cast<int>(ToolType::CreateParallel);
                 break;
             case Qt::Key_E:
-                toolType = static_cast<int>(ToolType::CreatePerpendicular);
+                tool_type = static_cast<int>(ToolType::CreatePerpendicular);
                 break;
             case Qt::Key_L:
-                toolType = static_cast<int>(ToolType::CreatePerpendicularFoot);
+                tool_type = static_cast<int>(ToolType::CreatePerpendicularFoot);
                 break;
             default:
                 event->ignore();
                 return;
         }
         setShortcutMode(ShortcutMode::None);
-        emit toolChangeRequested({.toolType=toolType,.subType=0});
+        emit toolChangeRequested({.toolType=tool_type,.subType=0});
         event->accept();
         return;
     }
@@ -342,18 +342,18 @@ void InputManager::setShortcutMode(ShortcutMode mode) {
     m_shortcutMode = mode;
     emit shortcutModeChanged(mode);
 
-    constexpr int sbLeft = std::to_underlying(StatusBarPart::Left);
+    constexpr int sb_left = std::to_underlying(StatusBarPart::Left);
 
     switch (mode) {
         case ShortcutMode::None:
             break;
         case ShortcutMode::Geometry:
-            showStatus(sbLeft, tr("Geometrie: [P] Punkt  [L] Gerade  "
+            showStatus(sb_left, tr("Geometrie: [P] Punkt  [L] Gerade  "
                           "[R] Halbgerade  [S] Strecke  [C] Kreis  "
                           "[Esc] Abbrechen"));
             break;
         case ShortcutMode::Construction:
-            showStatus(sbLeft, tr("Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  "
+            showStatus(sb_left, tr("Konstruktion: [S] Schnittpunkt  [M] Mittelpunkt  "
                           "[P] Parallele  [E] Senkrechte  [L] Lotfußpunkt  "
                           "[Esc] Abbrechen"));
             break;

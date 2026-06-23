@@ -34,9 +34,9 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     if (m_centerPoint == nullptr) {
         // Erster Klick: Bestehenden Punkt nehmen oder neuen erzeugen
@@ -61,29 +61,29 @@ void CreateCircleTool::mousePressEvent(QMouseEvent *event) {
         auto macro = std::make_unique<MacroCommand>(tr("Kreis erstellen"));
 
         // erster Punkt ins Macro, falls wir ihn erstellt haben
-        CreatePointCommand* centerPointCmd = nullptr;
-        Point* centerPoint = m_centerPoint;
+        CreatePointCommand* center_point_cmd = nullptr;
+        Point* center_point = m_centerPoint;
         if (m_centerIsNew) {
             auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, m_centerScenePos.x(), m_centerScenePos.y());
-            centerPointCmd = cmd.get();
-            centerPoint = nullptr;
+            center_point_cmd = cmd.get();
+            center_point = nullptr;
             macro->add(std::move(cmd));
         }
 
         // zweiter Punkt
-        CreatePointCommand* radiusPointCmd = nullptr;
-        Point* radiusPoint = pointAt(scenePos);
+        CreatePointCommand* radius_point_cmd = nullptr;
+        Point* radius_point = pointAt(scene_pos);
 
-        if (radiusPoint == nullptr) {
+        if (radius_point == nullptr) {
             auto cmd = std::make_unique<CreatePointCommand>(m_ctx.adapter, snapped.x(), snapped.y());
-            radiusPointCmd = cmd.get();
-            radiusPoint = nullptr;
+            radius_point_cmd = cmd.get();
+            radius_point = nullptr;
             macro->add(std::move(cmd));
         }
 
         macro->add(std::make_unique<CreateCircleCommand>(m_ctx.adapter,
-             CreatePointCommandPairForCircle{.centerPointCmd=centerPointCmd, .radiusPointCmd=radiusPointCmd},
-             PointPairForCircle{.center=centerPoint, .radiusPoint=radiusPoint}
+             CreatePointCommandPairForCircle{.centerPointCmd=center_point_cmd, .radiusPointCmd=radius_point_cmd},
+             PointPairForCircle{.center=center_point, .radiusPoint=radius_point}
             ));
         m_ctx.commandStack->execute(std::move(macro));
 
@@ -101,9 +101,9 @@ void CreateCircleTool::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
 
-    bool snapActive = (event->modifiers() & Qt::AltModifier) != 0;
-    QPointF scenePos = m_ctx.drawingBoard->mapToScene(event->pos());
-    QPointF snapped = m_ctx.snapHelper->snap(scenePos, snapActive);
+    bool snap_active = (event->modifiers() & Qt::AltModifier) != 0;
+    QPointF scene_pos = m_ctx.drawingBoard->mapToScene(event->pos());
+    QPointF snapped = m_ctx.snapHelper->snap(scene_pos, snap_active);
 
     m_preview->setRect(computePreviewCircle(snapped));
 
@@ -116,22 +116,22 @@ auto CreateCircleTool::computePreviewCircle(const QPointF &scenePos) const -> QR
         return {};
     }
 
-    const QPointF centerPoint(m_centerPoint->x(), m_centerPoint->y());
-    const QPointF radiusPoint = scenePos;
+    const QPointF center_point(m_centerPoint->x(), m_centerPoint->y());
+    const QPointF radius_point = scenePos;
 
-    const double delta_x = radiusPoint.x() - centerPoint.x();
-    const double delta_y = radiusPoint.y() - centerPoint.y();
+    const double delta_x = radius_point.x() - center_point.x();
+    const double delta_y = radius_point.y() - center_point.y();
     const double radius = sqrt((delta_x * delta_x) + (delta_y * delta_y));
 
-    return QRectF(centerPoint.x() - radius, centerPoint.y() - radius, 2 * radius, 2 * radius);
+    return {center_point.x() - radius, center_point.y() - radius, 2 * radius, 2 * radius};
 }
 
 auto CreateCircleTool::pointAt(const QPointF &scenePos) const -> Point* {
     const auto items = m_ctx.drawingBoard->scene()->items(
         QRectF(scenePos - QPointF(8,8), QSizeF(16,16)));
     for (QGraphicsItem* item : items) {
-        if (auto* pointItem = dynamic_cast<GeoPointItem*>(item)) {
-            return pointItem->point();
+        if (auto* point_item = dynamic_cast<GeoPointItem*>(item)) {
+            return point_item->point();
         }
     }
     return nullptr;

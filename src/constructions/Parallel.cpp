@@ -9,8 +9,8 @@ Parallel::Parallel(Point *origin, LinearObject *reference)
     if (m_origin == nullptr || m_reference == nullptr) {
         throw std::invalid_argument("null argument");
     }
-    PointPairForLinearObject pointPair{.point1=&m_phantom, .point2=origin};
-    m_line = new Line(pointPair);
+    PointPairForLinearObject point_pair{.point1=&m_phantom, .point2=origin};
+    m_line = new Line(point_pair);
     m_origin->addDependent(this);
     m_reference->addDependent(this);
     Parallel::recompute();

@@ -3,74 +3,85 @@
 #include <cassert>
 #include <stdexcept>
 
-LineParameters lineParametersFromPoints(const Point* p1, const Point* p2) {
-    assert(p1 != nullptr);
-    assert(p2 != nullptr);
-    assert(p1 != p2);
+auto lineParametersFromPoints(const Point* point1, const Point* point2) -> LineParameters {
+    assert(point1 != nullptr);
+    assert(point2 != nullptr);
+    assert(point1 != point2);
 
-    const double x1 = p1->x();
-    const double y1 = p1->y();
-    const double x2 = p2->x();
-    const double y2 = p2->y();
+    const double pos_x1 = point1->x();
+    const double pos_y1 = point1->y();
+    const double pos_x2 = point2->x();
+    const double pos_y2 = point2->y();
 
-    return { y1 - y2, x2 - x1, x1 * y2 - x2 * y1 };
+    return { .a=pos_y1 - pos_y2, .b=pos_x2 - pos_x1, .c=(pos_x1 * pos_y2) - (pos_x2 * pos_y1) };
 }
 
-LinePoints linePointsFromParameters(const double a, const double b, const double c) {
-    if (a == 0 && b == 0)
+auto linePointsFromParameters(const double param_a, const double param_b, const double param_c) -> LinePoints {
+    if (param_a == 0 && param_b == 0) {
         throw std::invalid_argument("Either a or b must not be 0");
-
-    double x1, x2, y1, y2;
-    if (a != 0) {
-        y1 = 0;
-        x1 = -c / a;
-        y2 = 1;
-        x2 = -(b + c) / a;
-    } else {
-        x1 = 0;
-        y1 = -c / b;
-        x2 = 1;
-        y2 = -(a + c) / b;
     }
 
-    auto* p1 = new Point(x1, y1);
-    auto* p2 = new Point(x2, y2);
-
-    if (x1 < x2) {
-        return { p1, p2 };
-    } else if (x1 > x2) {
-        return { p2, p1 };
+    double pos_x1;
+    double pos_x2;
+    double pos_y1;
+    double pos_y2;
+    if (param_a != 0) {
+        pos_y1 = 0;
+        pos_x1 = -param_c / param_a;
+        pos_y2 = 1;
+        pos_x2 = -(param_b + param_c) / param_a;
     } else {
-        if (y1 < y2) {
-            return { p1, p2 };
-        } else {
-            return { p2, p1 };
-        }
+        pos_x1 = 0;
+        pos_y1 = -param_c / param_b;
+        pos_x2 = 1;
+        pos_y2 = -(param_a + param_c) / param_b;
     }
+
+    auto* point1 = new Point(pos_x1, pos_y1);
+    auto* point2 = new Point(pos_x2, pos_y2);
+
+    if (pos_x1 < pos_x2) {
+        return { .p1=point1, .p2=point2 };
+    } 
+    if (pos_x1 > pos_x2) {
+        return { .p1=point2, .p2=point1 };
+    }  
+    if (pos_y1 < pos_y2) {
+        return { .p1=point1, .p2=point2 };
+    }
+
+    return { .p1=point2, .p2=point1 };
+   
+   
 }
 
-bool polygonPointsFormConvexPolygon(const std::vector<Point *>& points) {
-    const size_t n = points.size();
-    if (n < 3) return false;
+auto polygonPointsFormConvexPolygon(const std::vector<Point *>& points) -> bool {
+    const size_t n_points = points.size();
+    if (n_points < 3) {
+        return false;
+    }
 
     int sign = 0;
-    bool foundTurn = false;
+    bool found_turn = false;
 
-    for (int i = 0; i < n; ++i) {
-        const Point* a = points[i];
-        const Point* b = points[(i+1) % n];
-        const Point* c = points[(i+2) % n];
+    for (size_t i = 0; i < n_points; ++i) {
+        const Point* param_a = points[i];
+        const Point* param_b = points[(i+1) % n_points];
+        const Point* param_c = points[(i+2) % n_points];
 
-        const double cross = (b->x() - a->x()) * (c->y() - b->y()) - (b->y() - a->y()) * (c->x() - b->x());
+        const double cross =
+            ((param_c->y() - param_b->y()) * (param_b->x() - param_a->x())) -
+            ((param_b->y() - param_a->y()) * (param_c->x() - param_b->x()));
 
         if (cross != 0) {
-            foundTurn = true;
+            found_turn = true;
             if (sign == 0) {
                 sign = (cross > 0) ? 1 : -1;
-            } else if ((cross > 0 && sign < 0) || (cross < 0 && sign > 0))
+            } else if ((cross > 0 && sign < 0) || (cross < 0 && sign > 0)) {
                 return false;
+            }
         }
     }
 
-    return foundTurn;
+    return found_turn;
 }

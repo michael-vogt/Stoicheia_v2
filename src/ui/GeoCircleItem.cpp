@@ -16,8 +16,8 @@ GeoCircleItem::GeoCircleItem(Circle* circle, QGraphicsItem* parent)
 auto GeoCircleItem::boundingRect() const -> QRectF {
     double radius = m_circle->radius();
     double extra = (m_pen.widthF() / 2) + 1.0;
-    return QRectF(-radius - extra, -radius - extra,
-                   (radius + extra) * 2, (radius + extra) * 2);
+    return {-radius - extra, -radius - extra,
+                   (radius + extra) * 2, (radius + extra) * 2};
 }
 
 void GeoCircleItem::paint(QPainter* painter,

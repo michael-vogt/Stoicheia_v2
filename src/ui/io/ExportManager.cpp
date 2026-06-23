@@ -18,13 +18,13 @@ void ExportManager::exportWithDialog() const {
         filters << exporter->fileFilter();
     }
 
-    QString selectedFilter;
+    QString selected_filter;
     QString filename = QFileDialog::getSaveFileName(
         m_parent,
         tr("Exportieren"),
         {},
         filters.join(";;"),
-        &selectedFilter);
+        &selected_filter);
 
     if (filename.isEmpty()) { 
         return;
@@ -32,7 +32,7 @@ void ExportManager::exportWithDialog() const {
 
     // Passenden Exporter finden
     for (const auto& exporter : m_exporters) {
-        if (selectedFilter == exporter->fileFilter()) {
+        if (selected_filter == exporter->fileFilter()) {
             if (!filename.endsWith("." + exporter->fileExtension())) {
                 filename += "." + exporter->fileExtension();
             }

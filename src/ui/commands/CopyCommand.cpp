@@ -13,11 +13,11 @@
 #include "geometry/Ray.h"
 #include "geometry/Segment.h"
 
-CopyCommand::CopyCommand(SceneAdapter *adapter, const std::unordered_set<GeoObject *> &selection, const QPointF &offset)
+CopyCommand::CopyCommand(SceneAdapter *adapter, const std::set<GeoObject *> &selection, const QPointF &offset)
     : m_adapter(adapter), m_offset(offset)
 {
     // Topologisch sortieren: Quellen vor Abhängigen
-    std::unordered_set<GeoObject *> visited;
+    std::set<GeoObject *> visited;
     std::function<void(GeoObject*)> collect = [&](GeoObject* obj) -> void {
         if (visited.contains(obj)) {
             return;
